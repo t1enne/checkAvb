@@ -1,0 +1,146 @@
+:root {
+  font-size: min(max(15px, calc(0.9375rem + ((1vw - 5px) * 0.3521))), 20px);
+  min-height: 0vw;
+}
+
+@media (max-width: 768px) {
+  /* :root{
+    font-size: 30px;
+  } */
+  .pull-right {
+    float: none;
+  }
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Raleway';
+}
+
+input {
+  border: none;
+  border-bottom: 1px solid lightblue;
+  padding: 1rem !important;
+  text-transform: uppercase;
+  margin: 1rem 0;
+}
+
+label {
+  font-weight: 400;
+}
+ul {
+  list-style-type: none;
+}
+.label {
+  font-size: 1rem;
+  margin: 0 5px;
+}
+.label-price {
+  background-color: #1c84c6;
+  color: #FFFFFF;
+  padding: .3rem;
+  border-radius: 10px;
+}
+.label-description {
+  padding: .3rem;
+  border-radius: 10px;
+  font-size:
+}
+.label-size {
+  padding: .3rem;
+  border-radius: 10px;
+  background-color: #61ca85;
+  color: white;
+  width: min-content;
+}
+.pull-right {
+  float: right;
+}
+
+img {
+  width: 15rem;
+}
+img.sku-picture {
+  display: block;
+  margin:auto;
+  width: 30vw;
+  margin-bottom: .2rem;
+  border-radius: 10px;
+}
+
+.nav {
+  margin: auto;
+  text-align: center;
+}
+
+.results {
+  text-align: left;
+  margin: 5rem auto;
+  width: 75%;
+
+}
+
+.results * {
+  cursor: default;
+}
+.sku-wrapper {
+  border-radius: 10px;
+  border: 2px solid #d9d9d9;
+  padding: .5rem;
+
+}
+.sku {
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.sizes-wrapper {
+  transform: scaleY(1);
+  transform-origin: top;
+  transition: all 0.25s ease;
+  margin: 1rem 15px 15px 15px;
+  font-size: 1.1rem;
+}
+
+.sizes-wrapper.hidden {
+  transform: scaleY(0);
+  border: none;
+  overflow: hidden;
+  max-height: 0;
+}
+
+.button-primary {
+  display: block;
+  margin: auto;
+  background: transparent;
+  border: 1px solid lightblue;
+  border-radius: 10px;
+  height: 3rem;
+  width: 75%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.svg-icon {
+  width: 1.5em;
+  height: 1.5em;
+}
+
+.svg-icon path,
+.svg-icon polygon,
+.svg-icon rect {
+  fill: white;
+}
+
+.svg-icon circle {
+  stroke: #4691f6;
+  stroke-width: 1;
+}
+.loader {
+  text-align: center;
+}
+.loader.hidden {
+  display: none;
+}
