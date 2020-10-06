@@ -1,14 +1,19 @@
-:root {
+/* :root {
   font-size: min(max(15px, calc(0.9375rem + ((1vw - 5px) * 0.3521))), 20px);
   min-height: 0vw;
-}
-
-@media (max-width: 768px) {
+} */
+@media (min-width: 300px) {
   /* :root{
-    font-size: 30px;
+    font-size: 40px !important;
   } */
   .pull-right {
     float: none;
+  }
+  body {
+    font-size: 1em;
+  }
+  input {
+    height: 5rem;
   }
 }
 * {
@@ -25,7 +30,9 @@ input {
   text-transform: uppercase;
   margin: 1rem 0;
 }
-
+input[type=checkbox] {
+  height: 0px;
+}
 label {
   font-weight: 400;
 }
@@ -57,7 +64,9 @@ ul {
 .pull-right {
   float: right;
 }
-
+.row.model {
+  margin:auto;
+}
 img {
   width: 15rem;
 }
@@ -86,9 +95,9 @@ img.sku-picture {
 }
 .sku-wrapper {
   border-radius: 10px;
-  border: 2px solid #d9d9d9;
+  border: .5px solid #93d1f7;
   padding: .5rem;
-
+  margin: 1rem;
 }
 .sku {
   cursor: pointer;

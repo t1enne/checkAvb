@@ -3,9 +3,7 @@ const fetch = require('node-fetch');
 // const fs = require('fs');
 // const fileType = require('file-type');
 
-let data = {
-  results: {}
-}
+let data = {}
 
 async function getCookie() {
   let cookie = await fetch("https://websmart.brunellocucinelli.it/bcweb/LOGIN.pgm", {
@@ -127,6 +125,7 @@ async function availabilityRequest(model, color, onlyImage) {
       sku.model = $(tds[2]).find('a').text().split('+')[1].trim()
       sku.color = tds[3].children[0]['data']
       sku.descr = $(tds[4]).text();
+
       let price = getPrice(headers, sku.year, sku.season, model)
       sku.price = await price;
       sku.sizes = {};
@@ -134,9 +133,9 @@ async function availabilityRequest(model, color, onlyImage) {
       sku.string = `${sku.year}${sku.season} ${sku.model} ${sku.color}`;
 
       // IF ONLYIMAGE IS TRUE GET THE PICTURE
-      if (i == 0) {
+      if (i == 0 && onlyImage == true) {
         let pic = getImage(headers, sku.year, sku.season, sku.model)
-        data.results.picture = await pic;
+        sku.picture = await pic;
       }
 
       // CHECK AVAILABLE SIZES
@@ -171,6 +170,7 @@ async function availabilityRequest(model, color, onlyImage) {
           // PUSH THE RESULTS FOR THIS SKU INTO RESULTS
           if (size) {
             data.results[`${i}`] = sku;
+            console.log('pushed ' + i);
           }
         }
       }
@@ -183,6 +183,7 @@ async function availabilityRequest(model, color, onlyImage) {
 async function getAvb(model, color, onlyImage) {
   try {
     await availabilityRequest(model, color, onlyImage);
+    console.log(data.results);
     return data.results
   } catch (e) {
     console.log(e.message);

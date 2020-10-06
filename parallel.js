@@ -51,22 +51,28 @@ async function getPrice(headers, year, season, model) {
       let p = $('tr.altcol2:nth-child(7) > td:nth-child(2)').text()
       return p
     })
+  console.log(price);
   return price
 }
 
 async function getImage(headers, year, season, model) {
   console.log(`fetching image ${model}`);
+  let start = Date.now()
 
-  let pic = fetch(`https://websmart.brunellocucinelli.it/nsd/BC/modelli/${year}${season}/${model}_1.jpg`, {
+  let buffer = await fetch(`https://websmart.brunellocucinelli.it/nsd/BC/modelli/${year}${season}/${model}_1.jpg`, {
       "credentials": "include",
       "headers": headers,
       "referrer": "https://websmart.brunellocucinelli.it/bcweb/WRTICMO10R.pgm",
       "method": "GET",
       "mode": "cors"
-    }).then(res => res.buffer())
-    .then(buffer => Buffer.from(buffer).toString('base64'))
+    })
+    .then(res => res.buffer())
 
-  return pic
+  let end = Date.now()
+  console.log((end - start) / 1000);
+
+  let b64 = Buffer.from(buffer).toString('base64')
+  return `data:image/jpeg;base64,${b64}`
 }
 
 async function availabilityRequest(model, color, onlyImage) {
@@ -110,93 +116,131 @@ async function availabilityRequest(model, color, onlyImage) {
 
     //CREATE ARRAY OF PROMISES FOR PRICES
     let promises = [];
+    //CREATE ARRAY OF PROMISES FOR shops
+    let shopPromises = []
+
+    //FUNCTION THAT WILL BE INSIDE THE LOOP
+    let avb = async (i) => {
+      let $element = $(rows[i]);
+
+      let sku = {}
+      let tds = Object.values($element.find($('td')));
+
+      sku.year = $(tds[0]).text().split(' ')[1].trim().slice(-2)
+      sku.season = $(tds[0]).text().search('A/I') === 0 ? '2' : '1'
+      sku.model = $(tds[2]).find('a').text().split('+')[1].trim()
+      sku.color = tds[3].children[0]['data']
+      sku.descr = $(tds[4]).text();
+      sku.string = sku.year + sku.season + ' ' + sku.model + ' ' + sku.color
+
+      // let p = getPrice(headers, sku.year, sku.season, sku.model)
+      // let res = [];
+      // if (onlyImage == true && i === 0) {
+      //   let pic = getImage(headers, sku.year, sku.season, sku.model);
+      //   res = [await pic, await p]
+      //   sku.pic = pic
+      // } else {
+      //   res = [await p]
+      // }
+      // sku.price = p
+
+      let sizes = {};
+
+      // CHECK AVAILABLE SIZES
+
+      let shops = async (y) => {
+        let td = tds[y]
+
+        if ($(td).attr('onclick') != undefined) {
+
+          let reqSize = $(td).attr('onclick').split(',')[4].slice(1, 3)
+
+          let fetchUrl = `https:/` + `/websmart.brunellocucinelli.it/bcweb/WRTICMO10R.pgm?TASK=dett&BCRSTGANN=${sku.year}&BCRSTGSIG=${sku.season}&BCRMODELL=${sku.model}&BCRCOLORE=${sku.color}&idx_taglia=${reqSize}`;
+
+          await fetch(fetchUrl, {
+              "credentials": "include",
+              "headers": headers,
+              "referrer": "https://websmart.brunellocucinelli.it/bcweb/WRTICMO10R.pgm",
+              "method": "GET",
+              "mode": "cors"
+            })
+            .then(res => res.text())
+            .then(text => {
+              let $r = cheerio.load(text)
+              // TODO: order the results for size
+              let size = $r('table.mainlist:nth-child(1) > thead:nth-child(1) > tr:nth-child(4) > th:nth-child(2)').text().trim();
+              sizes[y] = {}
+              sizes[y][size] = []
+
+              let shops = $r('table.mainlist:nth-child(2) > tbody:nth-child(2) > tr > td:nth-child(2)')
+
+              for (let z = 0; z < shops.length; z++) {
+                sizes[y][size].push($r(shops[z]).text())
+              }
+              sku.sizes = sizes;
+            });
+        }
+      }
+
+      for (let y = 0; y < tds.length; y++) {
+        shopPromises.push(shops(y))
+      }
+
+      await Promise.all(shopPromises)
+        .then(() => {
+          console.log('done fetching shops');
+        })
+
+      let price = getPrice(headers, sku.year, sku.season, sku.model)
+
+      if (onlyImage === true && i === 0) {
+        console.log('getting picture');
+        let pic = getImage(headers, sku.year, sku.season, sku.model);
+        let res = [await pic, await price]
+        data.results.picture = res[0]
+        sku.price = res[1]
+      } else {
+        let res = await price
+        sku.price = res
+      }
+
+
+
+      // STORE HERE INFO ON SINGLE SKU
+      skus[i] = {}
+      skus[i] = sku;
+      return sku
+    }
 
     //LOOP OVER EACH SKU
     for (let i = 0; i < rows.length; i++) {
-
-      let avb = async (i) => {
-        let $element = $(rows[i]);
-
-        let sku = {}
-        let tds = Object.values($element.find($('td')));
-
-        sku.year = $(tds[0]).text().split(' ')[1].trim().slice(-2)
-        sku.season = $(tds[0]).text().search('A/I') === 0 ? '2' : '1'
-        sku.model = $(tds[2]).find('a').text().split('+')[1].trim()
-        sku.color = tds[3].children[0]['data']
-        sku.descr = $(tds[4]).text();
-
-        // if (onlyImage && i === 0) {
-        //   let pic = async () => {
-        //     getImage(headers, sku.year, sku.season, sku.model);
-        //   }
-        getPrice(headers, sku.year, sku.season, sku.model)
-
-        // IF ONLYIMAGE IS TRUE GET THE PICTURE
-
-        //   sku.sizes = {};
-        //   sku.shops = [];
-        //   sku.string = `${sku.year}${sku.season} ${sku.model} ${sku.color}`;
-        //
-        //
-        //
-        //   // CHECK AVAILABLE SIZES
-        //
-        //   for (let y = 0; y < tds.length; y++) {
-        //     let td = tds[y]
-        //
-        //     if ($(td).attr('onclick') != undefined) {
-        //       let reqSize = $(td).attr('onclick').split(',')[4].slice(1, 3)
-        //
-        //       let fetchUrl = `https:/` + `/websmart.brunellocucinelli.it/bcweb/WRTICMO10R.pgm?TASK=dett&BCRSTGANN=${sku.year}&BCRSTGSIG=${sku.season}&BCRMODELL=${sku.model}&BCRCOLORE=${sku.color}&idx_taglia=${reqSize}`;
-        //
-        //       fetch(fetchUrl, {
-        //           "credentials": "include",
-        //           "headers": headers,
-        //           "referrer": "https://websmart.brunellocucinelli.it/bcweb/WRTICMO10R.pgm",
-        //           "method": "GET",
-        //           "mode": "cors"
-        //         })
-        //         .then(res => res.text())
-        //         .then(text => {
-        //           let $r = cheerio.load(text)
-        //           let size = $r('table.mainlist:nth-child(1) > thead:nth-child(1) > tr:nth-child(4) > th:nth-child(2)').text().trim();
-        //           sku.sizes[size] = []
-        //
-        //           let shops = $r('table.mainlist:nth-child(2) > tbody:nth-child(2) > tr > td:nth-child(2)')
-        //           for (let z = 0; z < shops.length; z++) {
-        //             sku.sizes[size].push($r(shops[z]).text())
-        //           }
-        //           //console.log(sku.sizes);
-        //
-        //           // PUSH THE RESULTS FOR THIS SKU INTO RESULTS
-        //           if (size) {
-        //             data.results[`${element}`] = sku;
-        //           }
-        //         })
-        //     }
-        //   }
-        // }
-        //
-        // STORE HERE INFO ON SINGLE SKU
-        skus[i] = {}
-        skus[i] = sku;
-      }
-      promises.push(avb)
-      // GET ALL THE PRICES
-      Promise.all(promises).then(values => {
-        console.log(values);
-      })
+      promises.push(avb(i))
     }
+
+    await Promise.all(promises)
+      .then((sku) => {
+        sku.forEach((item, i) => {
+          data.results[`${i}`] = item
+        });
+
+
+      })
+
+    // LOOP OVER THE SHOPS
+
+
+
+
   } catch (e) {
     console.log(e);
   }
+  return data.results
 }
 
 async function getAvb(model, color, onlyImage) {
   try {
-    await availabilityRequest(model, color, onlyImage);
-    return data.results
+    let results = await availabilityRequest(model, color, onlyImage);
+    return results
   } catch (e) {
     console.log(e.message);
   }

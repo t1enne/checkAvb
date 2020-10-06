@@ -25,7 +25,7 @@ async function getAvb(model, color, onlyImage) {
 
 
 
-  if (onlyImage == true) {
+  if (onlyImage === true) {
     console.log(`displaying image: ${onlyImage}`);
     let img = make('img', 'sku-picture', resultsElement)
     img.src = res.picture;
@@ -70,10 +70,12 @@ async function getAvb(model, color, onlyImage) {
         classy(sizesWrapper, 'hidden', 'toggle')
       })
       let sizes = Object.keys(sku.sizes)
+      let sizeLabels = Object.values(sku.sizes)
 
       sizes.forEach((size, y) => {
+        let sizeLabel = Object.keys(sizeLabels[y])
         let sizeElement = make('li', `size size-${y}`, sizesList);
-        sizeElement.innerHTML = ` <label class="label-size"> ${size} </label>`;
+        sizeElement.innerHTML = ` <label class="label-size"> ${sizeLabel} </label>`;
 
         let shopWrapper = make('ul', 'shops-wrapper', sizesList);
 
@@ -87,11 +89,11 @@ async function getAvb(model, color, onlyImage) {
   });
 }
 
-// function typedArrayToURL(typedArray, mimeType) {
-//   return URL.createObjectURL(new Blob([typedArray.buffer], {
-//     type: mimeType
-//   }))
-// }
+function typedArrayToURL(typedArray, mimeType) {
+  return URL.createObjectURL(new Blob([typedArray.buffer], {
+    type: mimeType
+  }))
+}
 
 function make(element, classes, parent) {
   let e = document.createElement(element);
