@@ -4,8 +4,8 @@ const getAvb = require('./parallel.js');
 const app = express();
 
 app.use(express.static('public'));
-app.get('/api/avb/:model/:color/img=:onlyImage', async (req, res) => {
-  const avb = await getAvb(req.params.model, req.params.color, req.params.onlyImage);
+app.get('/api/avb/:model/:color/img=:withImage', async (req, res) => {
+  const avb = await getAvb(req.params.model, req.params.color, req.params.withImage);
   res.json(avb)
 })
 

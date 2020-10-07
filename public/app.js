@@ -5,28 +5,27 @@ const loader = document.querySelector('.loader');
 button.addEventListener('click', async () => {
   let model = document.querySelector('.model-input').value === '' ? 'm' : document.querySelector('.model-input').value
   let color = document.querySelector('.color-input').value === '' ? 'c' : document.querySelector('.color-input').value
-  let onlyImage = document.querySelector('.only-image').checked === true ? true : false;
+  let withImage = document.querySelector('.only-image').checked === true ? 1 : 0;
 
   let start = Date.now();
-  await getAvb(model, color, onlyImage)
+  await getAvb(model, color, withImage)
   let end = Date.now()
 
   let elapsed = (end - start) / 1000
   console.log(`Elapsed time: ${elapsed}`);
 })
 
-async function getAvb(model, color, onlyImage) {
+async function getAvb(model, color, withImage) {
   resultsElement.innerHTML = '';
   classy(loader, 'hidden', 'remove');
-  const res = await fetch(`/api/avb/${model}/${color}/img=${onlyImage}`)
+  const res = await fetch(`/api/avb/${model}/${color}/img=${withImage}`)
     .then(response => response.json())
-  console.log(res);
   classy(loader, 'hidden', 'add');
 
 
 
-  if (onlyImage === true) {
-    console.log(`displaying image: ${onlyImage}`);
+  if (withImage === 1) {
+    console.log(`displaying image: ${withImage}`);
     let img = make('img', 'sku-picture', resultsElement)
     img.src = res.picture;
   }

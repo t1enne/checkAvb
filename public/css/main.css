@@ -1,11 +1,6 @@
-/* :root {
-  font-size: min(max(15px, calc(0.9375rem + ((1vw - 5px) * 0.3521))), 20px);
-  min-height: 0vw;
-} */
-@media (min-width: 300px) {
-  /* :root{
-    font-size: 40px !important;
-  } */
+
+/* @media (min-width: 300px) {
+
   .pull-right {
     float: none;
   }
@@ -15,6 +10,10 @@
   input {
     height: 5rem;
   }
+} */
+
+@media (max-width: 500px) {
+
 }
 * {
   box-sizing: border-box;

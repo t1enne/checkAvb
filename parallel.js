@@ -75,7 +75,20 @@ async function getImage(headers, year, season, model) {
   return `data:image/jpeg;base64,${b64}`
 }
 
-async function availabilityRequest(model, color, onlyImage) {
+async function getToBeReceived(headers, sku) {
+  console.log(`fetching garments to be received`);
+
+  await fetch("https://websmart.brunellocucinelli.it/bcweb/WRTIRIO02R.pgm", {
+    "credentials": "include",
+    "headers": headers,
+    "referrer": "https://websmart.brunellocucinelli.it/bcweb/WRTIRIO02R.pgm",
+    "body": `task=filter&ww_fStagione=${sku.year}${sku.season}&ww_fBAPMODELL=${sku.model}&ww_fBAPCOLORE=${sku.color}&ww_fBAMORDTPL=CO&ww_fBAMORDTPL=C1&ww_fBAMORDTPL=C2&ww_fBAMORDTPL=C2N&ww_fBAMORDTPL=DR&ww_fBAMORDTPL=DS&ww_fBAMORDTPL=E&ww_fBAMORDTPL=EBA&ww_fBAMORDTPL=EBG&ww_fBAMORDTPL=EBI&ww_fBAMORDTPL=EBN&ww_fBAMORDTPL=EBP&ww_fBAMORDTPL=EBR&ww_fBAMORDTPL=EDG&ww_fBAMORDTPL=ENA&ww_fBAMORDTPL=ERA&ww_fBAMORDTPL=ETA&ww_fBAMORDTPL=EVG&ww_fBAMORDTPL=EVP&ww_fBAMORDTPL=EXG&ww_fBAMORDTPL=EXN&ww_fBAMORDTPL=G&ww_fBAMORDTPL=GB&ww_fBAMORDTPL=GRC&ww_fBAMORDTPL=GS&ww_fBAMORDTPL=L1&ww_fBAMORDTPL=L2&ww_fBAMORDTPL=N&ww_fBAMORDTPL=NB&ww_fBAMORDTPL=ND&ww_fBAMORDTPL=OTT&ww_fBAMORDTPL=P&ww_fBAMORDTPL=PIR&ww_fBAMORDTPL=PIS&ww_fBAMORDTPL=PM&ww_fBAMORDTPL=PS&ww_fBAMORDTPL=RCB&ww_fBAMORDTPL=RCN&ww_fBAMORDTPL=RCP&ww_fBAMORDTPL=RCR&ww_fBAMORDTPL=RCT&ww_fBAMORDTPL=RPR&ww_fBAMORDTPL=T&ww_fBAMORDTPL=TF&ww_fBAMORDTPL=TF1&ww_fBAMORDTPL=TN&ww_fBAMORDTPL=TNF&ww_fBAMORDTPL=T1&ww_fBAMORDTPL=U&ww_fBAMORDTPL=US&ww_fBAMORDTPL=USS&ww_fBAMORDTPL=YBC&ww_fBAMORDTPL=YRC&ww_fBAMORDTPL=YRP&ww_fBAMORDTPL=YRS&ww_fBAMORDTPL3=GP1&ww_fBAMORDTPL3=GR&ww_fBAMORDTPL3=GRT&ww_fBAMORDTPL3=GR1&ww_fBAMORDTPL3=GR2&ww_fBAMORDTPL3=GR3&ww_fBAMORDTPL3=GT1&ww_fBAMORDTPL3=GUT&ww_fBAMORDTPL3=GU1&ww_fBAMORDTPL3=G10&ww_fBAMORDTPL3=G11&ww_fBAMORDTPL3=NR&ww_fBAMORDTPL3=NR1&ww_fBAMORDTPL3=PGR&ww_fBAMORDTPL5=T&ww_fBAMORDTPL5=TF&ww_fBAMORDTPL5=TF1&ww_fBAMORDTPL5=TN&ww_fBAMORDTPL5=TNF&ww_fBAMORDTPL5=T1&ww_fBAMORDTPL6=GP1&ww_fBAMORDTPL6=GRT&ww_fBAMORDTPL6=GT1&ww_fBAMORDTPL6=PGR&ww_fBAMORDTPL2=BS1&ww_fBAMORDTPL2=RB&ww_fBAMORDTPL2=R1&ww_fBAMORDTPL2=R1Q&ww_fBAMORDTPL2=R13&ww_fBAMORDTPL2=R2&ww_fBAMORDTPL2=R2Q&ww_fBAMORDTPL2=R3&ww_fBAMORDTPL2=R4&ww_fBAMORDTPL2=R5&ww_fBAMORDTPL2=R50&ww_fBAMORDTPL2=R51&ww_fBAMORDTPL2=R6&ww_fBAMORDTPL2=R7&ww_fBAMORDTPL2=R8&ww_fBAMORDTPL2=R9&ww_fBAMORDTPL4=Z&ww_fBAMORDTPL4=ZD&ww_fStagione2=&ww_fTessuto=&ww_fBAMCLIENT=&ww_fGCDSC1=&clienti=1006000&ww_fINCLUDI=I&ww_fBTFPTIPOL=DOS&ww_fBTFPTIPOL=FRANCH_MONO&ww_fBTFPTIPOL=FRANCH_MULTI&tipo_buoni=BUONI&ww_fBCRUBICAZ=DISPOAI&ww_fBCRUBICAZ=DISPOPE&ww_fBCRUBICAZ=DISPOSM&ww_fBCRUBICAZ=LSDISPO&ww_fBCRUBICAZ=LSTYLE&ww_fBCRUBICAZ=MAGIONE&ww_fBCRUBICAZ=NEG1&ww_fBCRUBICAZ=NEG2&ww_fBCRUBICAZ=STK16-1&ww_fBCRUBICAZ=STK16-2&ww_fBCRUBICAZ=XDISPO&flgTipFil=S&flgModello=S%3E&flgColore=S`,
+    "method": "POST",
+    "mode": "cors"
+  });
+}
+
+async function availabilityRequest(model, color, withImage) {
 
   data.results = {};
 
@@ -135,7 +148,7 @@ async function availabilityRequest(model, color, onlyImage) {
 
       // let p = getPrice(headers, sku.year, sku.season, sku.model)
       // let res = [];
-      // if (onlyImage == true && i === 0) {
+      // if (withImage == true && i === 0) {
       //   let pic = getImage(headers, sku.year, sku.season, sku.model);
       //   res = [await pic, await p]
       //   sku.pic = pic
@@ -193,7 +206,7 @@ async function availabilityRequest(model, color, onlyImage) {
 
       let price = getPrice(headers, sku.year, sku.season, sku.model)
 
-      if (onlyImage === true && i === 0) {
+      if (withImage == 1 && i === 0) {
         console.log('getting picture');
         let pic = getImage(headers, sku.year, sku.season, sku.model);
         let res = [await pic, await price]
@@ -237,9 +250,9 @@ async function availabilityRequest(model, color, onlyImage) {
   return data.results
 }
 
-async function getAvb(model, color, onlyImage) {
+async function getAvb(model, color, withImage) {
   try {
-    let results = await availabilityRequest(model, color, onlyImage);
+    let results = await availabilityRequest(model, color, withImage);
     return results
   } catch (e) {
     console.log(e.message);
