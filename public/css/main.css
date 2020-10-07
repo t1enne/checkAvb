@@ -30,7 +30,6 @@ input {
   margin: 1rem 0;
 }
 input[type=checkbox] {
-  height: 0px;
 }
 label {
   font-weight: 400;
