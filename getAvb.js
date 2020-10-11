@@ -65,6 +65,17 @@ async function getImage(headers, year, season, model) {
     })
     .then(res => res.buffer())
 
+  if (buffer == undefined) {
+    buffer = await fetch(`https://websmart.brunellocucinelli.it/nsd/BC/modelli/${year}${season}/${model}_10.jpg`, {
+        "credentials": "include",
+        "headers": headers,
+        "referrer": "https://websmart.brunellocucinelli.it/bcweb/WRTICMO10R.pgm",
+        "method": "GET",
+        "mode": "cors"
+      })
+      .then(res => res.buffer())
+  }
+
   let end = Date.now()
   console.log((end - start) / 1000);
 

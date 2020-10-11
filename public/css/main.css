@@ -21,6 +21,11 @@
   padding: 0;
   font-family: 'Raleway';
 }
+html {
+  overflow-y: scroll;
+}
+body {
+}
 
 input {
   border: none;
@@ -30,6 +35,7 @@ input {
   margin: 1rem 0;
 }
 input[type=checkbox] {
+
 }
 label {
   font-weight: 400;
@@ -40,27 +46,30 @@ ul {
 .label {
   font-size: 1rem;
   margin: 0 5px;
+  padding: .3rem;
+  border-radius: 2px;
+  width: max-content;
 }
 .label-price {
   background-color: #1c84c6;
   color: #FFFFFF;
-  padding: .3rem;
-  border-radius: 10px;
+  display: inline;
 }
-.label-description {
-  padding: .3rem;
-  border-radius: 10px;
-  font-size:
+.label-receivables {
+  background: gold;
+  border: .5px solid lightgrey;
 }
+
 .label-size {
-  padding: .3rem;
-  border-radius: 10px;
-  background-color: #61ca85;
+  background-color: #2d8c4d;
   color: white;
-  width: min-content;
+  padding: 0 1rem;
 }
 .pull-right {
   float: right;
+}
+.content-width {
+  width: max-content;
 }
 .row.model {
   margin:auto;
@@ -73,7 +82,7 @@ img.sku-picture {
   margin:auto;
   width: 30vw;
   margin-bottom: .2rem;
-  border-radius: 10px;
+  border-radius: 2px;
 }
 
 .nav {
@@ -81,6 +90,48 @@ img.sku-picture {
   text-align: center;
 }
 
+.nav > .user-input {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: auto;
+  height: 95vh;
+  background: white;
+  display: flex;
+  transform: translateY(0%);
+  transition: all 0.3s cubic-bezier(.47,0,.74,.71) 0s;
+  border-left: 1px solid gray;
+  padding: 1rem;
+}
+.nav > .user-icon {
+  margin: auto 10px;
+  display: inline;
+  position: absolute;
+  right: 0px;
+  top: 10%;
+}
+.user-icon > .dropdown {
+  transform: rotate(-90deg) scale(.8);
+}
+.dropdown.user-icon {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4%;
+}
+/* .login-result {
+  background-color: #bcf762;
+  padding: .5rem;
+  border-radius: 5px;
+} */
+.user-input.hidden {
+  transform: translateY(-200%);
+}
+.user-inputs span {
+  display: block;
+}
+.login-button {
+  margin: auto;
+}
 .results {
   text-align: left;
   margin: 5rem auto;
@@ -92,42 +143,50 @@ img.sku-picture {
   cursor: default;
 }
 .sku-wrapper {
-  border-radius: 10px;
+  border-radius: 2px;
   border: .5px solid #93d1f7;
   padding: .5rem;
   margin: 1rem;
+  padding-left: 1rem;
 }
 .sku {
   cursor: pointer;
-  margin-top: 1rem;
+  margin: 1rem 0px;
 }
 
 .sizes-wrapper {
-  transform: scaleY(1);
+  /* transform: scaleY(1); */
   transform-origin: top;
-  transition: all 0.25s ease;
-  margin: 1rem 15px 15px 15px;
+  margin: 3rem 15px 15px 15px;
   font-size: 1.1rem;
 }
 
+
+
 .sizes-wrapper.hidden {
-  transform: scaleY(0);
+  /* transform: scaleY(0); */
   border: none;
   overflow: hidden;
   max-height: 0;
 }
 
 .button-primary {
-  display: block;
+  /* display: block;
   margin: auto;
   background: transparent;
   border: 1px solid lightblue;
-  border-radius: 10px;
+  border-radius: 2px;
   height: 3rem;
   width: 75%;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: center; */
+}
+.buttons-group > button > svg {
+  margin-bottom: -5px;
+}
+.user-icon svg path {
+  fill: black;
 }
 
 .svg-icon {
@@ -150,4 +209,26 @@ img.sku-picture {
 }
 .loader.hidden {
   display: none;
+}
+
+/* UTILITIES
+
+check function collapsibles in app.js
+*/
+
+.collapsible {
+  /* max-height: 150vh; */
+  overflow: hidden;
+}
+.collapsed {
+  overflow: hidden;
+  max-height: 0px;
+  padding: 0px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.flex {
+  display: flex;
+  flex-wrap: wrap;
 }
