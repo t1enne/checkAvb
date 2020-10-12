@@ -6,10 +6,10 @@ const loginPopout = document.querySelectorAll('.user-icon');
 const loginButton = document.querySelector('.login-button');
 
 //check if session exists
-
+let session;
 async function loginCheck(e) {
   try {
-    let session = await fetch('/logged')
+    session = await fetch('/logged')
       .then(res => res.json())
     if (session.smurf) {
       classy('.user-input', 'hidden', 'add')
@@ -34,11 +34,14 @@ loginPopout.forEach(item => {
 
 // LOGIN
 loginButton.onclick = async () => {
+  if(!session.user){
   await getCookie()
+  }
 }
 
 // GET AVB
 button.addEventListener('click', async () => {
+  if(session.user){
   let model = document.querySelector('.model-input').value === '' ? 'm' : document.querySelector('.model-input').value
   let color = document.querySelector('.color-input').value === '' ? 'c' : document.querySelector('.color-input').value
   let user = document.querySelector('.user').value
@@ -49,10 +52,17 @@ button.addEventListener('click', async () => {
 
   let elapsed = (end - start) / 1000
   console.log(`Elapsed time: ${elapsed}`);
+} else {
+  document.querySelector('.nav .user-icon').click()
+}
 })
 // GET picture
 imageSearch.onclick = async () => {
-  await getImage()
+  if(session.user){
+    await getImage()
+  } else {
+  document.querySelector('.nav .user-icon').click()
+  }
 }
 
 async function getCookie() {
@@ -75,6 +85,7 @@ async function getImage() {
     resultsElement.prepend(img)
   } else {
     img = document.querySelector('.sku-picture')
+    img.src = '';
   }
   classy(loader, 'hidden', 'remove');
   await fetch(`api/${user}/image/${model}`)

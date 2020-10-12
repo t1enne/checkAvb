@@ -1,7 +1,7 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 let session = require('express-session');
-const getter = require('./parallel.js');
+const getter = require('./index.js');
 
 const app = express();
 
@@ -28,9 +28,6 @@ app.get(`/api/:user/image/:model/`, async (req, res) => {
 app.get('/logged', (req, res) => {
   if (req.session) {
     console.log(req.session);
-    // res.setHeader('Content-Type', 'text/html')
-    // res.write('<p>views: ' + req.session.cookie + '</p>')
-    // res.write('<p>expires in: ' + (req.session.cookie.maxAge / 1000) + 's</p>')
     res.json(req.session)
   } else {
     res.end('Not Logged!')
@@ -42,8 +39,6 @@ app.get('/api/login/:user/:pwd', async (req, res) => {
   let smurfId = await getter.getCookie('ntaov', 'ntaov345');
   req.session.smurf = smurfId.cookie;
   req.session.user = req.params.user;
-  // cookies[req.params.user] = smurfId.slice(8);
-  // res.cookie('myCookie', smurfId)
   console.log(req.session);
   res.json(req.session)
 });

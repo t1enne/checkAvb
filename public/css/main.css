@@ -109,6 +109,7 @@ img.sku-picture {
   position: absolute;
   right: 0px;
   top: 10%;
+  text-transform: uppercase;
 }
 .user-icon > .dropdown {
   transform: rotate(-90deg) scale(.8);
