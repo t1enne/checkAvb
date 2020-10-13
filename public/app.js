@@ -99,28 +99,7 @@ async function getAvb(user, model, color) {
   classy(loader, 'hidden', 'remove');
   const res = await fetch(`/api/${user}/avb/${model}/${color}`)
     .then(response => response.json())
-  console.log(res);
   classy(loader, 'hidden', 'add');
-
-
-  // REMOVED FOR NOW
-
-  // if (withImage === 1) {
-  //   console.log(`displaying image: ${withImage}`);
-  //   let img = make('img', 'sku-picture', resultsElement)
-  //   img.src = res.picture;
-  // }
-
-  // WRITE TO FILE AND THEN USE IT AS src
-
-  // const url = typedArrayToURL(res.picture, 'image/jpeg');
-  // console.log(url);
-  // let img = make('img', 'sku-picture', resultsElement)
-  // img.src = url
-  // setTimeout(() => {
-  //   img.src = 'picture.jpg'
-  // }, 1500)
-
 
 
 
@@ -146,6 +125,11 @@ async function getAvb(user, model, color) {
 
       let receivableSizes = Object.keys(sku.receivables);
       let receivableQty = Object.values(sku.receivables);
+      let totalReceivables = sku.totalReceivables
+      if(totalReceivables){
+        let receivable = make('div', 'label total-receivables label-receivables', labelsWrapper);
+        receivable.textContent = totalReceivables + ' in prod!';
+      }
 
       if (receivableSizes.length > 0) {
         receivableSizes.forEach((item, i) => {

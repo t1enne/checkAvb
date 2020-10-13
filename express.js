@@ -9,11 +9,13 @@ app.use(cookieParser());
 app.use(session({
   secret: 'keyboard cat',
   cookie: {
-    maxAge: 1000 * 60 * 24 * 30
+    maxAge: 1000 * 60 * 24 * 30,
+    sameSite: 'strict'
+
   },
   rolling: true,
   resave: true,
-  saveUninitialized: true
+  saveUninitialized: true,
 }));
 
 app.use(express.static('public'));
@@ -39,16 +41,13 @@ app.get('/api/login/:user/:pwd', async (req, res) => {
   let smurfId = await getter.getCookie('ntaov', 'ntaov345');
   req.session.smurf = smurfId.cookie;
   req.session.user = req.params.user;
-  console.log(req.session);
   res.json(req.session)
 });
 
 // GET AVB
 
 app.get('/api/:user/avb/:model/:color/', async (req, res) => {
-  console.log(req.session);
   const avb = await getter.getAvb(req.session.smurf, req.params.model, req.params.color, req.params.withImage);
-
   res.json(avb)
 });
 

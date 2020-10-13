@@ -1,7 +1,5 @@
 const cheerio = require('cheerio');
 const fetch = require('node-fetch');
-// const fs = require('fs');
-// const fileType = require('file-type');
 
 let data = {
   results: {}
@@ -144,6 +142,7 @@ async function getToBeReceived(cookie, headers, sku) {
   let $ = cheerio.load(html)
 
   let rnd = $('#prevlinktop')[0].attribs.href
+  let total = $(`tr.altcol1:nth-child(2) > td:nth-child(17)`).text()
   let key = rnd.slice(rnd.search('rnd') + 4, rnd.search('&task'));
 
 
@@ -154,10 +153,10 @@ async function getToBeReceived(cookie, headers, sku) {
   if (willReceive != '') {
     let url = `https://websmart.brunellocucinelli.it/bcweb/WRTIRIO02R.pgm?TASK=dettaglio&BGACODICE=${sku.model}&COLORE=${sku.color}&TIPO=DARIC&rnd=${key}`
     url = encodeURI(url);
+    console.log(url);
     let detail = await fetch(url, {
       "credentials": "include",
       "headers": {
-        "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:81.0) Gecko/20100101 Firefox/81.0",
         "Accept": "text/html, */*; q=0.01",
         "Accept-Language": "en-US,en;q=0.5",
         "X-Requested-With": "XMLHttpRequest",
@@ -176,17 +175,18 @@ async function getToBeReceived(cookie, headers, sku) {
 
 
     sizesRow.each((i) => {
-      let th = $(thRow[i])
-      let size = $(sizesRow[i]);
-      if (size.text() != '' && i != sizesRow.length - 1 && i != 0) {
+      let th = $(thRow[i]).text();
+      let size = $(sizesRow[i]).text();
+      console.log(size);
+      if (size != '' && i != sizesRow.length - 1 && i != 0) {
         // console.log(th.text());
         // console.log(size.text());
-        receivables[th.text()] = size.text();
+        receivables[th] = size;
       }
     })
 
   }
-  return receivables
+  return [total, receivables]
 }
 
 async function availabilityRequest(cookie, model, color) {
@@ -215,15 +215,14 @@ async function availabilityRequest(cookie, model, color) {
       "mode": "cors"
     }).then(res => res.text())
 
-    //CHECK IF LOGIN SUCCEEDED
-    if (html === `<html><head></head><body NOSPLASH onload="location.replace('/bcweb/login.pgm?task=logout&errore=nonvalid');"></body></html>`) {
-      console.log(`LOGIN FAILED!!`);
-    }
     // LOGGIN OUT RESULTS
     let $ = cheerio.load(html)
     const rows = $('#listtable tbody tr')
       .slice(2);
 
+    if(rows.length === 0) {
+      return 'Model not found!'
+    }
     // INFO WILL BE STORED HERE
     let skus = {};
 
@@ -234,6 +233,7 @@ async function availabilityRequest(cookie, model, color) {
 
     //FUNCTION THAT WILL BE INSIDE THE LOOP
     let avb = async (i) => {
+      console.log('avb ' + i);
       let $element = $(rows[i]);
 
       let sku = {}
@@ -245,18 +245,7 @@ async function availabilityRequest(cookie, model, color) {
       sku.color = tds[3].children[0]['data']
       sku.descr = $(tds[4]).text();
       sku.string = sku.year + sku.season + ' ' + sku.model + ' ' + sku.color;
-
-      // let p = getPrice(headers, sku.year, sku.season, sku.model)
-      // let res = [];
-      // if (withImage == true && i === 0) {
-      //   let pic = getImage(headers, sku.year, sku.season, sku.model);
-      //   res = [await pic, await p]
-      //   sku.pic = pic
-      // } else {
-      //   res = [await p]
-      // }
-      // sku.price = p
-
+      sku.receivables = {}
       let sizes = {};
 
       // CHECK AVAILABLE SIZES
@@ -308,7 +297,9 @@ async function availabilityRequest(cookie, model, color) {
       let receivables = getToBeReceived(cookie, headers, sku)
       let res = [await price, await receivables, await sp]
       sku.price = res[0]
-      sku.receivables = res[1]
+      //receivables returns an array [total, detail]
+      sku.totalReceivables = res[1][0]
+      sku.receivables = res[1][1]
 
 
 
@@ -339,7 +330,7 @@ async function availabilityRequest(cookie, model, color) {
 
 
   } catch (e) {
-    console.log(e.message);
+    console.log(e);
   }
   return data.results
 }
