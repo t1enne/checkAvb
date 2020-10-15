@@ -38,7 +38,7 @@ app.get('/logged', (req, res) => {
 
 // GET COOKIE
 app.get('/api/login/:user/:pwd', async (req, res) => {
-  let smurfId = await getter.getCookie('ntaov', 'ntaov345');
+  let smurfId = await getter.getCookie(req.params.user, req.params.pwd);
   req.session.smurf = smurfId.cookie;
   req.session.user = req.params.user;
   res.json(req.session)
@@ -47,11 +47,15 @@ app.get('/api/login/:user/:pwd', async (req, res) => {
 // GET AVB
 
 app.get('/api/:user/avb/:model/:color/', async (req, res) => {
-  const avb = await getter.getAvb(req.session.smurf, req.params.model, req.params.color, req.params.withImage);
+  const avb = await getter.getAvb(req.session.smurf, req.params.model, req.params.color);
   res.json(avb)
 });
 
-
+// GET receivables
+app.get('/api/:user/toReceive/:model/:color/', async (req, res) => {
+  const avb = await getter.getAvb(req.session.smurf, req.params.model, req.params.color);
+  res.json(avb)
+});
 
 
 const port = process.env.PORT || 3000;

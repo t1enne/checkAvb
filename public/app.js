@@ -123,21 +123,24 @@ async function getAvb(user, model, color) {
       let priceElement = make('div', 'label label-price', labelsWrapper);
       priceElement.textContent = '€' + sku.price;
 
-      let receivableSizes = Object.keys(sku.receivables);
-      let receivableQty = Object.values(sku.receivables);
+      // let receivableSizes = Object.keys(sku.receivables);
+      // let receivableQty = Object.values(sku.receivables);
       let totalReceivables = sku.totalReceivables
+
       if(totalReceivables){
         let receivable = make('div', 'label total-receivables label-receivables', labelsWrapper);
-        receivable.textContent = totalReceivables + ' in prod!';
+        receivable.textContent = totalReceivables + ' da ricevere!';
+        labelsWrapper.innerHTML += `<div></div>`
       }
 
-      if (receivableSizes.length > 0) {
-        receivableSizes.forEach((item, i) => {
-          let receivable = make('div', 'label label-receivables', labelsWrapper);
-          receivable.textContent = `${receivableQty[i]}/${receivableSizes[i]}`;
-        });
 
-      }
+      // if (receivableSizes.length > 0) {
+      //   receivableSizes.forEach((item, i) => {
+      //     let receivable = make('div', 'label label-receivables', labelsWrapper);
+      //     receivable.textContent = `${receivableQty[i]}/${receivableSizes[i]}`;
+      //   });
+    //}
+
 
       let sizesWrapper = make('div', 'sizes-wrapper', skusWrapper);
       let sizesList = make('ul', 'size-list', sizesWrapper);
@@ -154,7 +157,9 @@ async function getAvb(user, model, color) {
       sizes.forEach((size, y) => {
         let sizeLabel = Object.keys(sizeLabels[y])
         let sizeElement = make('li', `size size-${y}`, sizesList);
-        sizeElement.innerHTML = ` <label class="label-size"> ${sizeLabel} </label>`;
+
+        let sizeText = `<label class="label-size"> ${sizeLabel} </label>`;
+        sizeElement.innerHTML = sizeText;
 
         let shopWrapper = make('ul', 'shops-wrapper', sizesList);
 
@@ -167,7 +172,7 @@ async function getAvb(user, model, color) {
     }
   });
   collapsibles('.sku', '.sizes-wrapper');
-  // collapsibles('.size', '.shops-wrapper');
+  
 }
 
 // function typedArrayToURL(typedArray, mimeType) {

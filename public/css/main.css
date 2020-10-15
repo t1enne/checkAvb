@@ -39,6 +39,7 @@ input[type=checkbox] {
 }
 label {
   font-weight: 400;
+  width: max-content;
 }
 ul {
   list-style-type: none;
@@ -48,7 +49,6 @@ ul {
   margin: 0 5px;
   padding: .3rem;
   border-radius: 2px;
-  width: max-content;
 }
 .label-price {
   background-color: #1c84c6;
@@ -136,8 +136,6 @@ img.sku-picture {
 .results {
   text-align: left;
   margin: 5rem auto;
-  width: 75%;
-
 }
 
 .results * {
