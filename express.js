@@ -21,7 +21,7 @@ app.use(session({
 app.use(express.static('public'));
 
 //GET IMAGE
-app.get(`/api/:user/image/:model/`, async (req, res) => {
+app.get(`/api/image/:model/`, async (req, res) => {
   let b64 = await getter.getImage(req.session.smurf, req.params.model);
   res.send(b64)
 });
@@ -46,14 +46,21 @@ app.get('/api/login/:user/:pwd', async (req, res) => {
 
 // GET AVB
 
-app.get('/api/:user/avb/:model/:color/', async (req, res) => {
+app.get('/api/avb/:model/:color/', async (req, res) => {
   const avb = await getter.getAvb(req.session.smurf, req.params.model, req.params.color);
   res.json(avb)
 });
 
+// GET SHOP DETAILS
+
+app.get('/api/:year/:season/:model/:color/:size', async (req, res) => {
+  const avb = await getter.getShops(req.session.smurf, req.params.year, req.params.season, req.params.model, req.params.color, req.params.size);
+  res.json(avb)
+});
+
 // GET receivables
-app.get('/api/:user/toReceive/:model/:color/', async (req, res) => {
-  const avb = await getter.getAvb(req.session.smurf, req.params.model, req.params.color);
+app.get('/api/toReceive/:model/:color/:rnd', async (req, res) => {
+  const avb = await getter.getToBeReceived(req.session.smurf, req.params.model, req.params.color, req.params.rnd);
   res.json(avb)
 });
 

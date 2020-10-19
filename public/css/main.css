@@ -46,14 +46,16 @@ ul {
 }
 .label {
   font-size: 1rem;
-  margin: 0 5px;
+  margin: 0 2.5px;
   padding: .3rem;
+  min-height: 30px;
   border-radius: 2px;
+  display: flex;
+  align-items: center;
 }
 .label-price {
   background-color: #1c84c6;
   color: #FFFFFF;
-  display: inline;
 }
 .label-receivables {
   background: gold;
@@ -64,6 +66,9 @@ ul {
   background-color: #2d8c4d;
   color: white;
   padding: 0 1rem;
+}
+.shop {
+  font-size: 1.2rem;
 }
 .pull-right {
   float: right;
