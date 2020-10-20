@@ -118,6 +118,9 @@ async function getAvb(user, model, color) {
       skuElement.addEventListener('click', async (event) => {
         // FETCH SHOPS if not already fetched
         if (!skuElement.classList.contains('fetched')) {
+          classy(skuElement, 'fetched', 'add');
+          let dotLoader = make('img', 'sizes-loader', skuElement)
+          dotLoader.src = "../loading.gif";
           // array for promises
           let shopsPromises = [];
 
@@ -148,8 +151,7 @@ async function getAvb(user, model, color) {
             });
 
           });
-          classy(skuElement, 'fetched', 'add')
-
+          dotLoader.classList.add('hidden')
         }
       });
 
