@@ -20,22 +20,14 @@ app.use(session({
 
 app.use(express.static('public'));
 
-//GET IMAGE
-app.get(`/api/image/:model/`, async (req, res) => {
-  let b64 = await getter.getImage(req.session.smurf, req.params.model);
-  res.send(b64)
-});
-
 // CHECK IF LOGGED
 app.get('/logged', (req, res) => {
   if (req.session) {
-    console.log(req.session);
     res.json(req.session)
   } else {
     res.end('Not Logged!')
   }
 })
-
 // GET COOKIE
 app.get('/api/login/:user/:pwd', async (req, res) => {
   let smurfId = await getter.getCookie(req.params.user, req.params.pwd);
@@ -44,6 +36,13 @@ app.get('/api/login/:user/:pwd', async (req, res) => {
   res.json(req.session)
 });
 
+//GET IMAGE
+app.get(`/api/image/:year/:season/:model/`, async (req, res) => {
+  let b64 = await getter.getImage(req.session.smurf, req.params.year, req.params.season, req.params.model);
+  res.send(b64)
+});
+
+
 // GET AVB
 
 app.get('/api/avb/:model/:color/', async (req, res) => {
@@ -51,18 +50,26 @@ app.get('/api/avb/:model/:color/', async (req, res) => {
   res.json(avb)
 });
 
-// GET SHOP DETAILS
+// GET receivables
+app.get(`/api/request/:year/:season/:model/:color/`, async (req, res) => {
+  const tr = await getter.getReceivables(req.session.smurf, req.params.year, req.params.season, req.params.model, req.params.color);
+  res.json(tr);
+});
 
+// GET SHOP DETAILS
 app.get('/api/:year/:season/:model/:color/:size', async (req, res) => {
   const avb = await getter.getShops(req.session.smurf, req.params.year, req.params.season, req.params.model, req.params.color, req.params.size);
   res.json(avb)
 });
 
-// GET receivables
-app.get('/api/toReceive/:model/:color/:rnd', async (req, res) => {
-  const avb = await getter.getToBeReceived(req.session.smurf, req.params.model, req.params.color, req.params.rnd);
-  res.json(avb)
+
+// GET Prices
+app.get(`/api/price/:year/:season/:model/`, async (req, res) => {
+  let price = await getter.getPrice(req.session.smurf, req.params.year, req.params.season, req.params.model);
+  res.json(price);
 });
+
+
 
 
 const port = process.env.PORT || 3000;

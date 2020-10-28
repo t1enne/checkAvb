@@ -46,7 +46,7 @@ ul {
 }
 .label {
   font-size: 1rem;
-  margin: 0 2.5px;
+  margin: 1.5px 2.5px;
   padding: .3rem;
   min-height: 30px;
   border-radius: 2px;
@@ -56,10 +56,19 @@ ul {
 .label-price {
   background-color: #1c84c6;
   color: #FFFFFF;
+  min-width: 4rem;
 }
+
 .label-receivables {
   background: gold;
   border: .5px solid lightgrey;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  transition: 1s ease-in;
+}
+.label-receivables > .label-size {
+  background-color: cornflowerblue;
 }
 
 .label-size {
@@ -69,6 +78,12 @@ ul {
 }
 .shop {
   font-size: 1.2rem;
+}
+.shop.negsol {
+  background: aliceblue;
+}
+.shop.negsol::before {
+  content: '! ';
 }
 .pull-right {
   float: right;
@@ -85,11 +100,15 @@ img {
 img.sku-picture {
   display: block;
   margin:auto;
-  width: 30vw;
+  width: auto;
   margin-bottom: .2rem;
   border-radius: 2px;
+  transition: .5s ease-in;
+  max-height: 150px;
 }
-
+img.sku-picture.hidden {
+  max-height: 0px;
+}
 .nav {
   margin: auto;
   text-align: center;
@@ -157,12 +176,20 @@ img.sku-picture {
   cursor: pointer;
   margin: 1rem 0px;
 }
+.sku-title {
+  justify-content: space-between;
+  align-items: center;
+}
 
 .sizes-wrapper {
   /* transform: scaleY(1); */
   transform-origin: top;
-  margin: 3rem 15px 15px 15px;
+  margin: 2rem 15px 15px 0px;
   font-size: 1.1rem;
+  transition: all 0.5s cubic-bezier(.47,0,.74,.71) 0s;
+}
+.sizes-wrapper.collapsed {
+  max-height: 0px;
 }
 .sizes-loader.hidden {
   display: none;
@@ -191,6 +218,9 @@ img.sku-picture {
   margin-bottom: -5px;
 }
 .user-icon svg path {
+  fill: black;
+}
+svg.get-image path {
   fill: black;
 }
 
@@ -225,12 +255,10 @@ check function collapsibles in app.js
 */
 
 .collapsible {
-  /* max-height: 150vh; */
   overflow: hidden;
 }
 .collapsed {
   overflow: hidden;
-  max-height: 0px;
   padding: 0px;
   margin-top: 0px;
   margin-bottom: 0px;
