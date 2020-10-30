@@ -69,8 +69,8 @@ button.addEventListener('click', async () => {
 // }
 
 async function getCookie() {
-  let user = document.querySelector('.user-inputs > input:nth-child(2)').value
-  let pwd = document.querySelector('.user-inputs > input:nth-child(3)').value
+  let user = document.querySelector('.user-inputs input:nth-child(2)').value
+  let pwd = document.querySelector('.user-inputs input:nth-child(3)').value
 
   await fetch(`api/login/${user}/${pwd}`)
     .then(res => res.json())
