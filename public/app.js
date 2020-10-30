@@ -5,6 +5,7 @@ const loginPopout = document.querySelectorAll('.user-icon');
 const loginButton = document.querySelector('.login-button');
 
 
+
 //check if session exists
 let session;
 async function loginCheck(e) {

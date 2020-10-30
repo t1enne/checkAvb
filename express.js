@@ -2,6 +2,42 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 let session = require('express-session');
 const getter = require('./index.js');
+const mongoose = require('mongoose');
+
+// MONGOOSE
+// mongoose.connect('mongodb://localhost/test', {useNewUrlParser: true});
+// const db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'connection error:')
+// db.once('open', () => {
+//
+// });
+//
+// const kittySchema = new mongoose.Sche({
+//   name: String
+// });
+// kittySchema.methods.speak = () => {
+//   const greeting =  this.name
+//   ? "Meow namy is " + this.name
+//   : "No name";
+//   console.log(greeting);
+// }
+// const Kitten = mongoose.model('Kitten', kittySchema);
+//
+// const silence = new Kitten{( name: 'Silence')};
+//
+// console.log(silence.name);
+//
+// const fluffy = new Kitten({ name: 'fluffy'});
+// fluffy.speak();
+
+
+
+
+
+
+
+
+// END OF MONGOOSE
 
 const app = express();
 

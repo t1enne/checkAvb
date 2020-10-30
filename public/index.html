@@ -4,7 +4,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NazBility</title>
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <title>Disponibilità BC</title>
+
+  <meta name="apple-mobile-web-app-status-bar" content="#aa7700">
+  <meta name="theme-color" content="white">
+
+
+  <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" type="text/css" href="/css/skeleton.css">
   <link rel="stylesheet" type="text/css" href="/css/normalize.css">
   <link rel="stylesheet" href="/css/main.css">
@@ -47,10 +55,12 @@
             </path>
           </svg>
         </div>
-        <input type="text" name="login" value="" placeholder="User">
-        <input type="password" name="password" value="" placeholder="Password">
-        <span> <button class="button login-button" type="button" name="button">Login</button>
-        </span>
+        <form class="login" action="index.html" >
+          <input type="text" name="login" value="" placeholder="User" autocomplete="username">
+          <input type="password" name="password" value="" placeholder="Password" autocomplete="current-password">
+          <span> <button class="button login-button" type="button" name="button">Login</button>
+          </span>
+        </form>
       </div>
     </div>
 
@@ -95,5 +105,25 @@
   </div>
 </body>
 <script type="text/javascript" src='app.js'></script>
+
+<script>
+    window.addEventListener('load', () => {
+      registerSW();
+    });
+
+    // Register the Service Worker
+    async function registerSW() {
+      if ('serviceWorker' in navigator) {
+        try {
+          await navigator
+                .serviceWorker
+                .register('serviceworker.js');
+        }
+        catch (e) {
+          console.log('SW registration failed');
+        }
+      }
+    }
+ </script>
 
 </html>
