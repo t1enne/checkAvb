@@ -1,12 +1,12 @@
 {
 	"name":"Disponibilità BC",
-	"short_name":"PWA",
+	"short_name":"PS BC",
 	"start_url":"index.html",
 	"display":"standalone",
 	"background_color":"white",
 	"theme_color":"white",
 	"scope": ".",
-	"description":"This is a PWA tutorial.",
+	"description":"This is a tool for Personal Assistants, developed by Nazir Taov",
 	"icons":[
 	{
 	"src":"favicon192.png",
