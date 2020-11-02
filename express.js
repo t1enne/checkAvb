@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 
 
 // MONGOOSE
-mongoose.connect(`mongodb+srv://t1enne:qazmlp10@cluster0.vtvpp.mongodb.net/client_orders?retryWrites=true&w=majority`, {useNewUrlParser: true});
+mongoose.connect(`mongodb+srv://user:pwd@cluster0.vtvpp.mongodb.net/client_orders?retryWrites=true&w=majority`, {useNewUrlParser: true});
 let db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
