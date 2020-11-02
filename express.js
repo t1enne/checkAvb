@@ -4,31 +4,35 @@ let session = require('express-session');
 const getter = require('./index.js');
 const mongoose = require('mongoose');
 
+
 // MONGOOSE
-// mongoose.connect('mongodb://localhost/test', {useNewUrlParser: true});
-// const db = mongoose.connection;
-// db.on('error', console.error.bind(console, 'connection error:')
-// db.once('open', () => {
-//
-// });
-//
-// const kittySchema = new mongoose.Sche({
-//   name: String
-// });
-// kittySchema.methods.speak = () => {
-//   const greeting =  this.name
-//   ? "Meow namy is " + this.name
-//   : "No name";
-//   console.log(greeting);
-// }
-// const Kitten = mongoose.model('Kitten', kittySchema);
-//
-// const silence = new Kitten{( name: 'Silence')};
-//
-// console.log(silence.name);
-//
-// const fluffy = new Kitten({ name: 'fluffy'});
-// fluffy.speak();
+mongoose.connect(`mongodb+srv://t1enne:qazmlp10@cluster0.vtvpp.mongodb.net/client_orders?retryWrites=true&w=majority`, {useNewUrlParser: true});
+let db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', () => {
+});
+
+let Schema = mongoose.Schema;
+
+var authorSchema = Schema({
+  name    : String,
+  stories : [{ type: Schema.Types.ObjectId, ref: 'Story' }]
+});
+
+var storySchema = Schema({
+  author : { type: Schema.Types.ObjectId, ref: 'Author' },
+  title    : String
+});
+
+var Story  = mongoose.model('Story', storySchema);
+var Author = mongoose.model('Author', authorSchema);
+
+
+// ALTERNATIVE WAY TO CREATE/SAVE MODEL
+// ClientOrders.create({ name: 'Naz', surname: 'Taov' }, (err, example_instance) => {
+//   if(err) return handleError(err)
+// })
+
 
 
 
