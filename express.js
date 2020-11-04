@@ -2,31 +2,39 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 let session = require('express-session');
 const getter = require('./index.js');
+require('dotenv').config();
 const mongoose = require('mongoose');
 
 
 // MONGOOSE
-/* 
-mongoose.connect(`mongodb+srv://user:pwd@cluster0.vtvpp.mongodb.net/client_orders?retryWrites=true&w=majority`, {useNewUrlParser: true});
+let mongoUrl = process.env.MONGOLAB_URI
+mongoose.connect(mongoUrl, {useNewUrlParser: true});
 let db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
+  console.log('connected to DB');
 });
 
-let Schema = mongoose.Schema;
+let SearchInstanceSchema = new mongoose.Schema({
+  model: String,
+  color: String,
+  user: String,
+  dateObj: { type: Date, default: new Date() }
+}, { toJSON: { virtuals: true } } );
 
-var authorSchema = Schema({
-  name    : String,
-  stories : [{ type: Schema.Types.ObjectId, ref: 'Story' }]
+SearchInstanceSchema.virtual('string').get(function() {
+  return this.model + ' ' + this.color;
+});
+SearchInstanceSchema.virtual('date').get(function() {
+  let d = this.dateObj
+  let day = d.getDay() + 1;
+  let month = d.getMonth() + 1;
+  let year = d.getYear() - 100;
+  let date = `${day}/${month}/${year}`
+  return date
 });
 
-var storySchema = Schema({
-  author : { type: Schema.Types.ObjectId, ref: 'Author' },
-  title    : String
-});
-
-var Story  = mongoose.model('Story', storySchema);
-var Author = mongoose.model('Author', authorSchema);
+const SearchInstance = mongoose.model('SearchInstance', SearchInstanceSchema);
 
 
 // ALTERNATIVE WAY TO CREATE/SAVE MODEL
@@ -34,7 +42,6 @@ var Author = mongoose.model('Author', authorSchema);
 //   if(err) return handleError(err)
 // })
 
-*/
 
 
 
@@ -85,9 +92,12 @@ app.get(`/api/image/:year/:season/:model/`, async (req, res) => {
 
 
 // GET AVB
-
-app.get('/api/avb/:model/:color/', async (req, res) => {
+app.get('/api/avb/:user/:model/:color/', async (req, res) => {
   const avb = await getter.getAvb(req.session.smurf, req.params.model, req.params.color);
+  let search = new SearchInstance({ model: req.params.model, color: req.params.color, user: req.params.user });
+  search.save( (err, search) => {
+    if(err) console.error(err)
+  })
   res.json(avb)
 });
 
@@ -110,6 +120,13 @@ app.get(`/api/price/:year/:season/:model/`, async (req, res) => {
   res.json(price);
 });
 
+// DISPLAY HISTORY OF Searches
+app.get(`/api/:user/SearchInstance`, async (req, res) => {
+  await SearchInstance.find( { user: req.params.user }, (err, searches) => {
+    if (err) console.error(err);
+    res.json(searches)
+  })
+});
 
 
 

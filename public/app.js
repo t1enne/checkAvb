@@ -4,6 +4,7 @@ const loader = document.querySelector('.loader');
 const loginPopout = document.querySelectorAll('.user-icon');
 const loginButton = document.querySelector('.login-button');
 
+
 //check if session exists
 let session;
 async function loginCheck() {
@@ -11,6 +12,7 @@ async function loginCheck() {
     session = await fetch('/logged').then(res => res.json())
     if (session.smurf && session.user) {
       classy('form.login', 'd-none', 'add')
+      classy('.user-personal-bucket', 'd-none', 'remove');
       if (!document.querySelector('.user-panel').classList.contains('hidden')) {
         classy('.user-panel', 'hidden', 'add')
       }
@@ -29,17 +31,61 @@ async function loginCheck() {
 
 loginCheck();
 
+let tabHandler = {
+  handler: () => {
+    // SELECT THE FIRST TAB
+    document.querySelector('#radio1').checked = true;
+    // add a listener
+    let tabs = document.querySelectorAll('#tabs > label');
+    tabs.forEach( (item, i) => {
+      if(item.checked === true) item.click();
+
+      item.addEventListener('click', (e) => {
+        if(e.target.classList.contains('tab-orders')) tabHandler.orders();
+        if(e.target.classList.contains('tab-clients')) tabHandler.clients();
+        if(e.target.classList.contains('tab-history')) tabHandler.history();
+      })
+    });
+  },
+  orders: () => {
+
+  },
+  clients: () => {
+
+  },
+  history: async () => {
+    document.querySelector('.searches-content').textContent = ''
+    let searches = await fetch(`/api/${session.user}/SearchInstance`)
+    .then(res => res.json())
+    console.log(searches);
+    searches.forEach((item, i) => {
+      let search = maker('div', {
+        class: `search-instance flex search-${i}`,
+        style: `justify-content: space-between;`,
+        onclick: () => {
+          console.log('clicked');
+        },
+        text: `${item.model} ${item.color}`
+      }, document.querySelector('.searches-content')
+    );
+      maker('p', {class: 'search-dates', text: item.date }, search)
+    });
+
+  }
+}
+tabHandler.handler();
+
 // SIDEBAR DROPDOWN
 loginPopout.forEach(item => {
   item.addEventListener('click', () => {
     classy('.user-panel', 'hidden', 'toggle')
+
   })
 
 });
 
 // LOGIN
 loginButton.onclick = async () => {
-  console.log(session);
   if (!session.user) {
     await getCookie()
   }
@@ -84,32 +130,11 @@ async function getCookie() {
   loginCheck();
 }
 
-// async function getImage() {
-//   let model = document.querySelector('.model-input').value
-//   let img
-//   if (!document.querySelector('.sku-picture')) {
-//     img = document.createElement('img')
-//     img.classList.add('sku-picture')
-//     resultsElement.prepend(img)
-//   } else {
-//     img = document.querySelector('.sku-picture')
-//     img.src = '';
-//   }
-//   classy(loader, 'hidden', 'remove');
-//   await fetch(`api/image/${year}/${season}${model}`).then(res => res.text()).then(url => img.src = url)
-//   classy(loader, 'hidden', 'add');
-// }
-
 async function getAvb(user, model, color) {
   resultsElement.innerHTML = '';
-  // create img for the picture
-  // img = document.createElement('img')
-  // img.setAttribute('class', 'sku-picture hidden');
-  // img.src = "../loading.gif";
-  // resultsElement.prepend(img)
 
   classy(loader, 'hidden', 'remove');
-  const res = await fetch(`/api/avb/${model}/${color}`).then(response => response.json())
+  const res = await fetch(`/api/avb/${session.user}/${model}/${color}`).then(response => response.json())
   console.log(res);
   classy(loader, 'hidden', 'add');
 
@@ -264,12 +289,6 @@ async function getAvb(user, model, color) {
 
 }
 
-// function typedArrayToURL(typedArray, mimeType) {
-//   return URL.createObjectURL(new Blob([typedArray.buffer], {
-//     type: mimeType
-//   }))
-// }
-
 // Collapsible utilities
 function collapsibles(parent, child) {
   let children = document.querySelectorAll(child);
@@ -311,6 +330,7 @@ function maker(element, attrs, parent) {
   });
 
   parent.appendChild(elem)
+  return elem
 }
 
 function classy(elem, c, addRemoveToggle) {
