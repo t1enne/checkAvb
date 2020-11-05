@@ -28,7 +28,7 @@ input {
   border: none;
   border-bottom: 1px solid black;
   padding: 1rem !important;
-  text-transform: uppercase;
+  text-transform: capitalize;
   margin: 1rem 0;
 }
 
@@ -127,6 +127,7 @@ img.sku-picture.hidden {
 
 .user-panel {
   position: absolute;
+  overflow: scroll;
   top: 0px;
   right: 0px;
   width: 100%;
@@ -226,11 +227,6 @@ input[name=css-tabs] {
   transition: transform 400ms;
   border-radius: 2px;
 }
-
-input[type='radio']:checked~label {
-  color: white;
-}
-
 #tabs label {
   position: relative;
   z-index: 100;
@@ -289,7 +285,8 @@ input[type='radio']:checked~label {
 
 .search-instance {
   padding: 1rem;
-  box-shadow: -1px 1px 10px gray;
+  border-radius: 5px;
+  box-shadow: 1px 2px 3px #b9b5b5;
   margin: 1rem;
   text-transform: uppercase;
 }
@@ -337,6 +334,7 @@ input[type='radio']:checked~label {
 #radio1:checked~#content #content1, #radio2:checked~#content #content2, #radio3:checked~#content #content3, #radio4:checked~#content #content4 {
   transform: translateY(0);
   opacity: 1;
+  z-index: 10;
 }
 
 .tab-label {
