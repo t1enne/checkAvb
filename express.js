@@ -4,6 +4,8 @@ let session = require('express-session');
 const getter = require('./index.js');
 require('dotenv').config();
 const mongoose = require('mongoose');
+// let OrderInstance = require("./public/models/client");
+const Client = require("./public/models/client");
 
 
 // MONGOOSE
@@ -15,27 +17,29 @@ db.once('open', () => {
   console.log('connected to DB');
 });
 
-let SearchInstanceSchema = new mongoose.Schema({
+// ORDER instance
+let OrderInstanceSchema = new mongoose.Schema({
+  year: String,
+  season: String,
   model: String,
   color: String,
+  size: String,
+  sizeForReq: String,
   user: String,
+  client: {type: String, default: "unassigned"},
   dateObj: { type: Date, default: new Date() }
 }, { toJSON: { virtuals: true } } );
 
-SearchInstanceSchema.virtual('string').get(function() {
-  return this.model + ' ' + this.color;
-});
-SearchInstanceSchema.virtual('date').get(function() {
+OrderInstanceSchema.virtual('date').get(function() {
   let d = this.dateObj
-  let day = d.getDay() + 1;
+  let day = d.getDate();
   let month = d.getMonth() + 1;
   let year = d.getYear() - 100;
   let date = `${day}/${month}/${year}`
   return date
 });
 
-const SearchInstance = mongoose.model('SearchInstance', SearchInstanceSchema);
-
+const OrderInstance = mongoose.model('OrderInstance', OrderInstanceSchema);
 
 // ALTERNATIVE WAY TO CREATE/SAVE MODEL
 // ClientOrders.create({ name: 'Naz', surname: 'Taov' }, (err, example_instance) => {
@@ -66,7 +70,7 @@ app.use(session({
   saveUninitialized: true,
 }));
 
-app.use(express.static('public'));
+app.use(express.static('public/dist'));
 
 // CHECK IF LOGGED
 app.get('/logged', (req, res) => {
@@ -94,10 +98,6 @@ app.get(`/api/image/:year/:season/:model/`, async (req, res) => {
 // GET AVB
 app.get('/api/avb/:user/:model/:color/', async (req, res) => {
   const avb = await getter.getAvb(req.session.smurf, req.params.model, req.params.color);
-  let search = new SearchInstance({ model: req.params.model, color: req.params.color, user: req.params.user });
-  search.save( (err, search) => {
-    if(err) console.error(err)
-  })
   res.json(avb)
 });
 
@@ -120,11 +120,39 @@ app.get(`/api/price/:year/:season/:model/`, async (req, res) => {
   res.json(price);
 });
 
+// Add Order to List
+app.get(`/api/addOrder/:user/:year/:season/:model/:color/:size/:sizeForReq/`, async (req, res) => {
+  let order = await new OrderInstance({ year: req.params.year, season: req.params.season, model: req.params.model, color: req.params.color, size: req.params.size, sizeForReq: req.params.sizeForReq, user: req.params.user });
+  order.save( (err, order) => {
+    if(err) console.error(err)
+    console.log(order);
+  })
+})
+
+// ADD NEW CLIENT
+app.get(`/api/newClient/:name/:surname/:username/:provider/:tail`, async (req, res) => {
+  let client = await new Client({ name: req.params.name, surname: req.params.surname, username: req.params.username, provider: req.params.provider + '.' + req.params.tail });
+  client.save( (err, client) => {
+    if(err) console.error(err)
+    console.log(client);
+    res.json(client)
+  })
+})
+
+
 // DISPLAY HISTORY OF Searches
-app.get(`/api/:user/SearchInstance`, async (req, res) => {
-  await SearchInstance.find( { user: req.params.user }, (err, searches) => {
+app.get(`/api/:user/OrderInstances`, async (req, res) => {
+  await OrderInstance.find( { user: req.params.user }, (err, orders) => {
     if (err) console.error(err);
-    res.json(searches)
+    res.json(orders)
+  })
+});
+
+// DISPLAY ALL CLIENTS
+app.get(`/api/listClients`, async (req, res) => {
+  await Client.find( {}, (err, clients) => {
+    if (err) console.error(err);
+    res.json(clients)
   })
 });
 

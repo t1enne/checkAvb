@@ -1,20 +1,27 @@
-var mongoose = require('mongoose');
+let mongoose = require('mongoose');
 
-var Schema = mongoose.Schema;
+let OrderInstanceSchema = new mongoose.Schema({
+  year: String,
+  season: String,
+  model: String,
+  color: String,
+  size: String,
+  sizeForReq: String,
+  user: String,
+  client: {type: String, default: "unassigned"},
+  dateObj: { type: Date, default: new Date() }
+}, { toJSON: { virtuals: true } } );
 
-var OrderSchema = new Schema(
-  {
-    client: {type: Schema.Types.ObjectId, ref: 'Client', required: true},
-    piecesNumber: {type: Number, required: true},
-  }
-);
-
-// Virtual for book's URL
-OrderSchema
-.virtual('url')
-.get(function () {
-  return '/catalog/order/' + this._id;
+OrderInstanceSchema.virtual('date').get(function() {
+  let d = this.dateObj
+  let day = d.getDate();
+  let month = d.getMonth() + 1;
+  let year = d.getYear() - 100;
+  let date = `${day}/${month}/${year}`
+  return date
 });
 
-//Export model
-module.exports = mongoose.model('Order', OrderSchema);
+const OrderInstance = mongoose.model('OrderInstance', OrderInstanceSchema);
+
+module.exports = OrderInstance;
+// module.exports = mongoose.model('OrderInstance', OrderInstanceSchema);

@@ -4,24 +4,26 @@ var Schema = mongoose.Schema;
 
 var ClientSchema = new Schema(
   {
-    first_name: {type: String, required: true, maxlength: 100},
-    family_name: {type: String, required: true, maxlength: 100},
-  }
+    name: {type: String, required: true, maxlength: 100},
+    surname: {type: String, required: true, maxlength: 100},
+    username: {type: String, maxlength: 100},
+    provider: {type: String, maxlength: 100},
+    orders: Array
+  }, { toJSON: { virtuals: true } }
 );
 
 // Virtual for author's full name
 ClientSchema
-.virtual('name')
+.virtual('fullname')
 .get(function () {
   return this.family_name + ', ' + this.first_name;
 });
-
-// Virtual for author's URL
 ClientSchema
-.virtual('url')
+.virtual('mail')
 .get(function () {
-  return '/catalog/client/' + this._id;
+  return this.username + '@' + this.provider;
 });
+
 
 //Export model
 module.exports = mongoose.model('Client', ClientSchema);

@@ -24,11 +24,15 @@ html {
 
 body {}
 
+input::placeholder {
+  text-transform: capitalize;
+}
+
 input {
   border: none;
   border-bottom: 1px solid black;
   padding: 1rem !important;
-  text-transform: capitalize;
+  text-transform: uppercase;
   margin: 1rem 0;
 }
 
@@ -37,10 +41,16 @@ input[type=checkbox] {}
 label {
   font-weight: 400;
   width: max-content;
+  cursor: pointer;
 }
 
 ul {
   list-style-type: none;
+  list-style: none;
+}
+
+li {
+  list-style: none;
 }
 
 .label {
@@ -51,6 +61,7 @@ ul {
   border-radius: 2px;
   display: flex;
   align-items: center;
+  cursor: pointer;
 }
 
 .label-price {
@@ -76,6 +87,19 @@ ul {
   background-color: #2d8c4d;
   color: white;
   padding: 0 1rem;
+}
+
+.sizes-wrapper .to-add-popout {
+  opacity: 0;
+  transition: .2s ease-in;
+  z-index: -1;
+}
+
+.sizes-wrapper .to-add-popout.add {
+  opacity: 1;
+  padding: 0 1rem;
+  background: yellow;
+  z-index: 0;
 }
 
 .shop {
@@ -126,7 +150,7 @@ img.sku-picture.hidden {
 }
 
 .user-panel {
-  position: absolute;
+  position: fixed;
   overflow: scroll;
   top: 0px;
   right: 0px;
@@ -147,6 +171,7 @@ img.sku-picture.hidden {
   right: 0px;
   top: 10%;
   text-transform: uppercase;
+  cursor: pointer;
 }
 
 .user-icon>.dropdown {
@@ -227,6 +252,7 @@ input[name=css-tabs] {
   transition: transform 400ms;
   border-radius: 2px;
 }
+
 #tabs label {
   position: relative;
   z-index: 100;
@@ -280,50 +306,79 @@ input[name=css-tabs] {
   position: relative;
   height: auto;
   width: 100%;
-  margin: 1rem;
+  margin: 2.5rem 1rem;
+  display: flex;
+  justify-content: center;
 }
 
-.search-instance {
-  padding: 1rem;
+#content2 .new-client.reveal-inputs .new-client-inputs {
+  max-height: 100vh;
+  opacity: 1;
+  z-index: 0;
+}
+
+#content2 .new-client-inputs {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  max-height: 0px;
+  opacity: 0;
+  transition: .3s ease-out;
+  z-index: -1;
+}
+
+#content2 ul.client-list {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+#content2 ul.client-list li {
   border-radius: 5px;
-  box-shadow: 1px 2px 3px #b9b5b5;
+  border: 1px solid;
+  padding: 0 2rem;
   margin: 1rem;
-  text-transform: uppercase;
+  cursor: pointer;
 }
-.search-dates {
-  margin: 0px;
-  font-style: italic;
-  color: grey;
+
+#content2 ul.client-list li span {
+  text-align: right;
+  color: #b9b5b5;
 }
+
 .searches-content {
   display: flex;
   flex-direction: column-reverse;
 }
 
-/* #content::before {
-	content: "";
-	display: block;
-	position: absolute;
-	width: 0;
-	height: 0;
-	margin-left: -50px;
-	border-top: 8px solid #000;
-	border-right: 10px solid #000;
-	border-left: 10px solid transparent;
-	border-bottom: 8px solid transparent;
+.searches-content .table {
+  display: flex;
+  flex-direction: column-reverse;
 }
-#content::after {
-	content: "";
-	display: block;
-	position: absolute;
-	width: 0;
-	height: 0;
-	margin-left: calc(100% + 30px);
-	border-top: 8px solid #000;
-	border-left: 10px solid #000;
-	border-right: 10px solid transparent;
-	border-bottom: 8px solid transparent;
-} */
+
+.searches-content span {
+  display: inline;
+}
+
+.search-instance {
+  padding: 1rem;
+  border-radius: 5px;
+  border: 1px solid #b9b5b5;
+  margin: 1rem;
+  text-transform: uppercase;
+}
+
+.search-instance div.search-date, .search-instance div.search-user {
+  margin: 0px;
+  font-style: italic;
+  color: #b9b5b5;
+  text-align: right;
+  text-transform: lowercase;
+}
+
+#client-name {
+  text-transform: capitalize;
+}
+
 #content section {
   position: absolute;
   transform: translateY(50px);
@@ -348,10 +403,6 @@ input[name=css-tabs] {
 .results {
   text-align: left;
   margin: 5rem auto;
-}
-
-.results * {
-  cursor: default;
 }
 
 .sku-wrapper {
@@ -412,7 +463,8 @@ input[name=css-tabs] {
   margin-bottom: -5px;
 }
 
-.user-icon svg path {
+.user-icon svg path,
+.button>svg>path {
   fill: black;
 }
 

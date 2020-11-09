@@ -1,15 +1,22 @@
+import 'regenerator-runtime/runtime';
+import m from 'mithril';
+import Tabs from '/components/Tabs';
+
 const resultsElement = document.querySelector('.results');
 const button = document.querySelector('.search-button');
 const loader = document.querySelector('.loader');
 const loginPopout = document.querySelectorAll('.user-icon');
 const loginButton = document.querySelector('.login-button');
 
-
 //check if session exists
 let session;
 async function loginCheck() {
   try {
-    session = await fetch('/logged').then(res => res.json())
+    session = {};
+    session.smurf = "SmurfID=00203033adc71eb37daa087a46a225c932893359cc8f0d78c0916890a5e4164e"
+    session.user = 'ntaov';
+
+    // session = await fetch('/logged').then(res => res.json())
     if (session.smurf && session.user) {
       classy('form.login', 'd-none', 'add')
       classy('.user-personal-bucket', 'd-none', 'remove');
@@ -31,46 +38,48 @@ async function loginCheck() {
 
 loginCheck();
 
+m.mount(document.querySelector('div.user-personal-bucket'), Tabs)
+
 let tabHandler = {
   handler: () => {
-    // SELECT THE FIRST TAB
+    // select the first tab
     document.querySelector('#radio1').checked = true;
     // add a listener
     let tabs = document.querySelectorAll('#tabs > label');
-    tabs.forEach( (item, i) => {
-      if(item.checked === true) item.click();
+    tabs.forEach((item, i) => {
+      if (item.checked === true) item.click();
 
       item.addEventListener('click', (e) => {
-        if(e.target.classList.contains('tab-orders')) tabHandler.orders();
-        if(e.target.classList.contains('tab-clients')) tabHandler.clients();
-        if(e.target.classList.contains('tab-history')) tabHandler.history();
-      })
+        if (e.target.classList.contains('tab-orders'))
+          tabHandler.orders();
+        if (e.target.classList.contains('tab-clients'))
+          tabHandler.clients();
+        if (e.target.classList.contains('tab-history'))
+          tabHandler.history();
+        }
+      )
     });
   },
-  orders: () => {
-
-  },
-  clients: () => {
-
+  orders: () => {},
+  clients: async () => {
   },
   history: async () => {
-    document.querySelector('.searches-content').textContent = ''
-    let searches = await fetch(`/api/${session.user}/SearchInstance`)
-    .then(res => res.json())
-    console.log(searches);
-    searches.forEach((item, i) => {
-      let search = maker('div', {
-        class: `search-instance flex search-${i}`,
-        style: `justify-content: space-between;`,
-        onclick: () => {
-          console.log('clicked');
-        },
-        text: `${item.model} ${item.color}`
-      }, document.querySelector('.searches-content')
-    );
-      maker('p', {class: 'search-dates', text: item.date }, search)
-    });
+    // document.querySelector('.searches-content').textContent = ''
+    let searches = await m.request({
+      method: "GET",
+      url: `/api/${session.user}/OrderInstances`
+    })
 
+    let searchesArray = searches.map(item => {
+      console.log(item);
+      return m(`.search-instance[url=${item._id}]`, m("span", `${item.year}${item.season} ${item.model} ${item.color} ${item.size}`), m(".search-date", item.date), m(".search-user", item.user))
+    })
+
+    m.mount(document.querySelector('.searches-content'), {
+      view: () => {
+        return m("div.table.u-full-width", searchesArray)
+      }
+    })
   }
 }
 tabHandler.handler();
@@ -205,10 +214,37 @@ async function getAvb(user, model, color) {
           let index = Object.keys(item)[0];
 
           let size = Object.keys(item[index])
+          console.log(sku);
 
-          let sizeLabel = make('li', `size-${z}`, sizesWrapper)
-          sizeLabel.innerHTML = `<label class="label label-size">${size}</label>`;
-          let sizeList = make('ul', 'size=list', sizeLabel)
+          let sizeLabelElement = make('li', `size-${z}`, sizesWrapper)
+          let sizeRow = maker("div", {
+            class: "size size-row flex"
+          }, sizeLabelElement)
+          let sizeLabel = maker("label", {
+            class: "label label-size",
+            size: sku.sizesForRequests[z],
+            // click to add to orders
+            on: [
+              "click", async () => {
+                if (toAddPopup.classList.contains('add')) {
+                  toAddPopup.classList.remove('add')
+                  await fetch(`/api/addOrder/${session.user}/${sku.year}/${sku.season}/${sku.model}/${sku.color}/${size}/${sku.sizesForRequests[z]}`).then(res => res.json()).then(json => console.log(json))
+                  // await m.request({
+                  //   method: 'GET',
+                  //   url: `/api/addOrder/${session.user}/${sku.year}/${sku.season}/${sku.model}/${sku.color}/${size}/${sku.sizesForRequests[z]}`
+                  // }).then(res => console.log(res))
+                } else
+                  toAddPopup.classList.add('add');
+                }
+              ],
+            text: size
+          }, sizeRow);
+          let toAddPopup = maker("span", {
+            class: "label to-add-popout",
+            text: "Add to orders"
+          }, sizeRow);
+
+          let sizeList = make('ul', 'size=list', sizeLabelElement)
 
           let shops = Object.values(item[index])[0]
           shops.forEach(item => {
@@ -268,6 +304,7 @@ async function getAvb(user, model, color) {
     });
   });
   collapsibles('.sku', '.sizes-wrapper');
+  collapsibles('.sku', '.sizes-wrapper');
 
   document.querySelectorAll('.total-receivables').forEach((item) => {
     item.addEventListener('click', async (event) => {
@@ -322,13 +359,19 @@ function maker(element, attrs, parent) {
   let elem = document.createElement(element);
   let attibutes = Object.keys(attrs)
   let values = Object.values(attrs)
-
   attibutes.forEach((item, i) => {
-    item === 'text'
-      ? elem.textContent = values[i]
-      : elem.setAttribute(item, values[i])
+    if (item === 'text') {
+      elem.textContent = values[i]
+    } else if (item === 'on') {
+      const event = values[i][0];
+      const callback = values[i][1];
+      elem.addEventListener(event, () => {
+        callback()
+      })
+    } else {
+      elem.setAttribute(item, values[i])
+    }
   });
-
   parent.appendChild(elem)
   return elem
 }
@@ -342,4 +385,13 @@ function classy(elem, c, addRemoveToggle) {
       item.classList[addRemoveToggle](c)
     });
   }
+}
+
+function s(query, cb) {
+  let e = document.querySelectorAll(query);
+  e.length = 1
+    ? cb(e)
+    : e.forEach(item => {
+      cb(item)
+    });
 }
