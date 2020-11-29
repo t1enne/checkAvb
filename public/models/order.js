@@ -1,14 +1,10 @@
 let mongoose = require('mongoose');
 
 let OrderInstanceSchema = new mongoose.Schema({
-  year: String,
-  season: String,
-  model: String,
-  color: String,
-  size: String,
-  sizeForReq: String,
+  clientId: String,
+  clientName: String,
   user: String,
-  client: {type: String, default: "unassigned"},
+  searches: Array,
   dateObj: { type: Date, default: new Date() }
 }, { toJSON: { virtuals: true } } );
 
@@ -24,4 +20,3 @@ OrderInstanceSchema.virtual('date').get(function() {
 const OrderInstance = mongoose.model('OrderInstance', OrderInstanceSchema);
 
 module.exports = OrderInstance;
-// module.exports = mongoose.model('OrderInstance', OrderInstanceSchema);
