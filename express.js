@@ -13,6 +13,7 @@ let mongoUrl = process.env.MONGOLAB_URI
 mongoose.connect(mongoUrl, {
   useNewUrlParser: true
 });
+mongoose.set('useFindAndModify', false);
 let db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
@@ -301,12 +302,13 @@ app.get(`/api/addSearch/:user/:year/:season/:model/:color/:size/:sizeForReq/:pri
 })
 
 // ADD NEW CLIENT
-app.get(`/api/newClient/:name/:surname/:username/:provider/:tail`, async (req, res) => {
+app.get(`/api/newClient/:name/:surname/:username/:provider/:tail/:phone`, async (req, res) => {
   let client = await new Client({
     name: req.params.name,
     surname: req.params.surname,
     username: req.params.username,
-    provider: req.params.provider + '.' + req.params.tail
+    provider: req.params.provider + '.' + req.params.tail,
+    phone: req.params.phone
   });
   client.save((err, client) => {
     if (err)
@@ -320,17 +322,18 @@ app.get(`/api/newClient/:name/:surname/:username/:provider/:tail`, async (req, r
 // TODO: when I assign Search to Order, push searchId to OrderInstance.searches
 
 app.get('/api/addToClient/:orderId/:searchId', async (req, res) => {
-  await SearchInstance.updateOne({
-    _id: req.params.searchId
-  }, {
-    order: req.params.orderId
-  })
-  await SearchInstance.find({
-    order: req.params.orderId
-  }, (err, order) => {
-    if (err) console.error(err);
-    res.json(order)
-  })
+  await SearchInstance.findOneAndUpdate({
+      _id: req.params.searchId
+    }, {
+      order: req.params.orderId
+    }, {
+      new: true
+    }),
+    (err, order) => {
+      if (err) console.error(err);
+      console.log('assigned ' + order);
+      res.json(order)
+    }
 })
 
 // CREATE ORDER
@@ -382,7 +385,7 @@ app.get(`/api/:order/SearchInstances`, async (req, res) => {
 app.get(`/api/:user/SearchInstances`, async (req, res) => {
   await SearchInstance.find({
     user: req.params.user
-  }.limit(10), (err, searches) => {
+  }, (err, searches) => {
     if (err)
       console.error(err);
     res.json(searches)

@@ -15056,6 +15056,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 var seaching = false,
     session;
+var AppToaster = new _constructUi.Toaster();
 var Clients = {
   clientsList: [],
   loadClients: function loadClients() {
@@ -15087,12 +15088,22 @@ var Clients = {
         onclick: function onclick(e) {
           navigator.clipboard.writeText(client.mail);
         }
+      }), (0, _mithril.default)(_constructUi.Button, {
+        class: 'phone-copy-button',
+        label: "phone: ".concat(client.phone ? client.phone : '', " "),
+        iconLeft: _constructUi.Icons.COPY,
+        basic: true,
+        onclick: function onclick(e) {
+          navigator.clipboard.writeText(client.phone);
+        }
       }));
     });
   }
 };
 var Searches = {
   searchesList: [],
+  unassignedSearches: [],
+  assignedSearches: {},
   loadSearches: function () {
     var _loadSearches = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
       return regeneratorRuntime.wrap(function _callee$(_context) {
@@ -15103,12 +15114,10 @@ var Searches = {
                 method: "GET",
                 url: "/api/SearchInstances"
               }).then(function (res) {
+                console.log(res);
                 Searches.searchesList = res;
-                Orders.unassignedSearches = res.filter(function (item) {
-                  return item.order === 'unassigned';
-                }).map(function (item) {
-                  return item;
-                });
+                Searches.filterSearches(res);
+                console.log(Searches.assignedSearches);
               });
 
             case 1:
@@ -15125,6 +15134,22 @@ var Searches = {
 
     return loadSearches;
   }(),
+  filterSearches: function filterSearches(searches) {
+    console.log('filtering searches');
+    Searches.unassignedSearches = searches.filter(function (item) {
+      return item.order === 'unassigned';
+    });
+    searches.map(function (search) {
+      if (search.order != 'unassigned') {
+        if (!Searches.assignedSearches[search.order]) {
+          Searches.assignedSearches[search.order] = [];
+          Searches.assignedSearches[search.order].push(search);
+        } else {
+          Searches.assignedSearches[search.order].push(search);
+        }
+      }
+    });
+  },
   oninit: function oninit() {
     if (Searches.searchesList.length === 0) {
       Searches.loadSearches();
@@ -15133,7 +15158,9 @@ var Searches = {
   view: function view() {
     return (0, _mithril.default)(_constructUi.List, {
       interactive: true,
-      size: 'md'
+      size: 'md',
+      class: 'flex reverse',
+      style: 'max-height:none;'
     }, Searches.searchesList.map(function (item) {
       return (0, _mithril.default)(_constructUi.ListItem, {
         label: "".concat(item.year).concat(item.season, " ").concat(item.model, " ").concat(item.color, " ").concat(item.size),
@@ -15154,10 +15181,12 @@ function AssignedSearch() {
         iconLeft: _constructUi.Icons.MINUS,
         intent: 'negative',
         size: 'xs',
-        outlined: true,
+        basic: true,
         onclick: function onclick(e) {
+          //UNASSIGN SEARCH
           e.preventDefault();
           e.stopPropagation();
+          console.log(1);
 
           _mithril.default.request({
             method: 'GET',
@@ -15187,32 +15216,33 @@ function UnassignedSearch() {
       var item = vnode.attrs.item;
       var contentR = (0, _mithril.default)(_constructUi.Tag, {
         label: item.price,
-        intent: 'primary'
-      });
-      var contentL = (0, _mithril.default)(_constructUi.Button, {
-        iconLeft: _constructUi.Icons.PLUS,
-        intent: 'positive',
-        size: 'xs',
-        outlined: true,
-        onclick: function onclick(e) {
-          var searchId = item._id;
-          var orderId = document.querySelector('.selected-order').getAttribute('id');
-          Searches.searchesList.push(order);
-          console.log('search id is ' + searchId);
-          console.log('order id is ' + orderId); // Add to order and update AssignedOrders
+        intent: 'warning'
+      }); // let contentL =
 
-          _mithril.default.request({
-            method: 'GET',
-            url: "/api/addToClient/".concat(orderId, "/").concat(searchId)
-          }).then(function (res) {
-            console.log(res);
-          });
-        }
-      });
       return (0, _mithril.default)(_constructUi.ListItem, {
         label: "".concat(item.year).concat(item.season, " ").concat(item.model, " ").concat(item.color, " ").concat(item.size),
         contentRight: contentR,
-        contentLeft: contentL
+        contentLeft: (0, _mithril.default)(_constructUi.Button, {
+          iconLeft: _constructUi.Icons.PLUS,
+          intent: 'positive',
+          size: 'xs',
+          label: 'Add',
+          basic: true,
+          onclick: function onclick(e) {
+            // ASSIGN SEARCH
+            var searchId = item._id;
+            var orderId = document.querySelector('.selected-order').getAttribute('id');
+            console.log('search id is ' + searchId);
+            console.log('order id is ' + orderId);
+
+            _mithril.default.request({
+              method: 'GET',
+              url: "/api/addToClient/".concat(orderId, "/").concat(searchId)
+            }).then(function (res) {
+              console.log(res);
+            });
+          }
+        })
       });
     }
   };
@@ -15221,7 +15251,6 @@ function UnassignedSearch() {
 
 var Orders = {
   ordersList: [],
-  unassignedSearches: [],
   loadOrders: function loadOrders() {
     _mithril.default.request({
       method: "GET",
@@ -15239,7 +15268,6 @@ var Orders = {
   },
   order: {
     oninit: function oninit(vnode) {
-      vnode.state.isOpen = true;
       vnode.state.selected = false;
       vnode.state.pieces = 0;
       vnode.state.total = 0;
@@ -15252,12 +15280,41 @@ var Orders = {
       var order = vnode.attrs.order;
       var o = vnode.attrs.o;
       return (0, _mithril.default)(_constructUi.Card, {
-        class: "order client-order",
+        class: "order client-order collapsible",
         id: order._id,
         clientId: order.clientId,
         interactive: true,
         fluid: true,
-        elevation: 2,
+        elevation: 2 // SELECT ORDER
+
+      }, (0, _mithril.default)(_constructUi.PopoverMenu, {
+        closeOnContentClick: true,
+        content: [(0, _mithril.default)(_constructUi.Button, {
+          iconLeft: _constructUi.Icons.TRASH,
+          intent: 'negative',
+          label: 'Delete',
+          basic: true,
+          align: 'center',
+          onclick: function onclick(e) {
+            // DELETE ORDER
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('deleting order ' + order._id);
+
+            _mithril.default.request({
+              method: "DELETE",
+              url: "/api/deleteOrder/".concat(order._id)
+            }).then(function (res) {
+              console.log(res);
+              Orders.ordersList.splice(Orders.ordersList.indexOf(res), 1);
+            });
+          }
+        })],
+        trigger: (0, _mithril.default)(_constructUi.Button, {
+          iconLeft: _constructUi.Icons.SETTINGS,
+          style: 'float:right;'
+        })
+      }), [(0, _mithril.default)(".order-client-name[id=".concat(order.clientId, "]"), {
         onclick: function onclick() {
           // controller for the selected order
           vnode.state.selected = !vnode.state.selected;
@@ -15273,55 +15330,36 @@ var Orders = {
             classy('.client-order', 'selected-order', 'remove');
             classy('.client-order', 'd-none', 'remove');
           }
-        } // SELECT ORDER
-
-      }, (0, _mithril.default)(_constructUi.Button, {
-        iconLeft: _constructUi.Icons.X,
-        style: 'float:right;',
-        intent: 'negative',
-        basic: true,
-        align: 'center',
-        onclick: function onclick(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('deleting order ' + order._id);
-
-          _mithril.default.request({
-            method: "DELETE",
-            url: "/api/deleteOrder/".concat(order._id)
-          }).then(function (res) {
-            return console.log;
-          });
         }
-      }), [(0, _mithril.default)("h1.order-client-name#client-name[id=".concat(order.clientId, "]"), order.clientName), (0, _mithril.default)(_constructUi.Tag, {
+      }, (0, _mithril.default)("h1", order.clientName)), (0, _mithril.default)(_constructUi.Tag, {
         label: order.date,
         class: 'date'
       }), (0, _mithril.default)(_constructUi.Tag, {
         label: order.user,
         intent: 'primary',
         class: 'user'
-      }), (0, _mithril.default)(_constructUi.Tag, {
-        label: order._id,
-        class: 'url',
+      }) //, m(Tag, {
+      //   label: order._id,
+      //   class: 'url',
+      //   size: 'xs',
+      //   url: order._id
+      // })
+      ], [(0, _mithril.default)(_constructUi.List, {
         size: 'xs',
-        url: order._id
-      })], (0, _mithril.default)(".searches-order-id-".concat(order._id, ".flex.reverse.searches-order-id")), [(0, _mithril.default)(_constructUi.Collapse, {
-        duration: 200,
-        isOpen: vnode.state.isOpen
-      }, [(0, _mithril.default)('h3', (0, _mithril.default)(_constructUi.List, Searches.searchesList.filter(function (search) {
-        return search.order === order._id;
-      }).map(function (search) {
+        style: "margin-top:1rem;",
+        class: 'collapsible assigned-orders'
+      }, Searches.assignedSearches[order._id] ? Searches.assignedSearches[order._id].map(function (search) {
         vnode.state.pieces++;
         vnode.state.total += parseInt(search.price);
         return (0, _mithril.default)(AssignedSearch, {
           search: search
         });
-      })), (0, _mithril.default)('.row.searches-totals', (0, _mithril.default)(_constructUi.Tag, {
+      }) : undefined), (0, _mithril.default)('.row.searches-totals', (0, _mithril.default)(_constructUi.Tag, {
         label: "total pcs: ".concat(vnode.state.pieces)
       }), (0, _mithril.default)(_constructUi.Tag, {
         label: "total: \u20AC".concat(vnode.state.total),
-        intent: 'primary'
-      })))]), (0, _mithril.default)(_constructUi.Button, {
+        intent: 'warning'
+      })), (0, _mithril.default)(_constructUi.Button, {
         fluid: true,
         size: 'md',
         style: 'margin: auto; display: block; padding: 0; transition: rotate .3s',
@@ -15330,13 +15368,27 @@ var Orders = {
         onclick: function onclick(e) {
           e.preventDefault();
           e.stopPropagation();
-          vnode.state.isOpen = !vnode.state.isOpen;
+          var list = vnode.dom.querySelector('.assigned-orders');
+          list.classList.toggle('collapsed');
+          console.log(vnode);
           var svg = e.target.children[0];
+
+          _mithril.default.redraw();
         }
       })]);
     }
   },
   view: function view(vnode) {
+    var array;
+
+    if (Searches.unassignedSearches.length != 0) {
+      array = Searches.unassignedSearches.map(function (item) {
+        return (0, _mithril.default)(UnassignedSearch, {
+          item: item
+        });
+      });
+    }
+
     return [(0, _mithril.default)('.orders.flex.reverse', Orders.ordersList.map(function (order, o) {
       return (0, _mithril.default)(Orders.order, {
         order: order,
@@ -15346,12 +15398,9 @@ var Orders = {
       fluid: true
     }, (0, _mithril.default)(_constructUi.List, {
       class: 'unassigned-searches',
-      interactive: true
-    }, Orders.unassignedSearches.map(function (item) {
-      return (0, _mithril.default)(UnassignedSearch, {
-        item: item
-      });
-    })))];
+      interactive: false,
+      size: 'xs'
+    }, (0, _mithril.default)('.list-items-wrapper', array)))];
   }
 };
 var Tabs = {
@@ -15448,8 +15497,7 @@ var Tabs = {
                     url: "/api/createOrder/".concat(item._id, "/").concat(session.user, "/").concat(item.name, "&").concat(item.surname)
                   }).then(function (res) {
                     console.log(res);
-
-                    _mithril.default.mount(document.querySelector('.order-list'), Orders);
+                    Orders.ordersList.push(res); //m.mount(document.querySelector('.order-list'), Orders)
                   });
                 },
                 trigger: (0, _mithril.default)(_constructUi.Button, {
@@ -15465,17 +15513,7 @@ var Tabs = {
         oncreate: function oncreate(vnode) {
           _mithril.default.mount(vnode.dom, Orders);
         }
-      }, 'Order List')]) // m(UnassignedSearches)
-      // m(Card, {
-      //   fluid: true
-      // }, m(`.unassigned-searches`, m('h1', 'Unassigned Searches'),
-      //   Searches.searchesList.map(item => {
-      //     console.log(item);
-      //     return m('.text', item.model)
-      //     // show ADD button only on the orders tab
-      //
-      //   })))
-      ];
+      }, 'Order List')])];
     }
   },
   clientsSection: {
@@ -15533,35 +15571,39 @@ var Tabs = {
         type: 'text',
         name: 'client-mail',
         placeholder: 'email'
+      }), (0, _mithril.default)(_constructUi.Input, {
+        type: 'text',
+        name: 'client-phone',
+        placeholder: 'Telephone'
       }), (0, _mithril.default)(_constructUi.Button, {
         type: 'submit',
         label: "Add Client",
-        // REGISTER NEW CLIENT
+        // CREATE NEW CLIENT
         onclick: function () {
           var _onclick3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
-            var name, surname, mail, username, provider, tail;
+            var name, surname, mail, phone, username, provider, tail;
             return regeneratorRuntime.wrap(function _callee5$(_context5) {
               while (1) {
                 switch (_context5.prev = _context5.next) {
                   case 0:
-                    name = document.querySelector('input[name="client-name"]').value;
-                    surname = document.querySelector('input[name="client-surname"]').value;
-                    mail = document.querySelector('input[name="client-mail"]').value;
+                    name = document.querySelector('input[name="client-name"]').value.trim();
+                    surname = document.querySelector('input[name="client-surname"]').value.trim();
+                    mail = document.querySelector('input[name="client-mail"]').value.trim();
+                    phone = document.querySelector('input[name="client-phone"]').value.trim();
                     username = mail.split('@')[0];
                     provider = mail.split('@')[1].split('.')[0];
-                    tail = mail.split('@')[1].split('.')[1]; // await fetch(`/api/newClient/${name}/${surname}/${username}/${provider}/${tail}`).then(res => res.json).then(json => console.log(json))
-
-                    _context5.next = 8;
+                    tail = mail.split('@')[1].split('.')[1];
+                    _context5.next = 9;
                     return _mithril.default.request({
                       method: "GET",
-                      url: "/api/newClient/".concat(name, "/").concat(surname, "/").concat(username, "/").concat(provider, "/").concat(tail)
+                      url: "/api/newClient/".concat(name, "/").concat(surname, "/").concat(username, "/").concat(provider, "/").concat(tail, "/").concat(phone)
                     });
 
-                  case 8:
+                  case 9:
                     // emit a click event for convenience on the clients radio to fetch the clients
                     document.querySelector('#radio2').click();
 
-                  case 9:
+                  case 10:
                   case "end":
                     return _context5.stop();
                 }
@@ -15614,16 +15656,18 @@ var Tabs = {
   },
   view: function view() {
     return [(0, _mithril.default)('.user-icons.flex.f-width', {
-      style: 'justify-content:space-between;position:absolute;'
-    }, (0, _mithril.default)(_constructUi.Icon, {
-      name: _constructUi.Icons.USER,
+      style: 'justify-content:space-between;'
+    }, (0, _mithril.default)(_constructUi.Button, {
+      iconLeft: _constructUi.Icons.USER,
       size: 'xl',
+      basic: true,
       onclick: function onclick() {
         classy('.user-panel', 'hidden', 'toggle');
       }
-    }), (0, _mithril.default)('.login-user'), (0, _mithril.default)(_constructUi.Icon, {
-      name: _constructUi.Icons.X,
+    }), (0, _mithril.default)('.login-user'), (0, _mithril.default)(_constructUi.Button, {
+      iconLeft: _constructUi.Icons.X,
       size: 'xl',
+      basic: true,
       onclick: function onclick() {
         classy('.user-panel', 'hidden', 'toggle');
       }
@@ -15691,7 +15735,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 _constructUi.FocusManager.alwaysShowFocus();
 
 var resultsElement = document.querySelector('.results');
-var loader = document.querySelector('.loader'); // Loader SVG
+var loader = document.querySelector('.loader');
+var AppToaster = new _constructUi.Toaster(); // Loader SVG
 
 _mithril.default.mount(loader, {
   view: function view() {
@@ -15700,6 +15745,15 @@ _mithril.default.mount(loader, {
 });
 
 var session;
+
+function show(msg) {
+  AppToaster.show({
+    message: msg,
+    icon: _constructUi.Icons.BELL,
+    intent: 'positive'
+  });
+}
+
 var Login = {
   view: function view() {
     return [(0, _mithril.default)('.logo-bg', {
@@ -15733,7 +15787,7 @@ var Login = {
                   e.preventDefault();
 
                   if (session.user) {
-                    _context.next = 4;
+                    _context.next = 5;
                     break;
                   }
 
@@ -15741,6 +15795,9 @@ var Login = {
                   return getCookie();
 
                 case 4:
+                  show('Logged in!');
+
+                case 5:
                 case "end":
                   return _context.stop();
               }
@@ -15754,6 +15811,9 @@ var Login = {
 
         return onclick;
       }()
+    }), (0, _mithril.default)(AppToaster, {
+      clearOnEscapeKey: true,
+      position: 'top'
     })];
   }
 }; //check if session exists
@@ -15877,12 +15937,6 @@ var resultsArray;
 var SearchForm = {
   loading: false,
   clearFields: function clearFields() {
-    // if (document.querySelectorAll('.size-wrapper')) {
-    //   document.querySelectorAll('.size-wrapper').forEach(item => item.textContent = '')
-    // }
-    // if (document.querySelectorAll('.label-price')) {
-    //   document.querySelectorAll('.label-price').forEach(item => item.textContent = '')
-    // }
     resultsArray = [];
   },
   view: function view(vnode) {
@@ -15985,7 +16039,8 @@ function Sku() {
       vnode.state.loading = false;
       vnode.state.imgSrc = '';
       vnode.state.availability = [];
-      vnode.state.price = undefined; // vnode.state.sku = vnode.attrs.sku
+      vnode.state.imgFetched = false; // vnode.state.price = '--,--'
+      // vnode.state.sku = vnode.attrs.sku
 
       vnode.state.getPrice = function () {
         _mithril.default.request({
@@ -16027,18 +16082,20 @@ function Sku() {
         size: 'xl',
         loading: vnode.state.loading,
         onclick: function onclick(e) {
-          vnode.state.imgSrc = '';
-          vnode.state.loading = !vnode.state.loading; // e.preventDefault();
-          // e.stopPropagation();
+          if (!vnode.state.imgFetched) {
+            vnode.state.loading = !vnode.state.loading; // e.preventDefault();
+            // e.stopPropagation();
 
-          fetch("api/image/".concat(sku.year, "/").concat(sku.season, "/").concat(sku.model)).then(function (res) {
-            return res.text();
-          }).then(function (url) {
-            vnode.state.imgSrc = url;
-            vnode.state.loading = !vnode.state.loading;
+            fetch("api/image/".concat(sku.year, "/").concat(sku.season, "/").concat(sku.model)).then(function (res) {
+              return res.text();
+            }).then(function (url) {
+              vnode.state.imgFetched = true;
+              vnode.state.imgSrc = url;
+              vnode.state.loading = !vnode.state.loading;
 
-            _mithril.default.redraw();
-          });
+              _mithril.default.redraw();
+            });
+          }
         }
       })), _m)), // m(PriceLabel, {
       //   sku: sku,
@@ -16046,6 +16103,7 @@ function Sku() {
       // })
       (0, _mithril.default)(_constructUi.Tag, {
         class: 'price-' + string,
+        intent: 'warning',
         oninit: function oninit() {
           if (!vnode.state.price) {
             _mithril.default.request({
@@ -16059,7 +16117,9 @@ function Sku() {
         label: vnode.state.price
       }))), (0, _mithril.default)('.row[style="display: block;"]', [// here go sku.desc and sizes
       (0, _mithril.default)(_constructUi.Tag, {
-        label: sku.descr
+        label: sku.descr,
+        intent: 'warning',
+        size: 'xs'
       }), // Size Buttons
       sku.sizes.map(function (item, i) {
         return (0, _mithril.default)(SizeButton, {
@@ -16103,6 +16163,7 @@ function SizeButton() {
         label: size,
         style: 'margin: 0 2px;',
         loading: isLoading,
+        intent: 'positive',
         size: 'xs',
         requestSize: sizeForReq,
         onclick: function () {
@@ -16412,7 +16473,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "13057" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "4310" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -16,6 +16,7 @@ import {
   Classes,
   ControlGroup,
   Tag,
+  Toaster,
   Popover,
   PopoverInteraction,
   PopoverPosition
@@ -26,6 +27,7 @@ import Tabs from '/components/Tabs';
 
 const resultsElement = document.querySelector('.results');
 const loader = document.querySelector('.loader');
+const AppToaster = new Toaster();
 
 // Loader SVG
 m.mount(loader, {
@@ -35,6 +37,14 @@ m.mount(loader, {
 })
 
 let session;
+
+function show(msg) {
+  AppToaster.show({
+    message: msg,
+    icon: Icons.BELL,
+    intent: 'positive',
+  })
+}
 
 let Login = {
   view: () => {
@@ -68,8 +78,13 @@ let Login = {
           e.preventDefault();
           if (!session.user) {
             await getCookie()
+            show('Logged in!')
           }
         }
+      }),
+      m(AppToaster, {
+        clearOnEscapeKey: true,
+        position: 'top'
       })
     ]
   }
@@ -143,12 +158,6 @@ let resultsArray;
 let SearchForm = {
   loading: false,
   clearFields: () => {
-    // if (document.querySelectorAll('.size-wrapper')) {
-    //   document.querySelectorAll('.size-wrapper').forEach(item => item.textContent = '')
-    // }
-    // if (document.querySelectorAll('.label-price')) {
-    //   document.querySelectorAll('.label-price').forEach(item => item.textContent = '')
-    // }
     resultsArray = []
   },
   view: (vnode) => {
@@ -217,6 +226,7 @@ let SearchForm = {
     ])
   }
 }
+
 m.mount(document.querySelector('.search-form'), SearchForm)
 
 m.mount(document.querySelector('.results'), {
@@ -243,7 +253,8 @@ function Sku() {
       vnode.state.loading = false
       vnode.state.imgSrc = ''
       vnode.state.availability = []
-      vnode.state.price = undefined
+      vnode.state.imgFetched = false
+      // vnode.state.price = '--,--'
       // vnode.state.sku = vnode.attrs.sku
       vnode.state.getPrice = () => {
         m.request({
@@ -290,17 +301,20 @@ function Sku() {
               size: 'xl',
               loading: vnode.state.loading,
               onclick: (e) => {
-                vnode.state.imgSrc = ''
-                vnode.state.loading = !vnode.state.loading;
-                // e.preventDefault();
-                // e.stopPropagation();
-                fetch(`api/image/${sku.year}/${sku.season}/${sku.model}`)
-                  .then(res => res.text())
-                  .then(url => {
-                    vnode.state.imgSrc = url;
-                    vnode.state.loading = !vnode.state.loading;
-                    m.redraw()
-                  })
+
+                if (!vnode.state.imgFetched) {
+                  vnode.state.loading = !vnode.state.loading;
+                  // e.preventDefault();
+                  // e.stopPropagation();
+                  fetch(`api/image/${sku.year}/${sku.season}/${sku.model}`)
+                    .then(res => res.text())
+                    .then(url => {
+                      vnode.state.imgFetched = true
+                      vnode.state.imgSrc = url;
+                      vnode.state.loading = !vnode.state.loading;
+                      m.redraw()
+                    })
+                }
               }
             })
           }),
@@ -310,6 +324,7 @@ function Sku() {
           // })
           m(Tag, {
             class: 'price-' + string,
+            intent: 'warning',
             oninit: () => {
               if (!vnode.state.price) {
                 m.request({
@@ -326,7 +341,9 @@ function Sku() {
         m('.row[style="display: block;"]', [
           // here go sku.desc and sizes
           m(Tag, {
-            label: sku.descr
+            label: sku.descr,
+            intent: 'warning',
+            size: 'xs'
           }),
           // Size Buttons
           sku.sizes.map((item, i) => {
@@ -378,6 +395,7 @@ function SizeButton() {
         label: size,
         style: 'margin: 0 2px;',
         loading: isLoading,
+        intent: 'positive',
         size: 'xs',
         requestSize: sizeForReq,
         onclick: async (e) => {

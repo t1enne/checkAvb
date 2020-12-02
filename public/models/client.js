@@ -8,6 +8,7 @@ var ClientSchema = new Schema(
     surname: {type: String, required: true, maxlength: 100},
     username: {type: String, maxlength: 100},
     provider: {type: String, maxlength: 100},
+    phone: {type: String, maxlength: 20 },
     dateObj: { type: Date, default: new Date() },
     orders: Array
   }, { toJSON: { virtuals: true } }
