@@ -3,6 +3,8 @@ import m from 'mithril';
 
 import {
   Button,
+  Drawer,
+  DrawerPosition,
   Input,
   Icon,
   IconName,
@@ -16,6 +18,9 @@ import {
   Classes,
   ControlGroup,
   Tag,
+  Menu,
+  MenuItem,
+  Size,
   Toaster,
   Popover,
   PopoverInteraction,
@@ -23,18 +28,12 @@ import {
 } from 'construct-ui';
 import '../node_modules/construct-ui/lib/index.css'
 FocusManager.alwaysShowFocus();
-import Tabs from '/components/Tabs';
 
-const resultsElement = document.querySelector('.results');
-const loader = document.querySelector('.loader');
+import Tabs from '/components/Tabs';
+import Nav from '/components/Nav';
+
 const AppToaster = new Toaster();
 
-// Loader SVG
-m.mount(loader, {
-  view: () => {
-    return m(`svg[version='1.1'][id='L9'][xmlns='http://www.w3.org/2000/svg'][xmlns:xlink='http://www.w3.org/1999/xlink'][x='0px'][y='0px'][viewBox='0 0 100 100'][enable-background='new 0 0 0 0'][xml:space='preserve']`, m("path[fill='black'][d='M73,50c0-12.7-10.3-23-23-23S27,37.3,27,50 M30.9,50c0-10.5,8.5-19.1,19.1-19.1S69.1,39.5,69.1,50']", m("animateTransform[attributeName='transform'][attributeType='XML'][type='rotate'][dur='1s'][from='0 50 50'][to='360 50 50'][repeatCount='indefinite']")))
-  }
-})
 
 let session;
 
@@ -49,66 +48,83 @@ function show(msg) {
 let Login = {
   view: () => {
     return [
-      m('.logo-bg', {
-        style: 'width: auto; height: 100px; background: url("/logo.86ce68ea.svg") no-repeat center;'
-      }),
-      m(Input, {
-        style: 'display:block;margin:5px auto;',
-        contentLeft: m(Icon, {
-          name: Icons.USER
+      m('form.login', m('.logo-bg', {
+          style: 'width: auto; height: 100px; background: url("/logo.86ce68ea.svg") no-repeat center;'
         }),
-        placeholder: 'Your ASWEB Username',
-        autocomplete: 'username'
-      }),
-      m(Input, {
-        style: 'display:block;margin:5px auto;',
-        contentLeft: m(Icon, {
-          name: Icons.LOCK
+        m(Input, {
+          style: 'display:block;margin:5px auto;',
+          contentLeft: m(Icon, {
+            name: Icons.USER
+          }),
+          placeholder: 'Your ASWEB Username',
+          autocomplete: 'username'
         }),
-        placeholder: 'Password',
-        type: 'password',
-        autocomplete: "current-password"
-      }),
-      m(Button, {
-        label: 'LOGIN',
-        style: 'display:block;margin:5px auto;',
-        type: 'submit',
-        intent: 'primary',
-        onclick: async (e) => {
-          e.preventDefault();
-          if (!session.user) {
-            await getCookie()
-            show('Logged in!')
+        m(Input, {
+          style: 'display:block;margin:5px auto;',
+          contentLeft: m(Icon, {
+            name: Icons.LOCK
+          }),
+          placeholder: 'Password',
+          type: 'password',
+          autocomplete: "current-password"
+        }),
+        m(Button, {
+          label: 'LOGIN',
+          style: 'display:block;margin:5px auto;',
+          type: 'submit',
+          intent: 'primary',
+          onclick: async (e) => {
+            e.preventDefault();
+            if (!session.user) {
+              await getCookie()
+              show('Logged in!')
+            }
           }
-        }
-      }),
-      m(AppToaster, {
-        clearOnEscapeKey: true,
-        position: 'top'
-      })
+        }),
+        m(AppToaster, {
+          clearOnEscapeKey: true,
+          position: 'top'
+        }))
     ]
   }
 }
 
+
+
+// Router
+
+m.route(document.body, '/main', {
+  '/main': {
+    onmatch: () => {
+      // if (!sesion.user)
+      // m.route.set('/login')
+      // else
+      return Home
+    }
+  },
+  '/login': Login,
+  '/orders': Tabs.ordersSection,
+  '/clients': Tabs.clientsSection,
+  '/history': Tabs.historySection
+})
 //check if session exists
 async function loginCheck() {
   try {
 
     session = await fetch('/logged').then(res => res.json())
-    if (session.smurf && session.user) {
-      classy('form.login', 'd-none', 'add')
-      classy('.user-personal-bucket', 'd-none', 'remove');
-      if (!document.querySelector('.user-panel').classList.contains('hidden')) {
-        classy('.user-panel', 'hidden', 'add')
-      }
-      console.log(session);
-      document.querySelectorAll('.login-user').forEach(item => {
-        item.textContent = session.user
-      })
-    } else {
-      classy('.user-panel', 'hidden', 'remove')
-      classy('form.login', 'd-none', 'remove')
-    }
+    //   if (session.smurf && session.user) {
+    //     classy('.user-personal-bucket', 'd-none', 'remove');
+    //     if (!document.querySelector('.user-panel').classList.contains('hidden')) {
+    //       classy('.user-panel', 'hidden', 'add')
+    //     }
+    //     console.log(session);
+    //     document.querySelectorAll('.login-user').forEach(item => {
+    //       item.textContent = session.user
+    //     })
+    //   } else {
+    //     classy('.user-panel', 'hidden', 'remove')
+    //     classy('form.login', 'd-none', 'remove')
+    //   }
   } catch (e) {
     console.log(e.message);
   }
@@ -116,7 +132,41 @@ async function loginCheck() {
 
 loginCheck();
 
-m.mount(document.querySelector('form.login'), Login)
+
+
+
+let Home = {
+  results: [],
+  size: 'xl',
+  view: (vnode) => {
+    return m('.main', m(Nav), m('.search', m('h1', 'Disponibilita'), m('.search-form', m(SearchForm))),
+      m('.results', Home.results.map((item, i) => {
+        return m('.sku-wrapper-key', {
+          key: item.id
+        }, m(Sku, {
+          sku: item,
+          i: i
+        }))
+      })))
+  }
+}
+
+
+// m.mount(document.querySelector('.results'), {
+//   loading: false,
+//   view: (vnode) => {
+//     if (resultsArray) {
+//       return m('.res-wrap', resultsArray.map((item, i) => {
+//         return m('.sku-wrapper-key', {
+//           key: item.id
+//         }, m(Sku, {
+//           sku: item,
+//           i: i
+//         }))
+//       }))
+//     }
+//   }
+// })
 
 async function getCookie() {
   // let user = document.querySelector('form.login > div.cui-input:nth-child(2) > input:nth-child(2)').value
@@ -133,45 +183,46 @@ async function getCookie() {
 }
 
 // userIcons
-m.mount(document.querySelector('.user-panel-dropdown'), {
-  view: () => {
-    return [m('.user-icons', {
-      onclick: () => {
-        classy('.user-panel', 'hidden', 'toggle')
-        document.querySelector('#radio1').click()
-      }
-    }, m(Icon, {
-      name: Icons.CHEVRON_DOWN,
-      size: 'xl'
-    }), m(Icon, {
-      name: Icons.USER,
-      size: 'xl'
-    }), m('.login-user'))]
 
-  }
-})
+// m.mount(document.querySelector('.user-panel-dropdown'), {
+//   view: () => {
+//     return [m('.user-icons', {
+//       onclick: () => {
+//         classy('.user-panel', 'hidden', 'toggle')
+//         document.querySelector('#radio1').click()
+//       }
+//     }, m(Icon, {
+//       name: Icons.CHEVRON_DOWN,
+//       size: 'xl'
+//     }), m(Icon, {
+//       name: Icons.USER,
+//       size: 'xl'
+//     }), m('.login-user'))]
+//
+//   }
+// })
 
-m.mount(document.querySelector('.user-personal-bucket'), Tabs)
+// m.mount(document.querySelector('.user-personal-bucket'), Tabs)
 
 let resultsArray;
 
 let SearchForm = {
   loading: false,
-  clearFields: () => {
-    resultsArray = []
-  },
+  clearResults: () => Home.results = [],
   view: (vnode) => {
     return m("form", [
       m("div.model",
         //m("input.model-input.twelve.columns[placeholder='Model'][type='text']")
         m(Input, {
           class: 'model-input',
+          style: 'width:75%;max-width:300px;',
           placeholder: 'Model'
         })),
       m("div.color",
         // m("input.color-input.twelve.columns[placeholder='Color'][type='text']")
         m(Input, {
           class: 'color-input',
+          style: 'width:75%;max-width:300px;',
           placeholder: 'Color'
         })),
       m(".row.rower", ),
@@ -193,7 +244,9 @@ let SearchForm = {
           loading: vnode.state.loading,
           onclick: async (e) => {
             e.preventDefault()
+            SearchForm.clearResults()
             vnode.state.loading = !vnode.state.loading
+
             if (session.user) {
 
               let model = document.querySelector('.model-input > input').value === '' ?
@@ -204,21 +257,17 @@ let SearchForm = {
                 document.querySelector('.color-input > input').value
 
               //
-              SearchForm.clearFields()
-
 
               await m.request({
                   method: "GET",
                   url: `/api/avb/${model}/${color}`
                 })
                 .then(res => {
-                  resultsArray = Object.values(res)
+                  Home.results = Object.values(res)
+                  console.log(Home.results);
                 })
 
               vnode.state.loading = !vnode.state.loading;
-
-            } else {
-              document.querySelector('.nav .user-icon').click()
             }
           }
         })
@@ -227,24 +276,9 @@ let SearchForm = {
   }
 }
 
-m.mount(document.querySelector('.search-form'), SearchForm)
+// m.mount(document.querySelector('.search-form'), SearchForm)
 
-m.mount(document.querySelector('.results'), {
-  loading: false,
-  view: (vnode) => {
-    if (resultsArray) {
-      return m('.res-wrap', resultsArray.map((item, i) => {
-        return m('.sku-wrapper-key', {
-          key: item.id
-        }, m(Sku, {
-          sku: item,
-          i: i
-        }))
-      }))
 
-    }
-  }
-})
 
 
 function Sku() {

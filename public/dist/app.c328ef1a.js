@@ -15039,12 +15039,124 @@ var reloadCSS = require('_css_loader');
 
 module.hot.dispose(reloadCSS);
 module.hot.accept(reloadCSS);
-},{"_css_loader":"../../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"components/Tabs.js":[function(require,module,exports) {
+},{"_css_loader":"../../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"logo.svg":[function(require,module,exports) {
+module.exports = "/logo.86ce68ea.svg";
+},{}],"components/Nav.js":[function(require,module,exports) {
 "use strict";
 
 var _mithril = _interopRequireDefault(require("mithril"));
 
 var _constructUi = require("construct-ui");
+
+var _logo = _interopRequireDefault(require("../logo.svg"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var DrawerContent = {
+  drawerOpen: false,
+  class: 'drawer',
+  size: 'xl',
+  view: function view(vnode) {
+    return [(0, _mithril.default)(_constructUi.Button, {
+      size: vnode.state.size,
+      iconLeft: _constructUi.Icons.MENU,
+      basic: true,
+      onclick: function onclick() {
+        vnode.state.drawerOpen = !vnode.state.drawerOpen;
+
+        _mithril.default.redraw();
+      }
+    }), (0, _mithril.default)(_constructUi.Drawer, {
+      closeOnOutsideClick: true,
+      closeOnEscapeKey: true,
+      onClose: function onClose() {
+        return vnode.state.drawerOpen = false;
+      },
+      hasBackdrop: true,
+      position: 'right',
+      isOpen: vnode.state.drawerOpen,
+      content: (0, _mithril.default)('.drawer-nav', (0, _mithril.default)(_mithril.default.route.Link, {
+        href: '/main'
+      }, (0, _mithril.default)(_constructUi.Button, {
+        iconLeft: _constructUi.Icons.SEARCH,
+        basic: true,
+        fluid: true,
+        align: 'left',
+        label: 'Availability',
+        size: vnode.state.size
+      })), (0, _mithril.default)(_mithril.default.route.Link, {
+        href: '/orders'
+      }, (0, _mithril.default)(_constructUi.Button, {
+        iconLeft: _constructUi.Icons.LIST,
+        fluid: true,
+        basic: true,
+        label: 'Orders',
+        align: 'left',
+        size: vnode.state.size
+      })), (0, _mithril.default)(_mithril.default.route.Link, {
+        href: '/clients'
+      }, (0, _mithril.default)(_constructUi.Button, {
+        iconLeft: _constructUi.Icons.USERS,
+        fluid: true,
+        basic: true,
+        align: 'left',
+        label: 'Clients',
+        size: vnode.state.size
+      })), (0, _mithril.default)(_mithril.default.route.Link, {
+        href: '/history'
+      }, (0, _mithril.default)(_constructUi.Button, {
+        iconLeft: _constructUi.Icons.ARCHIVE,
+        fluid: true,
+        basic: true,
+        align: 'left',
+        label: 'History',
+        size: vnode.state.size
+      })), (0, _mithril.default)('.last-row', ((0, _mithril.default)(_constructUi.Button, {
+        intent: 'primary',
+        size: vnode.state.size,
+        iconLeft: _constructUi.Icons.USER,
+        fluid: true,
+        // label: session.user ? session.user : 'LOGINPC',
+        onclick: function onclick() {
+          return vnode.state.menuOpen = !vnode.state.menuOpen;
+        }
+      }), (0, _mithril.default)(_constructUi.Menu, {
+        size: vnode.state.size,
+        basic: true
+      }, (0, _mithril.default)(_constructUi.MenuItem, {
+        iconLeft: _constructUi.Icons.LOG_OUT,
+        label: 'Log Out',
+        onclick: function onclick() {
+          session.user = false;
+        }
+      })))))
+    })];
+  }
+};
+var Nav = {
+  view: function view(vnode) {
+    return (0, _mithril.default)('.nav.flex', (0, _mithril.default)(_constructUi.Breadcrumb, {
+      size: vnode.state.size,
+      class: 'breadcrumbs',
+      separator: (0, _mithril.default)(_constructUi.Icon, {
+        name: _constructUi.Icons.CHEVRON_RIGHT
+      })
+    }, (0, _mithril.default)(_constructUi.BreadcrumbItem, {
+      href: '/#!/main'
+    }, (0, _mithril.default)(_constructUi.Icon, {
+      name: _constructUi.Icons.HOME
+    })), (0, _mithril.default)(_constructUi.BreadcrumbItem, {}, location.hash.split('/')[1])), (0, _mithril.default)("img.logo[src=".concat(_logo.default, "][alt='logo']")), (0, _mithril.default)(DrawerContent));
+  }
+};
+module.exports = Nav;
+},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../logo.svg":"logo.svg"}],"components/Tabs.js":[function(require,module,exports) {
+"use strict";
+
+var _mithril = _interopRequireDefault(require("mithril"));
+
+var _constructUi = require("construct-ui");
+
+var _Nav = _interopRequireDefault(require("./Nav"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -15434,7 +15546,7 @@ var Tabs = {
   }(),
   ordersSection: {
     view: function view(vnode) {
-      return [(0, _mithril.default)("h1", "Your Orders"), (0, _mithril.default)(_constructUi.Button, {
+      return [(0, _mithril.default)(_Nav.default), (0, _mithril.default)('.container.orders', (0, _mithril.default)("h1", "Your Orders"), (0, _mithril.default)(_constructUi.Button, {
         basic: true,
         iconLeft: _constructUi.Icons.REFRESH_CW,
         style: 'float: right;',
@@ -15513,13 +15625,13 @@ var Tabs = {
         oncreate: function oncreate(vnode) {
           _mithril.default.mount(vnode.dom, Orders);
         }
-      }, 'Order List')])];
+      }, 'Order List')]))];
     }
   },
   clientsSection: {
     loading: false,
     view: function view(vnode) {
-      return [(0, _mithril.default)("h1", "Client List"), (0, _mithril.default)(_constructUi.Button, {
+      return [(0, _mithril.default)(_Nav.default), (0, _mithril.default)('.container.clients', (0, _mithril.default)("h1", "Client List"), (0, _mithril.default)(_constructUi.Button, {
         basic: true,
         iconLeft: _constructUi.Icons.REFRESH_CW,
         style: 'float: right;',
@@ -15560,6 +15672,9 @@ var Tabs = {
       }), (0, _mithril.default)(_constructUi.ControlGroup, {
         class: 'new-client-inputs'
       }, [(0, _mithril.default)(_constructUi.Input, {
+        contentLeft: (0, _mithril.default)(_constructUi.Icon, {
+          name: _constructUi.Icons.USER
+        }),
         type: 'text',
         name: 'client-name',
         placeholder: 'Name'
@@ -15568,10 +15683,16 @@ var Tabs = {
         name: 'client-surname',
         placeholder: 'Surname'
       }), (0, _mithril.default)(_constructUi.Input, {
+        contentLeft: (0, _mithril.default)(_constructUi.Icon, {
+          name: _constructUi.Icons.MAIL
+        }),
         type: 'text',
         name: 'client-mail',
         placeholder: 'email'
       }), (0, _mithril.default)(_constructUi.Input, {
+        contentLeft: (0, _mithril.default)(_constructUi.Icon, {
+          name: _constructUi.Icons.PHONE
+        }),
         type: 'text',
         name: 'client-phone',
         placeholder: 'Telephone'
@@ -15617,13 +15738,13 @@ var Tabs = {
 
           return onclick;
         }()
-      })])]), (0, _mithril.default)("ul.client-list", (0, _mithril.default)(Clients))])];
+      })])]), (0, _mithril.default)("ul.client-list", (0, _mithril.default)(Clients))]))];
     }
   },
   historySection: {
     historyList: [],
     view: function view() {
-      return [(0, _mithril.default)("h1", "A History of your Searches"), (0, _mithril.default)(_constructUi.Button, {
+      return [(0, _mithril.default)(_Nav.default), (0, _mithril.default)('.container.searches', (0, _mithril.default)("h1", "A History of your Searches"), (0, _mithril.default)(_constructUi.Button, {
         basic: true,
         iconLeft: _constructUi.Icons.REFRESH_CW,
         style: 'float: right;',
@@ -15651,7 +15772,7 @@ var Tabs = {
 
           return onclick;
         }()
-      }), (0, _mithril.default)(Searches)];
+      }), (0, _mithril.default)(Searches))];
     }
   },
   view: function view() {
@@ -15709,7 +15830,7 @@ function s(query, cb) {
 }
 
 module.exports = Tabs;
-},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js"}],"app.js":[function(require,module,exports) {
+},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Nav":"components/Nav.js"}],"app.js":[function(require,module,exports) {
 "use strict";
 
 require("regenerator-runtime/runtime");
@@ -15721,6 +15842,8 @@ var _constructUi = require("construct-ui");
 require("../node_modules/construct-ui/lib/index.css");
 
 var _Tabs = _interopRequireDefault(require("/components/Tabs"));
+
+var _Nav = _interopRequireDefault(require("/components/Nav"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -15734,16 +15857,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 _constructUi.FocusManager.alwaysShowFocus();
 
-var resultsElement = document.querySelector('.results');
-var loader = document.querySelector('.loader');
-var AppToaster = new _constructUi.Toaster(); // Loader SVG
-
-_mithril.default.mount(loader, {
-  view: function view() {
-    return (0, _mithril.default)("svg[version='1.1'][id='L9'][xmlns='http://www.w3.org/2000/svg'][xmlns:xlink='http://www.w3.org/1999/xlink'][x='0px'][y='0px'][viewBox='0 0 100 100'][enable-background='new 0 0 0 0'][xml:space='preserve']", (0, _mithril.default)("path[fill='black'][d='M73,50c0-12.7-10.3-23-23-23S27,37.3,27,50 M30.9,50c0-10.5,8.5-19.1,19.1-19.1S69.1,39.5,69.1,50']", (0, _mithril.default)("animateTransform[attributeName='transform'][attributeType='XML'][type='rotate'][dur='1s'][from='0 50 50'][to='360 50 50'][repeatCount='indefinite']")));
-  }
-});
-
+var AppToaster = new _constructUi.Toaster();
 var session;
 
 function show(msg) {
@@ -15756,7 +15870,7 @@ function show(msg) {
 
 var Login = {
   view: function view() {
-    return [(0, _mithril.default)('.logo-bg', {
+    return [(0, _mithril.default)('form.login', (0, _mithril.default)('.logo-bg', {
       style: 'width: auto; height: 100px; background: url("/logo.86ce68ea.svg") no-repeat center;'
     }), (0, _mithril.default)(_constructUi.Input, {
       style: 'display:block;margin:5px auto;',
@@ -15814,9 +15928,25 @@ var Login = {
     }), (0, _mithril.default)(AppToaster, {
       clearOnEscapeKey: true,
       position: 'top'
-    })];
+    }))];
   }
-}; //check if session exists
+}; // Router
+
+_mithril.default.route(document.body, '/main', {
+  '/main': {
+    onmatch: function onmatch() {
+      // if (!sesion.user)
+      // m.route.set('/login')
+      // else
+      return Home;
+    }
+  },
+  '/login': Login,
+  '/orders': _Tabs.default.ordersSection,
+  '/clients': _Tabs.default.clientsSection,
+  '/history': _Tabs.default.historySection
+}); //check if session exists
+
 
 function loginCheck() {
   return _loginCheck.apply(this, arguments);
@@ -15836,49 +15966,75 @@ function _loginCheck() {
 
           case 3:
             session = _context5.sent;
-
-            if (session.smurf && session.user) {
-              classy('form.login', 'd-none', 'add');
-              classy('.user-personal-bucket', 'd-none', 'remove');
-
-              if (!document.querySelector('.user-panel').classList.contains('hidden')) {
-                classy('.user-panel', 'hidden', 'add');
-              }
-
-              console.log(session);
-              document.querySelectorAll('.login-user').forEach(function (item) {
-                item.textContent = session.user;
-              });
-            } else {
-              classy('.user-panel', 'hidden', 'remove');
-              classy('form.login', 'd-none', 'remove');
-            }
-
-            _context5.next = 10;
+            _context5.next = 9;
             break;
 
-          case 7:
-            _context5.prev = 7;
+          case 6:
+            _context5.prev = 6;
             _context5.t0 = _context5["catch"](0);
             console.log(_context5.t0.message);
 
-          case 10:
+          case 9:
           case "end":
             return _context5.stop();
         }
       }
-    }, _callee5, null, [[0, 7]]);
+    }, _callee5, null, [[0, 6]]);
   }));
   return _loginCheck.apply(this, arguments);
 }
 
 loginCheck();
-
-_mithril.default.mount(document.querySelector('form.login'), Login);
+var Home = {
+  results: [],
+  size: 'xl',
+  view: function view(vnode) {
+    return (0, _mithril.default)('.main', (0, _mithril.default)(_Nav.default), (0, _mithril.default)('.search', (0, _mithril.default)('h1', 'Disponibilita'), (0, _mithril.default)('.search-form', (0, _mithril.default)(SearchForm))), (0, _mithril.default)('.results', Home.results.map(function (item, i) {
+      return (0, _mithril.default)('.sku-wrapper-key', {
+        key: item.id
+      }, (0, _mithril.default)(Sku, {
+        sku: item,
+        i: i
+      }));
+    })));
+  }
+}; // m.mount(document.querySelector('.results'), {
+//   loading: false,
+//   view: (vnode) => {
+//     if (resultsArray) {
+//       return m('.res-wrap', resultsArray.map((item, i) => {
+//         return m('.sku-wrapper-key', {
+//           key: item.id
+//         }, m(Sku, {
+//           sku: item,
+//           i: i
+//         }))
+//       }))
+//     }
+//   }
+// })
 
 function getCookie() {
   return _getCookie.apply(this, arguments);
 } // userIcons
+// m.mount(document.querySelector('.user-panel-dropdown'), {
+//   view: () => {
+//     return [m('.user-icons', {
+//       onclick: () => {
+//         classy('.user-panel', 'hidden', 'toggle')
+//         document.querySelector('#radio1').click()
+//       }
+//     }, m(Icon, {
+//       name: Icons.CHEVRON_DOWN,
+//       size: 'xl'
+//     }), m(Icon, {
+//       name: Icons.USER,
+//       size: 'xl'
+//     }), m('.login-user'))]
+//
+//   }
+// })
+// m.mount(document.querySelector('.user-personal-bucket'), Tabs)
 
 
 function _getCookie() {
@@ -15914,39 +16070,22 @@ function _getCookie() {
   return _getCookie.apply(this, arguments);
 }
 
-_mithril.default.mount(document.querySelector('.user-panel-dropdown'), {
-  view: function view() {
-    return [(0, _mithril.default)('.user-icons', {
-      onclick: function onclick() {
-        classy('.user-panel', 'hidden', 'toggle');
-        document.querySelector('#radio1').click();
-      }
-    }, (0, _mithril.default)(_constructUi.Icon, {
-      name: _constructUi.Icons.CHEVRON_DOWN,
-      size: 'xl'
-    }), (0, _mithril.default)(_constructUi.Icon, {
-      name: _constructUi.Icons.USER,
-      size: 'xl'
-    }), (0, _mithril.default)('.login-user'))];
-  }
-});
-
-_mithril.default.mount(document.querySelector('.user-personal-bucket'), _Tabs.default);
-
 var resultsArray;
 var SearchForm = {
   loading: false,
-  clearFields: function clearFields() {
-    resultsArray = [];
+  clearResults: function clearResults() {
+    return Home.results = [];
   },
   view: function view(vnode) {
     return (0, _mithril.default)("form", [(0, _mithril.default)("div.model", //m("input.model-input.twelve.columns[placeholder='Model'][type='text']")
     (0, _mithril.default)(_constructUi.Input, {
       class: 'model-input',
+      style: 'width:75%;max-width:300px;',
       placeholder: 'Model'
     })), (0, _mithril.default)("div.color", // m("input.color-input.twelve.columns[placeholder='Color'][type='text']")
     (0, _mithril.default)(_constructUi.Input, {
       class: 'color-input',
+      style: 'width:75%;max-width:300px;',
       placeholder: 'Color'
     })), (0, _mithril.default)(".row.rower"), (0, _mithril.default)("div.row.buttons-group", [// GET AVB
     // m("Button.clear-button.button[type='button'][style='width:150px;margin:5px 10px;']",
@@ -15970,34 +16109,30 @@ var SearchForm = {
               switch (_context2.prev = _context2.next) {
                 case 0:
                   e.preventDefault();
+                  SearchForm.clearResults();
                   vnode.state.loading = !vnode.state.loading;
 
                   if (!session.user) {
-                    _context2.next = 11;
+                    _context2.next = 9;
                     break;
                   }
 
                   model = document.querySelector('.model-input > input').value === '' ? 'm' : document.querySelector('.model-input > input').value;
                   color = document.querySelector('.color-input > input').value === '' ? 'c' : document.querySelector('.color-input > input').value; //
 
-                  SearchForm.clearFields();
                   _context2.next = 8;
                   return _mithril.default.request({
                     method: "GET",
                     url: "/api/avb/".concat(model, "/").concat(color)
                   }).then(function (res) {
-                    resultsArray = Object.values(res);
+                    Home.results = Object.values(res);
+                    console.log(Home.results);
                   });
 
                 case 8:
                   vnode.state.loading = !vnode.state.loading;
-                  _context2.next = 12;
-                  break;
 
-                case 11:
-                  document.querySelector('.nav .user-icon').click();
-
-                case 12:
+                case 9:
                 case "end":
                   return _context2.stop();
               }
@@ -16013,25 +16148,7 @@ var SearchForm = {
       }()
     })])]);
   }
-};
-
-_mithril.default.mount(document.querySelector('.search-form'), SearchForm);
-
-_mithril.default.mount(document.querySelector('.results'), {
-  loading: false,
-  view: function view(vnode) {
-    if (resultsArray) {
-      return (0, _mithril.default)('.res-wrap', resultsArray.map(function (item, i) {
-        return (0, _mithril.default)('.sku-wrapper-key', {
-          key: item.id
-        }, (0, _mithril.default)(Sku, {
-          sku: item,
-          i: i
-        }));
-      }));
-    }
-  }
-});
+}; // m.mount(document.querySelector('.search-form'), SearchForm)
 
 function Sku() {
   return {
@@ -16445,7 +16562,7 @@ function s(query, cb) {
     cb(item);
   });
 }
-},{"regenerator-runtime/runtime":"../node_modules/regenerator-runtime/runtime.js","mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../node_modules/construct-ui/lib/index.css":"../node_modules/construct-ui/lib/index.css","/components/Tabs":"components/Tabs.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"regenerator-runtime/runtime":"../node_modules/regenerator-runtime/runtime.js","mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../node_modules/construct-ui/lib/index.css":"../node_modules/construct-ui/lib/index.css","/components/Tabs":"components/Tabs.js","/components/Nav":"components/Nav.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -16473,7 +16590,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "4310" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "4980" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

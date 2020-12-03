@@ -60,11 +60,22 @@ li {
 }
 
 .container {
-  width: 80%;
+  width: 95%;
+  margin: auto;
+}
+
+.breadcrumbs {
+  margin: .5rem;
 }
 
 .logo {
-  padding: 20px;
+  padding: 10px;
+  height: 70px;
+  width: auto;
+}
+
+.search {
+  text-align: center;
 }
 
 .model-input,
@@ -102,9 +113,25 @@ img.sku-picture.hidden {
 }
 
 .nav {
-  margin: auto;
+  margin: 0 auto 2rem auto;
   text-align: center;
-  /* filter: blur(1); */
+  justify-content: space-between;
+  align-items: center;
+}
+
+.drawer-nav {
+  position: relative;
+  height: 100%;
+}
+
+.drawer-nav a {
+  display: block;
+}
+
+.drawer-nav .last-row {
+  display: block;
+  position: absolute;
+  bottom: 0;
 }
 
 .user-panel {
@@ -157,6 +184,8 @@ img.sku-picture.hidden {
 
 form.login {
   margin: 10% auto !important;
+  max-width: 400px;
+  padding: 10%;
 }
 
 .login-form.hidden {
@@ -299,13 +328,13 @@ input[name=css-tabs] {
   justify-content: center;
 }
 
-#content2 .new-client.reveal-inputs .new-client-inputs {
+.new-client.reveal-inputs .new-client-inputs {
   max-height: 100vh;
   opacity: 1;
   z-index: 0;
 }
 
-#content2 .new-client-inputs {
+.new-client-inputs {
   display: flex;
   position: relative;
   flex-wrap: wrap;
@@ -332,18 +361,18 @@ input[name=css-tabs] {
   text-transform: lowercase;
 }
 
-#content2 ul.client-list {
+ul.client-list {
   display: flex;
   flex-direction: column-reverse;
 }
 
-#content2 ul.client-list .client-card {
+ul.client-list .client-card {
   padding: 1rem 2rem;
   margin: 1rem 0;
   cursor: pointer;
 }
 
-#content2 ul.client-list .client-card span {
+ul.client-list .client-card span {
   text-align: right;
   color: #b9b5b5;
 }
