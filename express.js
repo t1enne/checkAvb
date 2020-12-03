@@ -46,30 +46,30 @@ app.use(express.static('public/dist'));
 
 //CHECK IF LOGGED
 
-// app.get('/logged', (req, res) => {
-//   if (req.session) {
-//     res.json(req.session)
-//   } else {
-//     res.end('Not Logged!')
-//   }
-// })
-
-
 app.get('/logged', (req, res) => {
-  let session = {
-    "cookie": {
-      "originalMaxAge": 43200000,
-      "expires": "2020-11-28T07:21:40.690Z",
-      "httpOnly": true,
-      "path": "/",
-      "sameSite": "strict"
-    },
-    "smurf": "SmurfID=0020925c832a4aa1e112ba7d5b01efcbc6f20a9fb12f56235ba649d3789821c9",
-    "user": "ntaov"
-
+  if (req.session) {
+    res.json(req.session)
+  } else {
+    res.end('Not Logged!')
   }
-  res.json(session)
 })
+
+
+// app.get('/logged', (req, res) => {
+//   let session = {
+//     "cookie": {
+//       "originalMaxAge": 43200000,
+//       "expires": "2020-11-28T07:21:40.690Z",
+//       "httpOnly": true,
+//       "path": "/",
+//       "sameSite": "strict"
+//     },
+//     "smurf": "SmurfID=0020925c832a4aa1e112ba7d5b01efcbc6f20a9fb12f56235ba649d3789821c9",
+//     "user": "ntaov"
+//
+//   }
+//   res.json(session)
+// })
 
 // GET COOKIE
 app.get('/api/login/:user/:pwd', async (req, res) => {
@@ -254,12 +254,12 @@ let mockRes = {
 }
 // GET AVB
 app.get('/api/avb/:model/:color/', async (req, res) => {
-  // const avb = await getter.getAvb(req.session.smurf, req.params.model, req.params.color);
+  const avb = await getter.getAvb(req.session.smurf, req.params.model, req.params.color);
 
   // mock response
-  setTimeout(() => {
-    res.json(mockRes)
-  }, 500)
+  // setTimeout(() => {
+  //   res.json(mockRes)
+  // }, 500)
 
   res.json(avb)
 });
