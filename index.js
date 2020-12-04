@@ -224,9 +224,10 @@ async function availabilityRequest(cookie, model, color) {
     const rows = $('#listtable tbody tr')
       .slice(1);
 
-    if (rows.length === 0) {
-      return 'Model not found!'
-    }
+    // if (rows.length === 0) {
+    //   return 'Model not found!'
+    // }
+
     // data store in object
     let skus = {};
     let sizeRow;
@@ -307,6 +308,7 @@ async function availabilityRequest(cookie, model, color) {
 async function getAvb(cookie, model, color, withImage) {
   try {
     let results = await availabilityRequest(cookie, model, color);
+    console.log(results);
     return results
   } catch (e) {
     console.log(e.message);

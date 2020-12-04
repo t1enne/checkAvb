@@ -72,17 +72,28 @@ app.get('/logged', (req, res) => {
 // })
 
 // GET COOKIE
-app.get('/api/login/:user/:pwd', async (req, res) => {
-  console.log('login req');
-  let smurfId = await getter.getCookie(req.params.user, req.params.pwd);
-  req.session.smurf = smurfId.cookie;
-  req.session.user = req.params.user;
-  console.log(req.session);
+// app.get('/api/login/:user/:pwd', async (req, res) => {
+//   console.log('login req');
+//   let smurfId = await getter.getCookie(req.params.user, req.params.pwd);
+//   req.session.smurf = smurfId.cookie;
+//   req.session.user = req.params.user;
+//   console.log(req.session);
+//
+//   res.json(req.session)
+// });
 
-  // req.session.smurf = smurfId.cookie;
-  // req.session.user = req.params.user;
+
+app.get('/api/login', async (req, res) => {
+  let smurfId = await getter.getCookie(req.headers.user, req.headers.pwd);
+  req.session.smurf = smurfId.cookie;
+  req.session.user = req.headers.user;
   res.json(req.session)
 });
+
+app.get('/api/logout', async (req, res) => {
+  req.session.smurf = null
+  req.session.user = null
+})
 
 //GET IMAGE
 app.get(`/api/image/:year/:season/:model/`, async (req, res) => {
@@ -94,173 +105,9 @@ app.get(`/api/image/:year/:season/:model/`, async (req, res) => {
 });
 
 
-let mockRes = {
-  "1": {
-    "year": "20",
-    "season": "2",
-    "model": "MCS42741",
-    "color": "CS170",
-    "descr": "CIOTTOLO+GRIGIO SCURO",
-    "string": "202 MCS42741 CS170",
-    "receivables": {},
-    "sizesForRequests": [
-      "03", "04"
-    ],
-    "sizes": ["M", "L"]
-  },
-  "2": {
-    "year": "20",
-    "season": "2",
-    "model": "M2240900",
-    "color": "CS170",
-    "descr": "CIOTTOLO+GRIGIO SCURO",
-    "string": "202 M2240900 CS170",
-    "receivables": {},
-    "sizesForRequests": [
-      "04", "05"
-    ],
-    "sizes": ["L", "XL"]
-  },
-  "3": {
-    "year": "20",
-    "season": "2",
-    "model": "M2293118",
-    "color": "CS170",
-    "descr": "CIOTTOLO+GRIGIO SCURO",
-    "string": "202 M2293118 CS170",
-    "receivables": {},
-    "sizesForRequests": [
-      "03", "04"
-    ],
-    "sizes": ["M", "L"]
-  },
-  "5": {
-    "year": "20",
-    "season": "2",
-    "model": "M2300106",
-    "color": "CS170",
-    "descr": "CIOTTOLO+GRIGIO SCURO",
-    "string": "202 M2300106 CS170",
-    "receivables": {},
-    "sizesForRequests": [
-      "03", "04", "06", "07"
-    ],
-    "sizes": ["46", "48", "52", "54"]
-  },
-  "6": {
-    "year": "19",
-    "season": "2",
-    "model": "M2300106",
-    "color": "CS170",
-    "descr": "CIOTTOLO+GRIGIO SCURO",
-    "string": "192 M2300106 CS170",
-    "receivables": {},
-    "sizesForRequests": [
-      "02",
-      "05",
-      "06",
-      "07",
-      "09",
-      "10"
-    ],
-    "sizes": [
-      "44",
-      "50",
-      "52",
-      "54",
-      "58",
-      "60"
-    ]
-  },
-  "7": {
-    "year": "19",
-    "season": "2",
-    "model": "M2300124",
-    "color": "CS170",
-    "descr": "CIOTTOLO+GRIGIO SCURO",
-    "string": "192 M2300124 CS170",
-    "receivables": {},
-    "sizesForRequests": ["03"],
-    "sizes": ["46"]
-  },
-  "8": {
-    "year": "19",
-    "season": "1",
-    "model": "M2200100",
-    "color": "CS170",
-    "descr": "CIOTTOLO+GRIGIO SCURO",
-    "string": "191 M2200100 CS170",
-    "receivables": {},
-    "sizesForRequests": ["07"],
-    "sizes": ["54"]
-  },
-  "9": {
-    "year": "18",
-    "season": "2",
-    "model": "M2300100",
-    "color": "CS170",
-    "descr": "CIOTTOLO+GRIGIO SCURO",
-    "string": "182 M2300100 CS170",
-    "receivables": {},
-    "sizesForRequests": ["07"],
-    "sizes": ["54"]
-  },
-  "10": {
-    "year": "18",
-    "season": "1",
-    "model": "M2300100",
-    "color": "CS170",
-    "descr": "CIOTTOLO+GRIGIO SCURO",
-    "string": "181 M2300100 CS170",
-    "receivables": {},
-    "sizesForRequests": [
-      "04", "06", "07", "08"
-    ],
-    "sizes": ["48", "52", "54", "56"]
-  },
-  "11": {
-    "year": "17",
-    "season": "2",
-    "model": "M2300100",
-    "color": "CS170",
-    "descr": "CIOTTOLO+GRIGIO SCURO",
-    "string": "172 M2300100 CS170",
-    "receivables": {},
-    "sizesForRequests": ["08"],
-    "sizes": ["56"]
-  },
-  "12": {
-    "year": "17",
-    "season": "2",
-    "model": "M2300162",
-    "color": "CS170",
-    "descr": "CIOTTOLO+GRIGIO SCURO",
-    "string": "172 M2300162 CS170",
-    "receivables": {},
-    "sizesForRequests": ["07"],
-    "sizes": ["54"]
-  },
-  "13": {
-    "year": "17",
-    "season": "1",
-    "model": "M2300162",
-    "color": "CS170",
-    "descr": "CIOTTOLO+GRIGIO SCURO",
-    "string": "171 M2300162 CS170",
-    "receivables": {},
-    "sizesForRequests": ["07"],
-    "sizes": ["54"]
-  }
-}
 // GET AVB
 app.get('/api/avb/:model/:color/', async (req, res) => {
   const avb = await getter.getAvb(req.session.smurf, req.params.model, req.params.color);
-
-  // mock response
-  // setTimeout(() => {
-  //   res.json(mockRes)
-  // }, 500)
-
   res.json(avb)
 });
 

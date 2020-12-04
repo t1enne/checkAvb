@@ -26,22 +26,35 @@ import {
   PopoverInteraction,
   PopoverPosition
 } from 'construct-ui';
+
 import '../node_modules/construct-ui/lib/index.css'
+
 FocusManager.alwaysShowFocus();
 
-import Tabs from '/components/Tabs';
+// import ordersSection from '/components/Tabs';
+// import clientsSection from '/components/Tabs';
+// import historySection from '/components/Tabs';
+const {
+  ordersSection,
+  clientsSection,
+  historySection
+} = require('/components/Tabs')
+
 import Nav from '/components/Nav';
+
+import EditOrder from '/components/EditOrder';
 
 const AppToaster = new Toaster();
 
 
 let session;
 
-function show(msg) {
+function show(msg, intent) {
+  console.log('showing toast');
   AppToaster.show({
     message: msg,
     icon: Icons.BELL,
-    intent: 'positive',
+    intent: intent,
   })
 }
 
@@ -75,16 +88,12 @@ let Login = {
           intent: 'primary',
           onclick: async (e) => {
             e.preventDefault();
-            if (!session.user) {
-              await getCookie()
-              show('Logged in!')
+            if (!session) {
+              await login.authenticate()
             }
           }
-        }),
-        m(AppToaster, {
-          clearOnEscapeKey: true,
-          position: 'top'
-        }))
+        })
+      )
     ]
   }
 }
@@ -96,41 +105,45 @@ let Login = {
 m.route(document.body, '/main', {
   '/main': {
     onmatch: () => {
-      // if (!sesion.user)
-      // m.route.set('/login')
-      // else
-      return Home
+      if (!session) {
+        login.check()
+      } else return Home
     }
   },
   '/login': Login,
-  '/orders': Tabs.ordersSection,
-  '/clients': Tabs.clientsSection,
-  '/history': Tabs.historySection
+  '/orders': ordersSection,
+  '/clients': clientsSection,
+  '/history': historySection,
+  '/orders/edit/:id': EditOrder
 })
-//check if session exists
-async function loginCheck() {
-  try {
 
+
+//check if session exists
+let login = {
+  async check() {
     session = await fetch('/logged').then(res => res.json())
-    //   if (session.smurf && session.user) {
-    //     classy('.user-personal-bucket', 'd-none', 'remove');
-    //     if (!document.querySelector('.user-panel').classList.contains('hidden')) {
-    //       classy('.user-panel', 'hidden', 'add')
-    //     }
-    //     console.log(session);
-    //     document.querySelectorAll('.login-user').forEach(item => {
-    //       item.textContent = session.user
-    //     })
-    //   } else {
-    //     classy('.user-panel', 'hidden', 'remove')
-    //     classy('form.login', 'd-none', 'remove')
-    //   }
-  } catch (e) {
-    console.log(e.message);
+    session.user ? m.route.set('/main') : m.route.set('/login')
+  },
+  async authenticate() {
+    let user = document.querySelector('form.login > div.cui-input:nth-child(2) > input:nth-child(2)').value.trim()
+    let pwd = document.querySelector('form.login div.cui-input:nth-child(3) > input:nth-child(2)').value.trim()
+
+    m.request({
+      url: `/api/login`,
+      headers: {
+        'user': user,
+        'pwd': pwd
+      }
+    }).then(res => {
+      if (res.user) {
+        session = res
+        localStorage.setItem('user', session.user)
+        localStorage.setItem('smurf', session.smurf)
+      }
+      login.check()
+    })
   }
 }
-
-loginCheck();
 
 
 
@@ -139,7 +152,10 @@ let Home = {
   results: [],
   size: 'xl',
   view: (vnode) => {
-    return m('.main', m(Nav), m('.search', m('h1', 'Disponibilita'), m('.search-form', m(SearchForm))),
+    return m('.main', m(AppToaster, {
+        clearOnEscapeKey: true,
+        position: 'top'
+      }), m(Nav), m('.search', m('h1', 'Disponibilita'), m('.search-form', m(SearchForm))),
       m('.results', Home.results.map((item, i) => {
         return m('.sku-wrapper-key', {
           key: item.id
@@ -167,20 +183,6 @@ let Home = {
 //     }
 //   }
 // })
-
-async function getCookie() {
-  // let user = document.querySelector('form.login > div.cui-input:nth-child(2) > input:nth-child(2)').value
-  // let pwd = document.querySelector('form.login div.cui-input:nth-child(3) > input:nth-child(2)').value
-  let user = 'ntaov'
-  let pwd = 'ntaov456'
-
-  await fetch(`api/login/${user}/${pwd}`).then(res => res.json()).then(json => console.log(json))
-
-  user = ''
-  pwd = ''
-
-  loginCheck();
-}
 
 // userIcons
 
@@ -247,28 +249,25 @@ let SearchForm = {
             SearchForm.clearResults()
             vnode.state.loading = !vnode.state.loading
 
-            if (session.user) {
+            let model = document.querySelector('.model-input > input').value === '' ?
+              'm' :
+              document.querySelector('.model-input > input').value
+            let color = document.querySelector('.color-input > input').value === '' ?
+              'c' :
+              document.querySelector('.color-input > input').value
 
-              let model = document.querySelector('.model-input > input').value === '' ?
-                'm' :
-                document.querySelector('.model-input > input').value
-              let color = document.querySelector('.color-input > input').value === '' ?
-                'c' :
-                document.querySelector('.color-input > input').value
+            //
 
-              //
+            await m.request({
+                method: "GET",
+                url: `/api/avb/${model}/${color}`
+              })
+              .then(res => {
+                Home.results = Object.values(res)
+                console.log(Home.results);
+              })
 
-              await m.request({
-                  method: "GET",
-                  url: `/api/avb/${model}/${color}`
-                })
-                .then(res => {
-                  Home.results = Object.values(res)
-                  console.log(Home.results);
-                })
-
-              vnode.state.loading = !vnode.state.loading;
-            }
+            vnode.state.loading = !vnode.state.loading;
           }
         })
       ])
@@ -409,16 +408,10 @@ function SizeButton() {
       .then(res => {
         shops = Object.values(res)[0]
         isLoading = !isLoading
-        // m.redraw()
-
-        // console.log(shops);
       })
   }
 
   return {
-    // oninit(vnode) {
-    //   vnode.state.loading = false
-    // },
     view(vnode) {
       let i = vnode.attrs.i
       let sku = vnode.attrs.sku
@@ -439,56 +432,52 @@ function SizeButton() {
           m.mount(document.querySelector(`ul.size-${i}-${string}`), {
             oninit: (vnode) => {
               vnode.state.intent = 'warning'
-              vnode.state.label = 'Add'
             },
             view: () => {
               let string = sku.string.split(' ').join('')
 
-              return [
-                m(Tag, {
-                  label: Object.keys(shops)[0],
-                  intent: 'positive'
-                }),
-                m(Button, {
-                  iconLeft: Icons.PLUS,
-                  size: 'xs',
-                  intent: vnode.state.intent,
-                  label: vnode.state.label,
-                  basic: true,
-                  outline: true,
-                  onclick: () => {
 
-                    // ADD SEARCH
+              if (Object.keys(shops)[0]) {
+                return [
+                  m(Tag, {
+                    label: Object.keys(shops)[0],
+                    intent: 'positive'
+                  }),
+                  m(Button, {
+                    iconLeft: Icons.PLUS,
+                    size: 'xs',
+                    basic: true,
+                    outline: true,
+                    onclick: () => {
+                      // ADD SEARCH
+                      let price = document.querySelector('.price-' + string).textContent.split(',')[0].split('.').join('')
 
-
-                    let price = document.querySelector('.price-' + string).textContent.split(',')[0].split('.').join('')
-
-                    console.log(price);
-
-                    m.request({
-                      method: "GET",
-                      url: `/api/addSearch/${session.user}/${sku.year}/${sku.season}/${sku.model}/${sku.color}/${size}/${sizeForReq}/${price}`
-                    }).then(res => {
-                      if (res._id) {
-                        console.log(res._id);
-                        vnode.state.intent = 'positive'
-                        vnode.state.label = 'Added!'
-                      } else {
-                        vnode.state.label = 'Error!'
-                        vnode.state.intent = 'negative'
-                      }
-                    })
-                  }
-                }),
-                Object.values(shops)[0] ? Object.values(shops)[0].map(item => {
-                  if (item.search('NEGOZIO SOLOMEO') != -1) {
-                    return m('.list-item.solomeo', item)
-                  } else {
-                    return m(`.list-item`, item)
-                  }
-                }) : null
-              ]
+                      m.request({
+                        method: "GET",
+                        url: `/api/addSearch/${session.user}/${sku.year}/${sku.season}/${sku.model}/${sku.color}/${size}/${sizeForReq}/${price}`
+                      }).then(res => {
+                        if (res._id) {
+                          console.log(res._id);
+                          show(`Added Search ${sku.string} ${size}!`, 'positive')
+                        } else {
+                          show(`Couldn't add Search ${sku.string} ${size}!`, 'negative')
+                        }
+                      })
+                    }
+                  }),
+                  Object.values(shops)[0].map(item => {
+                    if (item.search('NEGOZIO SOLOMEO') != -1) {
+                      return m('.list-item.solomeo', item)
+                    } else {
+                      return m(`.list-item`, item)
+                    }
+                  })
+                ]
+              }
             }
+
+
+
           })
 
         }

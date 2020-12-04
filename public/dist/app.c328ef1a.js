@@ -15123,11 +15123,18 @@ var DrawerContent = {
       }), (0, _mithril.default)(_constructUi.Menu, {
         size: vnode.state.size,
         basic: true
-      }, (0, _mithril.default)(_constructUi.MenuItem, {
+      }, (0, _mithril.default)(_constructUi.Tag, {
+        label: localStorage.getItem('user')
+      }), (0, _mithril.default)(_constructUi.MenuItem, {
         iconLeft: _constructUi.Icons.LOG_OUT,
         label: 'Log Out',
         onclick: function onclick() {
-          session.user = false;
+          localStorage.clear();
+          console.log(localStorage);
+
+          _mithril.default.request({
+            url: '/api/logout'
+          }).then(_mithril.default.route.set('/login'));
         }
       })))))
     })];
@@ -15136,11 +15143,8 @@ var DrawerContent = {
 var Nav = {
   view: function view(vnode) {
     return (0, _mithril.default)('.nav.flex', (0, _mithril.default)(_constructUi.Breadcrumb, {
-      size: vnode.state.size,
-      class: 'breadcrumbs',
-      separator: (0, _mithril.default)(_constructUi.Icon, {
-        name: _constructUi.Icons.CHEVRON_RIGHT
-      })
+      size: 'xl',
+      class: 'breadcrumbs'
     }, (0, _mithril.default)(_constructUi.BreadcrumbItem, {
       href: '/#!/main'
     }, (0, _mithril.default)(_constructUi.Icon, {
@@ -15149,7 +15153,161 @@ var Nav = {
   }
 };
 module.exports = Nav;
-},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../logo.svg":"logo.svg"}],"components/Tabs.js":[function(require,module,exports) {
+},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../logo.svg":"logo.svg"}],"components/Orders.js":[function(require,module,exports) {
+"use strict";
+
+var _mithril = _interopRequireDefault(require("mithril"));
+
+var _constructUi = require("construct-ui");
+
+var _Tabs = _interopRequireDefault(require("./Tabs"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Orders = {
+  ordersList: [],
+  loadOrders: function loadOrders() {
+    _mithril.default.request({
+      method: "GET",
+      url: "/api/listOrders"
+    }).then(function (res) {
+      console.log(res);
+      Orders.ordersList = res;
+    });
+  },
+  oninit: function oninit(vnode) {
+    if (Orders.ordersList.length === 0) {
+      Orders.loadOrders();
+
+      _Tabs.default.loadSearches();
+    }
+  },
+  order: {
+    oninit: function oninit(vnode) {
+      vnode.state.selected = false;
+      vnode.state.pieces = 0;
+      vnode.state.total = 0;
+    },
+    onupdate: function onupdate(vnode) {
+      vnode.state.pieces = 0;
+      vnode.state.total = 0;
+    },
+    view: function view(vnode) {
+      var order = vnode.attrs.order;
+      var o = vnode.attrs.o;
+      return (0, _mithril.default)(_constructUi.Card, {
+        class: "order client-order collapsible",
+        id: order._id,
+        clientId: order.clientId,
+        interactive: true,
+        fluid: true,
+        elevation: 2 // SELECT ORDER
+
+      }, (0, _mithril.default)(PopoverMenu, {
+        closeOnContentClick: true,
+        content: [(0, _mithril.default)(_constructUi.Button, {
+          iconLeft: _constructUi.Icons.TRASH,
+          intent: 'negative',
+          label: 'Delete',
+          basic: true,
+          align: 'center',
+          onclick: function onclick(e) {
+            // DELETE ORDER
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('deleting order ' + order._id);
+
+            _mithril.default.request({
+              method: "DELETE",
+              url: "/api/deleteOrder/".concat(order._id)
+            }).then(function (res) {
+              console.log(res);
+              Orders.ordersList.splice(Orders.ordersList.indexOf(res), 1);
+            });
+          }
+        })],
+        trigger: (0, _mithril.default)(_constructUi.Button, {
+          iconLeft: _constructUi.Icons.SETTINGS,
+          style: 'float:right;'
+        })
+      }), [(0, _mithril.default)(".order-client-name[id=".concat(order.clientId, "]"), {
+        onclick: function onclick() {
+          _mithril.default.route.set("/orders/edit/".concat(order.id));
+        }
+      }, (0, _mithril.default)("h1", order.clientName)), (0, _mithril.default)(Tag, {
+        label: order.date,
+        class: 'date'
+      }), (0, _mithril.default)(Tag, {
+        label: order.user,
+        intent: 'primary',
+        class: 'user'
+      }) //, m(Tag, {
+      //   label: order._id,
+      //   class: 'url',
+      //   size: 'xs',
+      //   url: order._id
+      // })
+      ], [(0, _mithril.default)(_constructUi.List, {
+        size: 'xs',
+        style: "margin-top:1rem;",
+        class: 'collapsible assigned-orders'
+      }, _Tabs.default.assignedSearches[order._id] ? _Tabs.default.assignedSearches[order._id].map(function (search) {
+        vnode.state.pieces++;
+        vnode.state.total += parseInt(search.price);
+        return (0, _mithril.default)(AssignedSearch, {
+          search: search
+        });
+      }) : undefined), (0, _mithril.default)('.row.searches-totals', (0, _mithril.default)(Tag, {
+        label: "total pcs: ".concat(vnode.state.pieces)
+      }), (0, _mithril.default)(Tag, {
+        label: "total: \u20AC".concat(vnode.state.total),
+        intent: 'warning'
+      })), (0, _mithril.default)(_constructUi.Button, {
+        fluid: true,
+        size: 'md',
+        style: 'margin: auto; display: block; padding: 0; transition: rotate .3s',
+        iconLeft: _constructUi.Icons.CHEVRON_DOWN,
+        basic: true,
+        onclick: function onclick(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var list = vnode.dom.querySelector('.assigned-orders');
+          list.classList.toggle('collapsed');
+          console.log(vnode);
+          var svg = e.target.children[0];
+
+          _mithril.default.redraw();
+        }
+      })]);
+    }
+  },
+  view: function view(vnode) {
+    var array;
+
+    if (_Tabs.default.unassignedSearches.length != 0) {
+      array = _Tabs.default.unassignedSearches.map(function (item) {
+        return (0, _mithril.default)(UnassignedSearch, {
+          item: item
+        });
+      });
+    }
+
+    return [(0, _mithril.default)('.orders.flex.reverse', Orders.ordersList.map(function (order, o) {
+      return (0, _mithril.default)(Orders.order, {
+        order: order,
+        o: o
+      });
+    })), (0, _mithril.default)('h1', 'Unassigned Searches'), (0, _mithril.default)(_constructUi.Card, {
+      fluid: true
+    }, (0, _mithril.default)(_constructUi.List, {
+      class: 'unassigned-searches',
+      interactive: false,
+      size: 'xs'
+    }, (0, _mithril.default)('.list-items-wrapper', array)))];
+  }
+};
+module.exports = Orders;
+},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Tabs":"components/Tabs.js"}],"components/Tabs.js":[function(require,module,exports) {
 "use strict";
 
 var _mithril = _interopRequireDefault(require("mithril"));
@@ -15166,6 +15324,9 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+var Orders = require('./Orders');
+
+console.log(Orders);
 var seaching = false,
     session;
 var AppToaster = new _constructUi.Toaster();
@@ -15358,456 +15519,238 @@ function UnassignedSearch() {
       });
     }
   };
-} // GET ORDERS
+}
 
-
-var Orders = {
-  ordersList: [],
-  loadOrders: function loadOrders() {
-    _mithril.default.request({
-      method: "GET",
-      url: "/api/listOrders"
-    }).then(function (res) {
-      console.log(res);
-      Orders.ordersList = res;
-    });
-  },
-  oninit: function oninit(vnode) {
-    if (Orders.ordersList.length === 0) {
-      Orders.loadOrders();
-      Searches.loadSearches();
-    }
-  },
-  order: {
-    oninit: function oninit(vnode) {
-      vnode.state.selected = false;
-      vnode.state.pieces = 0;
-      vnode.state.total = 0;
-    },
-    onupdate: function onupdate(vnode) {
-      vnode.state.pieces = 0;
-      vnode.state.total = 0;
-    },
-    view: function view(vnode) {
-      var order = vnode.attrs.order;
-      var o = vnode.attrs.o;
-      return (0, _mithril.default)(_constructUi.Card, {
-        class: "order client-order collapsible",
-        id: order._id,
-        clientId: order.clientId,
-        interactive: true,
-        fluid: true,
-        elevation: 2 // SELECT ORDER
-
-      }, (0, _mithril.default)(_constructUi.PopoverMenu, {
-        closeOnContentClick: true,
-        content: [(0, _mithril.default)(_constructUi.Button, {
-          iconLeft: _constructUi.Icons.TRASH,
-          intent: 'negative',
-          label: 'Delete',
-          basic: true,
-          align: 'center',
-          onclick: function onclick(e) {
-            // DELETE ORDER
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('deleting order ' + order._id);
-
-            _mithril.default.request({
-              method: "DELETE",
-              url: "/api/deleteOrder/".concat(order._id)
-            }).then(function (res) {
-              console.log(res);
-              Orders.ordersList.splice(Orders.ordersList.indexOf(res), 1);
-            });
-          }
-        })],
-        trigger: (0, _mithril.default)(_constructUi.Button, {
-          iconLeft: _constructUi.Icons.SETTINGS,
-          style: 'float:right;'
-        })
-      }), [(0, _mithril.default)(".order-client-name[id=".concat(order.clientId, "]"), {
-        onclick: function onclick() {
-          // controller for the selected order
-          vnode.state.selected = !vnode.state.selected;
-          var thisOrder = document.getElementById("".concat(order._id));
-
-          if (vnode.state.selected) {
-            classy('.client-order', 'selected-order', 'remove');
-            thisOrder.classList.toggle('selected-order');
-            classy('.client-order', 'd-none', 'add');
-            thisOrder.classList.toggle('d-none');
-          } else {
-            // thisOrder.classList.toggle('selected-order')
-            classy('.client-order', 'selected-order', 'remove');
-            classy('.client-order', 'd-none', 'remove');
-          }
-        }
-      }, (0, _mithril.default)("h1", order.clientName)), (0, _mithril.default)(_constructUi.Tag, {
-        label: order.date,
-        class: 'date'
-      }), (0, _mithril.default)(_constructUi.Tag, {
-        label: order.user,
-        intent: 'primary',
-        class: 'user'
-      }) //, m(Tag, {
-      //   label: order._id,
-      //   class: 'url',
-      //   size: 'xs',
-      //   url: order._id
-      // })
-      ], [(0, _mithril.default)(_constructUi.List, {
-        size: 'xs',
-        style: "margin-top:1rem;",
-        class: 'collapsible assigned-orders'
-      }, Searches.assignedSearches[order._id] ? Searches.assignedSearches[order._id].map(function (search) {
-        vnode.state.pieces++;
-        vnode.state.total += parseInt(search.price);
-        return (0, _mithril.default)(AssignedSearch, {
-          search: search
-        });
-      }) : undefined), (0, _mithril.default)('.row.searches-totals', (0, _mithril.default)(_constructUi.Tag, {
-        label: "total pcs: ".concat(vnode.state.pieces)
-      }), (0, _mithril.default)(_constructUi.Tag, {
-        label: "total: \u20AC".concat(vnode.state.total),
-        intent: 'warning'
-      })), (0, _mithril.default)(_constructUi.Button, {
-        fluid: true,
-        size: 'md',
-        style: 'margin: auto; display: block; padding: 0; transition: rotate .3s',
-        iconLeft: _constructUi.Icons.CHEVRON_DOWN,
-        basic: true,
-        onclick: function onclick(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          var list = vnode.dom.querySelector('.assigned-orders');
-          list.classList.toggle('collapsed');
-          console.log(vnode);
-          var svg = e.target.children[0];
-
-          _mithril.default.redraw();
-        }
-      })]);
-    }
-  },
+var ordersSection = {
   view: function view(vnode) {
-    var array;
+    return [(0, _mithril.default)(_Nav.default), (0, _mithril.default)('.container.orders', (0, _mithril.default)("h1", "Your Orders"), (0, _mithril.default)(_constructUi.Button, {
+      basic: true,
+      iconLeft: _constructUi.Icons.REFRESH_CW,
+      style: 'float: right;',
+      // loading: vnode.tag.loading,
+      onclick: function () {
+        var _onclick = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+          return regeneratorRuntime.wrap(function _callee2$(_context2) {
+            while (1) {
+              switch (_context2.prev = _context2.next) {
+                case 0:
+                  _context2.next = 2;
+                  return Orders.loadOrders();
 
-    if (Searches.unassignedSearches.length != 0) {
-      array = Searches.unassignedSearches.map(function (item) {
-        return (0, _mithril.default)(UnassignedSearch, {
-          item: item
+                case 2:
+                case "end":
+                  return _context2.stop();
+              }
+            }
+          }, _callee2);
+        }));
+
+        function onclick() {
+          return _onclick.apply(this, arguments);
+        }
+
+        return onclick;
+      }()
+    }), (0, _mithril.default)(".orders-container", [(0, _mithril.default)(".create-order", [(0, _mithril.default)(_constructUi.Button, {
+      label: 'New Order',
+      iconLeft: _constructUi.Icons.PLUS,
+      //CREATE NEW ORDER
+      onclick: function onclick() {
+        _mithril.default.mount(document.querySelector('.new-order'), {
+          oninit: function oninit() {
+            if (Clients.clientsList.length === 0) {
+              Clients.loadClients();
+            }
+          },
+          view: function view() {
+            return (0, _mithril.default)('.order-div', [// CREATE ORDER
+            (0, _mithril.default)(_constructUi.SelectList, {
+              items: Clients.clientsList,
+              itemRender: function itemRender(item) {
+                return (0, _mithril.default)(_constructUi.ListItem, {
+                  label: item.fullname,
+                  url: item._id,
+                  name: item.name,
+                  surname: item.surname,
+                  contentLeft: (0, _mithril.default)('div', '+')
+                });
+              },
+              itemPredicate: function itemPredicate(query, item) {
+                return item.fullname.toLowerCase().includes(query.toLowerCase());
+              },
+              onSelect: function onSelect(item) {
+                console.log(item);
+
+                _mithril.default.request({
+                  method: "POST",
+                  url: "/api/createOrder/".concat(item._id, "/").concat(session.user, "/").concat(item.name, "&").concat(item.surname)
+                }).then(function (res) {
+                  console.log(res);
+                  Orders.ordersList.push(res);
+
+                  _mithril.default.mount(document.querySelector('.order-list'), Orders);
+                });
+              },
+              trigger: (0, _mithril.default)(_constructUi.Button, {
+                iconLeft: _constructUi.Icons.USERS,
+                label: "Search Client",
+                iconRight: _constructUi.Icons.CHEVRON_DOWN
+              })
+            })]);
+          }
         });
-      });
-    }
-
-    return [(0, _mithril.default)('.orders.flex.reverse', Orders.ordersList.map(function (order, o) {
-      return (0, _mithril.default)(Orders.order, {
-        order: order,
-        o: o
-      });
-    })), (0, _mithril.default)('h1', 'Unassigned Searches'), (0, _mithril.default)(_constructUi.Card, {
-      fluid: true
-    }, (0, _mithril.default)(_constructUi.List, {
-      class: 'unassigned-searches',
-      interactive: false,
-      size: 'xs'
-    }, (0, _mithril.default)('.list-items-wrapper', array)))];
+      }
+    })]), (0, _mithril.default)('.new-order'), (0, _mithril.default)(".search-results"), (0, _mithril.default)(".order-list", {
+      oncreate: function oncreate(vnode) {// m.mount(vnode.dom, Orders)
+      }
+    }, 'Order List')]))];
   }
 };
-var Tabs = {
-  oninit: function () {
-    var _oninit = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-      return regeneratorRuntime.wrap(function _callee2$(_context2) {
-        while (1) {
-          switch (_context2.prev = _context2.next) {
-            case 0:
-              _context2.next = 2;
-              return fetch('/logged').then(function (res) {
-                return res.json();
-              });
+var clientsSection = {
+  loading: false,
+  view: function view(vnode) {
+    return [(0, _mithril.default)(_Nav.default), (0, _mithril.default)('.container.clients', (0, _mithril.default)("h1", "Client List"), (0, _mithril.default)(_constructUi.Button, {
+      basic: true,
+      iconLeft: _constructUi.Icons.REFRESH_CW,
+      style: 'float: right;',
+      loading: vnode.state.loading,
+      onclick: function () {
+        var _onclick2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+          return regeneratorRuntime.wrap(function _callee3$(_context3) {
+            while (1) {
+              switch (_context3.prev = _context3.next) {
+                case 0:
+                  vnode.state.loading = !vnode.state.loading;
+                  _context3.next = 3;
+                  return Clients.loadClients();
 
-            case 2:
-              session = _context2.sent;
+                case 3:
+                  vnode.state.loading = !vnode.state.loading;
 
-            case 3:
-            case "end":
-              return _context2.stop();
-          }
-        }
-      }, _callee2);
-    }));
-
-    function oninit() {
-      return _oninit.apply(this, arguments);
-    }
-
-    return oninit;
-  }(),
-  ordersSection: {
-    view: function view(vnode) {
-      return [(0, _mithril.default)(_Nav.default), (0, _mithril.default)('.container.orders', (0, _mithril.default)("h1", "Your Orders"), (0, _mithril.default)(_constructUi.Button, {
-        basic: true,
-        iconLeft: _constructUi.Icons.REFRESH_CW,
-        style: 'float: right;',
-        // loading: vnode.tag.loading,
-        onclick: function () {
-          var _onclick = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
-            return regeneratorRuntime.wrap(function _callee3$(_context3) {
-              while (1) {
-                switch (_context3.prev = _context3.next) {
-                  case 0:
-                    _context3.next = 2;
-                    return Orders.loadOrders();
-
-                  case 2:
-                  case "end":
-                    return _context3.stop();
-                }
+                case 4:
+                case "end":
+                  return _context3.stop();
               }
-            }, _callee3);
-          }));
-
-          function onclick() {
-            return _onclick.apply(this, arguments);
-          }
-
-          return onclick;
-        }()
-      }), (0, _mithril.default)(".orders-container", [(0, _mithril.default)(".create-order", [(0, _mithril.default)(_constructUi.Button, {
-        label: 'New Order',
-        iconLeft: _constructUi.Icons.PLUS,
-        //CREATE NEW ORDER
-        onclick: function onclick() {
-          _mithril.default.mount(document.querySelector('.new-order'), {
-            oninit: function oninit() {
-              if (Clients.clientsList.length === 0) {
-                Clients.loadClients();
-              }
-            },
-            view: function view() {
-              return (0, _mithril.default)('.order-div', [// CREATE ORDER
-              (0, _mithril.default)(_constructUi.SelectList, {
-                items: Clients.clientsList,
-                itemRender: function itemRender(item) {
-                  return (0, _mithril.default)(_constructUi.ListItem, {
-                    label: item.fullname,
-                    url: item._id,
-                    name: item.name,
-                    surname: item.surname,
-                    contentLeft: (0, _mithril.default)('div', '+')
-                  });
-                },
-                itemPredicate: function itemPredicate(query, item) {
-                  return item.fullname.toLowerCase().includes(query.toLowerCase());
-                },
-                onSelect: function onSelect(item) {
-                  console.log(item);
-
-                  _mithril.default.request({
-                    method: "POST",
-                    url: "/api/createOrder/".concat(item._id, "/").concat(session.user, "/").concat(item.name, "&").concat(item.surname)
-                  }).then(function (res) {
-                    console.log(res);
-                    Orders.ordersList.push(res); //m.mount(document.querySelector('.order-list'), Orders)
-                  });
-                },
-                trigger: (0, _mithril.default)(_constructUi.Button, {
-                  iconLeft: _constructUi.Icons.USERS,
-                  label: "Search Client",
-                  iconRight: _constructUi.Icons.CHEVRON_DOWN
-                })
-              })]);
             }
-          });
+          }, _callee3);
+        }));
+
+        function onclick() {
+          return _onclick2.apply(this, arguments);
         }
-      })]), (0, _mithril.default)('.new-order'), (0, _mithril.default)(".search-results"), (0, _mithril.default)(".order-list", {
-        oncreate: function oncreate(vnode) {
-          _mithril.default.mount(vnode.dom, Orders);
+
+        return onclick;
+      }()
+    }), (0, _mithril.default)(".client-content", [(0, _mithril.default)(".new-client.row", [(0, _mithril.default)(_constructUi.Button, {
+      onclick: function onclick(e) {
+        document.querySelector('.new-client.row').classList.toggle('reveal-inputs');
+      },
+      label: "New Client",
+      iconLeft: _constructUi.Icons.PLUS
+    }), (0, _mithril.default)(_constructUi.ControlGroup, {
+      class: 'new-client-inputs'
+    }, [(0, _mithril.default)(_constructUi.Input, {
+      contentLeft: (0, _mithril.default)(_constructUi.Icon, {
+        name: _constructUi.Icons.USER
+      }),
+      type: 'text',
+      name: 'client-name',
+      placeholder: 'Name'
+    }), (0, _mithril.default)(_constructUi.Input, {
+      type: 'text',
+      name: 'client-surname',
+      placeholder: 'Surname'
+    }), (0, _mithril.default)(_constructUi.Input, {
+      contentLeft: (0, _mithril.default)(_constructUi.Icon, {
+        name: _constructUi.Icons.MAIL
+      }),
+      type: 'text',
+      name: 'client-mail',
+      placeholder: 'email'
+    }), (0, _mithril.default)(_constructUi.Input, {
+      contentLeft: (0, _mithril.default)(_constructUi.Icon, {
+        name: _constructUi.Icons.PHONE
+      }),
+      type: 'text',
+      name: 'client-phone',
+      placeholder: 'Telephone'
+    }), (0, _mithril.default)(_constructUi.Button, {
+      type: 'submit',
+      label: "Add Client",
+      // CREATE NEW CLIENT
+      onclick: function () {
+        var _onclick3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
+          var name, surname, mail, phone, username, provider, tail;
+          return regeneratorRuntime.wrap(function _callee4$(_context4) {
+            while (1) {
+              switch (_context4.prev = _context4.next) {
+                case 0:
+                  name = document.querySelector('input[name="client-name"]').value.trim();
+                  surname = document.querySelector('input[name="client-surname"]').value.trim();
+                  mail = document.querySelector('input[name="client-mail"]').value.trim();
+                  phone = document.querySelector('input[name="client-phone"]').value.trim();
+                  username = mail.split('@')[0];
+                  provider = mail.split('@')[1].split('.')[0];
+                  tail = mail.split('@')[1].split('.')[1];
+                  _context4.next = 9;
+                  return _mithril.default.request({
+                    method: "GET",
+                    url: "/api/newClient/".concat(name, "/").concat(surname, "/").concat(username, "/").concat(provider, "/").concat(tail, "/").concat(phone)
+                  });
+
+                case 9:
+                  // emit a click event for convenience on the clients radio to fetch the clients
+                  document.querySelector('#radio2').click();
+
+                case 10:
+                case "end":
+                  return _context4.stop();
+              }
+            }
+          }, _callee4);
+        }));
+
+        function onclick() {
+          return _onclick3.apply(this, arguments);
         }
-      }, 'Order List')]))];
-    }
-  },
-  clientsSection: {
-    loading: false,
-    view: function view(vnode) {
-      return [(0, _mithril.default)(_Nav.default), (0, _mithril.default)('.container.clients', (0, _mithril.default)("h1", "Client List"), (0, _mithril.default)(_constructUi.Button, {
-        basic: true,
-        iconLeft: _constructUi.Icons.REFRESH_CW,
-        style: 'float: right;',
-        loading: vnode.state.loading,
-        onclick: function () {
-          var _onclick2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
-            return regeneratorRuntime.wrap(function _callee4$(_context4) {
-              while (1) {
-                switch (_context4.prev = _context4.next) {
-                  case 0:
-                    vnode.state.loading = !vnode.state.loading;
-                    _context4.next = 3;
-                    return Clients.loadClients();
 
-                  case 3:
-                    vnode.state.loading = !vnode.state.loading;
-
-                  case 4:
-                  case "end":
-                    return _context4.stop();
-                }
-              }
-            }, _callee4);
-          }));
-
-          function onclick() {
-            return _onclick2.apply(this, arguments);
-          }
-
-          return onclick;
-        }()
-      }), (0, _mithril.default)(".client-content", [(0, _mithril.default)(".new-client.row", [(0, _mithril.default)(_constructUi.Button, {
-        onclick: function onclick(e) {
-          document.querySelector('.new-client.row').classList.toggle('reveal-inputs');
-        },
-        label: "New Client",
-        iconLeft: _constructUi.Icons.PLUS
-      }), (0, _mithril.default)(_constructUi.ControlGroup, {
-        class: 'new-client-inputs'
-      }, [(0, _mithril.default)(_constructUi.Input, {
-        contentLeft: (0, _mithril.default)(_constructUi.Icon, {
-          name: _constructUi.Icons.USER
-        }),
-        type: 'text',
-        name: 'client-name',
-        placeholder: 'Name'
-      }), (0, _mithril.default)(_constructUi.Input, {
-        type: 'text',
-        name: 'client-surname',
-        placeholder: 'Surname'
-      }), (0, _mithril.default)(_constructUi.Input, {
-        contentLeft: (0, _mithril.default)(_constructUi.Icon, {
-          name: _constructUi.Icons.MAIL
-        }),
-        type: 'text',
-        name: 'client-mail',
-        placeholder: 'email'
-      }), (0, _mithril.default)(_constructUi.Input, {
-        contentLeft: (0, _mithril.default)(_constructUi.Icon, {
-          name: _constructUi.Icons.PHONE
-        }),
-        type: 'text',
-        name: 'client-phone',
-        placeholder: 'Telephone'
-      }), (0, _mithril.default)(_constructUi.Button, {
-        type: 'submit',
-        label: "Add Client",
-        // CREATE NEW CLIENT
-        onclick: function () {
-          var _onclick3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
-            var name, surname, mail, phone, username, provider, tail;
-            return regeneratorRuntime.wrap(function _callee5$(_context5) {
-              while (1) {
-                switch (_context5.prev = _context5.next) {
-                  case 0:
-                    name = document.querySelector('input[name="client-name"]').value.trim();
-                    surname = document.querySelector('input[name="client-surname"]').value.trim();
-                    mail = document.querySelector('input[name="client-mail"]').value.trim();
-                    phone = document.querySelector('input[name="client-phone"]').value.trim();
-                    username = mail.split('@')[0];
-                    provider = mail.split('@')[1].split('.')[0];
-                    tail = mail.split('@')[1].split('.')[1];
-                    _context5.next = 9;
-                    return _mithril.default.request({
-                      method: "GET",
-                      url: "/api/newClient/".concat(name, "/").concat(surname, "/").concat(username, "/").concat(provider, "/").concat(tail, "/").concat(phone)
-                    });
-
-                  case 9:
-                    // emit a click event for convenience on the clients radio to fetch the clients
-                    document.querySelector('#radio2').click();
-
-                  case 10:
-                  case "end":
-                    return _context5.stop();
-                }
-              }
-            }, _callee5);
-          }));
-
-          function onclick() {
-            return _onclick3.apply(this, arguments);
-          }
-
-          return onclick;
-        }()
-      })])]), (0, _mithril.default)("ul.client-list", (0, _mithril.default)(Clients))]))];
-    }
-  },
-  historySection: {
-    historyList: [],
-    view: function view() {
-      return [(0, _mithril.default)(_Nav.default), (0, _mithril.default)('.container.searches', (0, _mithril.default)("h1", "A History of your Searches"), (0, _mithril.default)(_constructUi.Button, {
-        basic: true,
-        iconLeft: _constructUi.Icons.REFRESH_CW,
-        style: 'float: right;',
-        // loading: vnode.tag.loading,
-        onclick: function () {
-          var _onclick4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6() {
-            return regeneratorRuntime.wrap(function _callee6$(_context6) {
-              while (1) {
-                switch (_context6.prev = _context6.next) {
-                  case 0:
-                    _context6.next = 2;
-                    return Searches.loadSearches();
-
-                  case 2:
-                  case "end":
-                    return _context6.stop();
-                }
-              }
-            }, _callee6);
-          }));
-
-          function onclick() {
-            return _onclick4.apply(this, arguments);
-          }
-
-          return onclick;
-        }()
-      }), (0, _mithril.default)(Searches))];
-    }
-  },
+        return onclick;
+      }()
+    })])]), (0, _mithril.default)("ul.client-list", (0, _mithril.default)(Clients))]))];
+  }
+};
+var historySection = {
+  historyList: [],
   view: function view() {
-    return [(0, _mithril.default)('.user-icons.flex.f-width', {
-      style: 'justify-content:space-between;'
-    }, (0, _mithril.default)(_constructUi.Button, {
-      iconLeft: _constructUi.Icons.USER,
-      size: 'xl',
+    return [(0, _mithril.default)(_Nav.default), (0, _mithril.default)('.container.searches', (0, _mithril.default)("h1", "A History of your Searches"), (0, _mithril.default)(_constructUi.Button, {
       basic: true,
-      onclick: function onclick() {
-        classy('.user-panel', 'hidden', 'toggle');
-      }
-    }), (0, _mithril.default)('.login-user'), (0, _mithril.default)(_constructUi.Button, {
-      iconLeft: _constructUi.Icons.X,
-      size: 'xl',
-      basic: true,
-      onclick: function onclick() {
-        classy('.user-panel', 'hidden', 'toggle');
-      }
-    })), (0, _mithril.default)("input[id='radio1'][type='radio'][name='css-tabs']", {
-      onclick: function onclick() {
-        _mithril.default.mount(document.querySelector('#content1'), Tabs.ordersSection);
-      }
-    }), (0, _mithril.default)("input[id='radio2'][type='radio'][name='css-tabs']", {
-      onclick: function onclick(e) {
-        _mithril.default.mount(document.querySelector('#content2'), Tabs.clientsSection);
-      }
-    }), (0, _mithril.default)("input[id='radio3'][type='radio'][name='css-tabs']", {
-      onclick: function onclick(e) {
-        _mithril.default.mount(document.querySelector('#content3'), Tabs.historySection);
-      }
-    }), (0, _mithril.default)("[id='tabs']", [(0, _mithril.default)("label.tab-orders[id='tab1 tab-orders'][for='radio1']", "Orders"), (0, _mithril.default)("label.tab-clients[id='tab2 tab-clients'][for='radio2']", "Clients"), (0, _mithril.default)("label.tab-history[id='tab3 tab-history'][for='radio3']", "History")]), (0, _mithril.default)("[id='content']", [(0, _mithril.default)("section[id='content1']"), (0, _mithril.default)("section[id='content2']"), (0, _mithril.default)("section[id='content3']") // m(Tabs.ordersSection),
-    // m(Tabs.clientsSection),
-    // m(Tabs.historySection)
-    ])];
+      iconLeft: _constructUi.Icons.REFRESH_CW,
+      style: 'float: right;',
+      // loading: vnode.tag.loading,
+      onclick: function () {
+        var _onclick4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
+          return regeneratorRuntime.wrap(function _callee5$(_context5) {
+            while (1) {
+              switch (_context5.prev = _context5.next) {
+                case 0:
+                  _context5.next = 2;
+                  return Searches.loadSearches();
+
+                case 2:
+                case "end":
+                  return _context5.stop();
+              }
+            }
+          }, _callee5);
+        }));
+
+        function onclick() {
+          return _onclick4.apply(this, arguments);
+        }
+
+        return onclick;
+      }()
+    }), (0, _mithril.default)(Searches))];
   }
 };
 
@@ -15829,8 +15772,34 @@ function s(query, cb) {
   });
 }
 
-module.exports = Tabs;
-},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Nav":"components/Nav.js"}],"app.js":[function(require,module,exports) {
+exports.ordersSection = ordersSection;
+exports.clientsSection = clientsSection;
+exports.historySection = historySection; // module.exports = Searches
+},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Nav":"components/Nav.js","./Orders":"components/Orders.js"}],"components/EditOrder.js":[function(require,module,exports) {
+"use strict";
+
+var _mithril = _interopRequireDefault(require("mithril"));
+
+require("construct-ui");
+
+var _Nav = _interopRequireDefault(require("./Nav"));
+
+var _Orders = _interopRequireDefault(require("./Orders"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var EditOrder = {
+  order: {},
+  oninit: function oninit(vnode) {
+    vnode.state.order = _Orders.default.ordersList.filter(item.id = vnode.attrs.id);
+    console.log(vnode.state.order);
+  },
+  view: function view(vnode) {
+    return [(0, _mithril.default)(_Nav.default), (0, _mithril.default)('.edit-order-wrapper', [(0, _mithril.default)('h1', order.client)])];
+  }
+};
+module.exports = EditOrder;
+},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Nav":"components/Nav.js","./Orders":"components/Orders.js"}],"app.js":[function(require,module,exports) {
 "use strict";
 
 require("regenerator-runtime/runtime");
@@ -15841,9 +15810,9 @@ var _constructUi = require("construct-ui");
 
 require("../node_modules/construct-ui/lib/index.css");
 
-var _Tabs = _interopRequireDefault(require("/components/Tabs"));
-
 var _Nav = _interopRequireDefault(require("/components/Nav"));
+
+var _EditOrder = _interopRequireDefault(require("/components/EditOrder"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -15855,16 +15824,25 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-_constructUi.FocusManager.alwaysShowFocus();
+_constructUi.FocusManager.alwaysShowFocus(); // import ordersSection from '/components/Tabs';
+// import clientsSection from '/components/Tabs';
+// import historySection from '/components/Tabs';
+
+
+var _require = require('/components/Tabs'),
+    ordersSection = _require.ordersSection,
+    clientsSection = _require.clientsSection,
+    historySection = _require.historySection;
 
 var AppToaster = new _constructUi.Toaster();
 var session;
 
-function show(msg) {
+function show(msg, intent) {
+  console.log('showing toast');
   AppToaster.show({
     message: msg,
     icon: _constructUi.Icons.BELL,
-    intent: 'positive'
+    intent: intent
   });
 }
 
@@ -15900,18 +15878,15 @@ var Login = {
                 case 0:
                   e.preventDefault();
 
-                  if (session.user) {
-                    _context.next = 5;
+                  if (session) {
+                    _context.next = 4;
                     break;
                   }
 
                   _context.next = 4;
-                  return getCookie();
+                  return login.authenticate();
 
                 case 4:
-                  show('Logged in!');
-
-                case 5:
                 case "end":
                   return _context.stop();
               }
@@ -15925,9 +15900,6 @@ var Login = {
 
         return onclick;
       }()
-    }), (0, _mithril.default)(AppToaster, {
-      clearOnEscapeKey: true,
-      position: 'top'
     }))];
   }
 }; // Router
@@ -15935,61 +15907,86 @@ var Login = {
 _mithril.default.route(document.body, '/main', {
   '/main': {
     onmatch: function onmatch() {
-      // if (!sesion.user)
-      // m.route.set('/login')
-      // else
-      return Home;
+      if (!session) {
+        login.check();
+      } else return Home;
     }
   },
   '/login': Login,
-  '/orders': _Tabs.default.ordersSection,
-  '/clients': _Tabs.default.clientsSection,
-  '/history': _Tabs.default.historySection
+  '/orders': ordersSection,
+  '/clients': clientsSection,
+  '/history': historySection,
+  '/orders/edit/:id': _EditOrder.default
 }); //check if session exists
 
 
-function loginCheck() {
-  return _loginCheck.apply(this, arguments);
-}
+var login = {
+  check: function check() {
+    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+      return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              _context2.next = 2;
+              return fetch('/logged').then(function (res) {
+                return res.json();
+              });
 
-function _loginCheck() {
-  _loginCheck = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
-    return regeneratorRuntime.wrap(function _callee5$(_context5) {
-      while (1) {
-        switch (_context5.prev = _context5.next) {
-          case 0:
-            _context5.prev = 0;
-            _context5.next = 3;
-            return fetch('/logged').then(function (res) {
-              return res.json();
-            });
+            case 2:
+              session = _context2.sent;
+              session.user ? _mithril.default.route.set('/main') : _mithril.default.route.set('/login');
 
-          case 3:
-            session = _context5.sent;
-            _context5.next = 9;
-            break;
-
-          case 6:
-            _context5.prev = 6;
-            _context5.t0 = _context5["catch"](0);
-            console.log(_context5.t0.message);
-
-          case 9:
-          case "end":
-            return _context5.stop();
+            case 4:
+            case "end":
+              return _context2.stop();
+          }
         }
-      }
-    }, _callee5, null, [[0, 6]]);
-  }));
-  return _loginCheck.apply(this, arguments);
-}
+      }, _callee2);
+    }))();
+  },
+  authenticate: function authenticate() {
+    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+      var user, pwd;
+      return regeneratorRuntime.wrap(function _callee3$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              user = document.querySelector('form.login > div.cui-input:nth-child(2) > input:nth-child(2)').value.trim();
+              pwd = document.querySelector('form.login div.cui-input:nth-child(3) > input:nth-child(2)').value.trim();
 
-loginCheck();
+              _mithril.default.request({
+                url: "/api/login",
+                headers: {
+                  'user': user,
+                  'pwd': pwd
+                }
+              }).then(function (res) {
+                if (res.user) {
+                  session = res;
+                  localStorage.setItem('user', session.user);
+                  localStorage.setItem('smurf', session.smurf);
+                }
+
+                login.check();
+              });
+
+            case 3:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, _callee3);
+    }))();
+  }
+};
 var Home = {
   results: [],
   size: 'xl',
   view: function view(vnode) {
-    return (0, _mithril.default)('.main', (0, _mithril.default)(_Nav.default), (0, _mithril.default)('.search', (0, _mithril.default)('h1', 'Disponibilita'), (0, _mithril.default)('.search-form', (0, _mithril.default)(SearchForm))), (0, _mithril.default)('.results', Home.results.map(function (item, i) {
+    return (0, _mithril.default)('.main', (0, _mithril.default)(AppToaster, {
+      clearOnEscapeKey: true,
+      position: 'top'
+    }), (0, _mithril.default)(_Nav.default), (0, _mithril.default)('.search', (0, _mithril.default)('h1', 'Disponibilita'), (0, _mithril.default)('.search-form', (0, _mithril.default)(SearchForm))), (0, _mithril.default)('.results', Home.results.map(function (item, i) {
       return (0, _mithril.default)('.sku-wrapper-key', {
         key: item.id
       }, (0, _mithril.default)(Sku, {
@@ -16013,10 +16010,7 @@ var Home = {
 //     }
 //   }
 // })
-
-function getCookie() {
-  return _getCookie.apply(this, arguments);
-} // userIcons
+// userIcons
 // m.mount(document.querySelector('.user-panel-dropdown'), {
 //   view: () => {
 //     return [m('.user-icons', {
@@ -16035,40 +16029,6 @@ function getCookie() {
 //   }
 // })
 // m.mount(document.querySelector('.user-personal-bucket'), Tabs)
-
-
-function _getCookie() {
-  _getCookie = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6() {
-    var user, pwd;
-    return regeneratorRuntime.wrap(function _callee6$(_context6) {
-      while (1) {
-        switch (_context6.prev = _context6.next) {
-          case 0:
-            // let user = document.querySelector('form.login > div.cui-input:nth-child(2) > input:nth-child(2)').value
-            // let pwd = document.querySelector('form.login div.cui-input:nth-child(3) > input:nth-child(2)').value
-            user = 'ntaov';
-            pwd = 'ntaov456';
-            _context6.next = 4;
-            return fetch("api/login/".concat(user, "/").concat(pwd)).then(function (res) {
-              return res.json();
-            }).then(function (json) {
-              return console.log(json);
-            });
-
-          case 4:
-            user = '';
-            pwd = '';
-            loginCheck();
-
-          case 7:
-          case "end":
-            return _context6.stop();
-        }
-      }
-    }, _callee6);
-  }));
-  return _getCookie.apply(this, arguments);
-}
 
 var resultsArray;
 var SearchForm = {
@@ -16102,25 +16062,19 @@ var SearchForm = {
       type: 'submit',
       loading: vnode.state.loading,
       onclick: function () {
-        var _onclick2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(e) {
+        var _onclick2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(e) {
           var model, color;
-          return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          return regeneratorRuntime.wrap(function _callee4$(_context4) {
             while (1) {
-              switch (_context2.prev = _context2.next) {
+              switch (_context4.prev = _context4.next) {
                 case 0:
                   e.preventDefault();
                   SearchForm.clearResults();
                   vnode.state.loading = !vnode.state.loading;
-
-                  if (!session.user) {
-                    _context2.next = 9;
-                    break;
-                  }
-
                   model = document.querySelector('.model-input > input').value === '' ? 'm' : document.querySelector('.model-input > input').value;
                   color = document.querySelector('.color-input > input').value === '' ? 'c' : document.querySelector('.color-input > input').value; //
 
-                  _context2.next = 8;
+                  _context4.next = 7;
                   return _mithril.default.request({
                     method: "GET",
                     url: "/api/avb/".concat(model, "/").concat(color)
@@ -16129,15 +16083,15 @@ var SearchForm = {
                     console.log(Home.results);
                   });
 
-                case 8:
+                case 7:
                   vnode.state.loading = !vnode.state.loading;
 
-                case 9:
+                case 8:
                 case "end":
-                  return _context2.stop();
+                  return _context4.stop();
               }
             }
-          }, _callee2);
+          }, _callee4);
         }));
 
         function onclick(_x2) {
@@ -16262,15 +16216,11 @@ function SizeButton() {
       url: "/api/".concat(sku.year, "/").concat(sku.season, "/").concat(sku.model, "/").concat(sku.color, "/").concat(sku.sizesForRequests[i])
     }).then(function (res) {
       shops = Object.values(res)[0];
-      isLoading = !isLoading; // m.redraw()
-      // console.log(shops);
+      isLoading = !isLoading;
     });
   }
 
   return {
-    // oninit(vnode) {
-    //   vnode.state.loading = false
-    // },
     view: function view(vnode) {
       var i = vnode.attrs.i;
       var sku = vnode.attrs.sku;
@@ -16284,14 +16234,14 @@ function SizeButton() {
         size: 'xs',
         requestSize: sizeForReq,
         onclick: function () {
-          var _onclick3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(e) {
+          var _onclick3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(e) {
             var string;
-            return regeneratorRuntime.wrap(function _callee3$(_context3) {
+            return regeneratorRuntime.wrap(function _callee5$(_context5) {
               while (1) {
-                switch (_context3.prev = _context3.next) {
+                switch (_context5.prev = _context5.next) {
                   case 0:
                     isLoading = !isLoading;
-                    _context3.next = 3;
+                    _context5.next = 3;
                     return getShops(sku, i);
 
                   case 3:
@@ -16300,55 +16250,52 @@ function SizeButton() {
                     _mithril.default.mount(document.querySelector("ul.size-".concat(i, "-").concat(string)), {
                       oninit: function oninit(vnode) {
                         vnode.state.intent = 'warning';
-                        vnode.state.label = 'Add';
                       },
                       view: function view() {
                         var string = sku.string.split(' ').join('');
-                        return [(0, _mithril.default)(_constructUi.Tag, {
-                          label: Object.keys(shops)[0],
-                          intent: 'positive'
-                        }), (0, _mithril.default)(_constructUi.Button, {
-                          iconLeft: _constructUi.Icons.PLUS,
-                          size: 'xs',
-                          intent: vnode.state.intent,
-                          label: vnode.state.label,
-                          basic: true,
-                          outline: true,
-                          onclick: function onclick() {
-                            // ADD SEARCH
-                            var price = document.querySelector('.price-' + string).textContent.split(',')[0].split('.').join('');
-                            console.log(price);
 
-                            _mithril.default.request({
-                              method: "GET",
-                              url: "/api/addSearch/".concat(session.user, "/").concat(sku.year, "/").concat(sku.season, "/").concat(sku.model, "/").concat(sku.color, "/").concat(size, "/").concat(sizeForReq, "/").concat(price)
-                            }).then(function (res) {
-                              if (res._id) {
-                                console.log(res._id);
-                                vnode.state.intent = 'positive';
-                                vnode.state.label = 'Added!';
-                              } else {
-                                vnode.state.label = 'Error!';
-                                vnode.state.intent = 'negative';
-                              }
-                            });
-                          }
-                        }), Object.values(shops)[0] ? Object.values(shops)[0].map(function (item) {
-                          if (item.search('NEGOZIO SOLOMEO') != -1) {
-                            return (0, _mithril.default)('.list-item.solomeo', item);
-                          } else {
-                            return (0, _mithril.default)(".list-item", item);
-                          }
-                        }) : null];
+                        if (Object.keys(shops)[0]) {
+                          return [(0, _mithril.default)(_constructUi.Tag, {
+                            label: Object.keys(shops)[0],
+                            intent: 'positive'
+                          }), (0, _mithril.default)(_constructUi.Button, {
+                            iconLeft: _constructUi.Icons.PLUS,
+                            size: 'xs',
+                            basic: true,
+                            outline: true,
+                            onclick: function onclick() {
+                              // ADD SEARCH
+                              var price = document.querySelector('.price-' + string).textContent.split(',')[0].split('.').join('');
+
+                              _mithril.default.request({
+                                method: "GET",
+                                url: "/api/addSearch/".concat(session.user, "/").concat(sku.year, "/").concat(sku.season, "/").concat(sku.model, "/").concat(sku.color, "/").concat(size, "/").concat(sizeForReq, "/").concat(price)
+                              }).then(function (res) {
+                                if (res._id) {
+                                  console.log(res._id);
+                                  show("Added Search ".concat(sku.string, " ").concat(size, "!"), 'positive');
+                                } else {
+                                  show("Couldn't add Search ".concat(sku.string, " ").concat(size, "!"), 'negative');
+                                }
+                              });
+                            }
+                          }), Object.values(shops)[0].map(function (item) {
+                            if (item.search('NEGOZIO SOLOMEO') != -1) {
+                              return (0, _mithril.default)('.list-item.solomeo', item);
+                            } else {
+                              return (0, _mithril.default)(".list-item", item);
+                            }
+                          })];
+                        }
                       }
                     });
 
                   case 5:
                   case "end":
-                    return _context3.stop();
+                    return _context5.stop();
                 }
               }
-            }, _callee3);
+            }, _callee5);
           }));
 
           function onclick(_x3) {
@@ -16364,16 +16311,16 @@ function SizeButton() {
 
 
 var displayShops = /*#__PURE__*/function () {
-  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
+  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6() {
     var shopsPromises, y, shopsObject, res;
-    return regeneratorRuntime.wrap(function _callee4$(_context4) {
+    return regeneratorRuntime.wrap(function _callee6$(_context6) {
       while (1) {
-        switch (_context4.prev = _context4.next) {
+        switch (_context6.prev = _context6.next) {
           case 0:
             skuElement = document.querySelector(".sku-".concat(i));
 
             if (skuElement.classList.contains('fetched')) {
-              _context4.next = 18;
+              _context6.next = 18;
               break;
             }
 
@@ -16384,30 +16331,30 @@ var displayShops = /*#__PURE__*/function () {
 
           case 5:
             if (!(y < sku.sizesForRequests.length)) {
-              _context4.next = 15;
+              _context6.next = 15;
               break;
             }
 
             shopsObject = fetch("/api/".concat(sku.year, "/").concat(sku.season, "/").concat(sku.model, "/").concat(sku.color, "/").concat(sku.sizesForRequests[y])).then(function (res) {
               return res.json();
             });
-            _context4.t0 = shopsPromises;
-            _context4.next = 10;
+            _context6.t0 = shopsPromises;
+            _context6.next = 10;
             return shopsObject;
 
           case 10:
-            _context4.t1 = _context4.sent;
+            _context6.t1 = _context6.sent;
 
-            _context4.t0.push.call(_context4.t0, _context4.t1);
+            _context6.t0.push.call(_context6.t0, _context6.t1);
 
           case 12:
             y++;
-            _context4.next = 5;
+            _context6.next = 5;
             break;
 
           case 15:
             res = [];
-            _context4.next = 18;
+            _context6.next = 18;
             return Promise.all(shopsPromises).then(function (shops) {
               res = shops;
               return res;
@@ -16415,10 +16362,10 @@ var displayShops = /*#__PURE__*/function () {
 
           case 18:
           case "end":
-            return _context4.stop();
+            return _context6.stop();
         }
       }
-    }, _callee4);
+    }, _callee6);
   }));
 
   return function displayShops() {
@@ -16562,7 +16509,7 @@ function s(query, cb) {
     cb(item);
   });
 }
-},{"regenerator-runtime/runtime":"../node_modules/regenerator-runtime/runtime.js","mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../node_modules/construct-ui/lib/index.css":"../node_modules/construct-ui/lib/index.css","/components/Tabs":"components/Tabs.js","/components/Nav":"components/Nav.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"regenerator-runtime/runtime":"../node_modules/regenerator-runtime/runtime.js","mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../node_modules/construct-ui/lib/index.css":"../node_modules/construct-ui/lib/index.css","/components/Tabs":"components/Tabs.js","/components/Nav":"components/Nav.js","/components/EditOrder":"components/EditOrder.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -16590,7 +16537,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "4980" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "5051" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

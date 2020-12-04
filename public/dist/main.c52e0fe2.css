@@ -66,12 +66,17 @@ li {
 
 .breadcrumbs {
   margin: .5rem;
+  font-variant: small-caps;
 }
 
 .logo {
   padding: 10px;
   height: 70px;
   width: auto;
+  position: absolute;
+  right: 50%;
+  top: 0%;
+  transform: translate(50%);
 }
 
 .search {
@@ -215,6 +220,19 @@ input[name=css-tabs] {
 .sku-wrapper {
   width: 95% !important;
   margin: 2rem auto;
+  animation: fade-in .5s;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(2rem)
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0rem)
+  }
 }
 
 .sku-wrapper * {
