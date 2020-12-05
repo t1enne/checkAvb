@@ -195,8 +195,8 @@ img.sku-picture.hidden {
 }
 
 form.login {
-  margin: 10% auto !important;
-  max-width: 400px;
+  margin: 0% auto !important;
+  max-width: 500px;
   padding: 10%;
 }
 
