@@ -83,6 +83,7 @@ app.get('/logged', (req, res) => {
 // });
 
 
+// LOGIN
 app.get('/api/login', async (req, res) => {
   let smurfId = await getter.getCookie(req.headers.user, req.headers.pwd);
   req.session.smurf = smurfId.cookie;
@@ -93,6 +94,7 @@ app.get('/api/login', async (req, res) => {
 app.get('/api/logout', async (req, res) => {
   req.session.smurf = null
   req.session.user = null
+  res.json(req.session)
 })
 
 //GET IMAGE
@@ -149,42 +151,51 @@ app.get(`/api/addSearch/:user/:year/:season/:model/:color/:size/:sizeForReq/:pri
 })
 
 // ADD NEW CLIENT
-app.get(`/api/newClient/:name/:surname/:username/:provider/:tail/:phone`, async (req, res) => {
+app.get(`/api/newClient`, async (req, res) => {
+  console.log(req.headers);
   let client = await new Client({
-    name: req.params.name,
-    surname: req.params.surname,
-    username: req.params.username,
-    provider: req.params.provider + '.' + req.params.tail,
-    phone: req.params.phone
+    name: req.headers.name,
+    surname: req.headers.surname,
+    mail: req.headers.username,
+    phone: req.headers.phone
   });
   client.save((err, client) => {
-    if (err)
-      console.error(err)
+    if (err) console.error(err)
     res.json(client)
   })
 })
+
+// DELETE CLIENT
+app.delete('/api/delete/:clientId', async (req, res) => {
+  await Client.findByIdAndRemove(req.params.clientId, (err, client) => {
+    if (err) console.log(err);
+    console.log(client);
+    res.json(client)
+  })
+})
+
 
 // Update order
 
 // TODO: when I assign Search to Order, push searchId to OrderInstance.searches
 
 app.get('/api/addToClient/:orderId/:searchId', async (req, res) => {
+  let updateSearch = {
+    order: req.params.orderId
+  }
+
   await SearchInstance.findOneAndUpdate({
       _id: req.params.searchId
-    }, {
-      order: req.params.orderId
-    }, {
-      new: true
-    }),
-    (err, order) => {
+    }, updateSearch, null,
+    function(err, order) {
       if (err) console.error(err);
       console.log('assigned ' + order);
       res.json(order)
-    }
+    })
 })
 
 // CREATE ORDER
-app.post(`/api/createOrder/:client/:user/:name`, async (req, res) => {
+app.post(`/api/createOrder/:client/:name`, async (req, res) => {
   let fullname = req.params.name.split('&');
   let name = fullname[0]
   let surname = fullname[1]
@@ -194,8 +205,8 @@ app.post(`/api/createOrder/:client/:user/:name`, async (req, res) => {
     user: req.session.user
   });
   await order.save((err, order) => {
-    if (err)
-      console.error(err)
+    if (err) console.error(err)
+    console.log(order);
     res.json(order);
   })
 
@@ -208,6 +219,17 @@ app.get(`/api/listOrders`, async (req, res) => {
   })
 })
 
+// GET ONE ORDER
+
+app.get(`/api/order/:id`, async (req, res) => {
+  await OrderInstance.find({
+    _id: req.params.id
+  }, (err, order) => {
+    if (err) console.error(err);
+    res.json(order[0])
+  })
+})
+
 // DELETE ONE ORDER {
 app.delete(`/api/deleteOrder/:orderId`, async (req, res) => {
   await OrderInstance.findByIdAndRemove(req.params.orderId, (err, order) => {
@@ -216,12 +238,12 @@ app.delete(`/api/deleteOrder/:orderId`, async (req, res) => {
   })
 });
 
-// DISPLAY SEARCHES FOR EACH Order
+// DISPLAY ASSIGNED SEARCHES
 app.get(`/api/:order/SearchInstances`, async (req, res) => {
   await SearchInstance.find({
     order: req.params.order
   }, (err, searches) => {
-    console.log('order is ' + req.params.order);
+    console.log('Getting assigned searches for order ' + req.params.order);
     if (err)
       console.error(err);
     res.json(searches)
@@ -239,7 +261,19 @@ app.get(`/api/:user/SearchInstances`, async (req, res) => {
   })
 });
 
-// DISPLAY UNASSIGNED SEARCHES
+// LIST UNASSIGNED SEARCHES
+app.get(`/api/SearchInstances/unassigned`, async (req, res) => {
+  await SearchInstance.find({
+    order: 'unassigned'
+  }, (err, searches) => {
+    if (err)
+      console.error(err);
+    res.json(searches)
+  })
+});
+
+
+// LIST ALL SEARCHES
 app.get(`/api/SearchInstances`, async (req, res) => {
   await SearchInstance.find({}, (err, searches) => {
     if (err)

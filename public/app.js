@@ -24,7 +24,8 @@ import {
   Toaster,
   Popover,
   PopoverInteraction,
-  PopoverPosition
+  PopoverPosition,
+  Switch
 } from 'construct-ui';
 
 import '../node_modules/construct-ui/lib/index.css'
@@ -40,32 +41,35 @@ const {
   historySection
 } = require('/components/Tabs')
 
-import Nav from '/components/Nav';
+import {
+  Nav,
+  showToast
+} from '/components/Nav';
 
 import EditOrder from '/components/EditOrder';
 
-const AppToaster = new Toaster();
 
 
 let session;
 
-function show(msg, intent) {
-  console.log('showing toast');
-  AppToaster.show({
-    message: msg,
-    icon: Icons.BELL,
-    intent: intent,
-  })
-}
 
 let Login = {
-  view: () => {
+  remember: false,
+  oninit: (vnode) => {
+    if (localStorage.pwd) {
+      vnode.state.remember = true
+
+    }
+
+  },
+  view: (vnode) => {
     return [
       m('form.login', m('.logo-bg', {
           style: 'width: auto; height: 100px; background: url("/logo.86ce68ea.svg") no-repeat center;'
         }),
         m(Input, {
           style: 'display:block;margin:5px auto;',
+          value: localStorage.user || '',
           contentLeft: m(Icon, {
             name: Icons.USER
           }),
@@ -74,6 +78,7 @@ let Login = {
         }),
         m(Input, {
           style: 'display:block;margin:5px auto;',
+          value: localStorage.pwd || '',
           contentLeft: m(Icon, {
             name: Icons.LOCK
           }),
@@ -86,11 +91,19 @@ let Login = {
           style: 'display:block;margin:5px auto;',
           type: 'submit',
           intent: 'primary',
-          onclick: async (e) => {
+          onclick: (e) => {
+            console.log('clicked');
             e.preventDefault();
-            if (!session) {
-              await login.authenticate()
-            }
+            login.authenticate(vnode.state.remember)
+            showToast(`Welcome back ${localStorage.user} !`, 'positive')
+          }
+        }),
+        m(Switch, {
+          label: 'Remember me',
+          style: 'display: block;margin: auto;margin-top: 1rem;',
+          checked: vnode.state.remember,
+          onchange: () => {
+            vnode.state.remember = !vnode.state.remember
           }
         })
       )
@@ -124,7 +137,7 @@ let login = {
     session = await fetch('/logged').then(res => res.json())
     session.user ? m.route.set('/main') : m.route.set('/login')
   },
-  async authenticate() {
+  async authenticate(remember) {
     let user = document.querySelector('form.login > div.cui-input:nth-child(2) > input:nth-child(2)').value.trim()
     let pwd = document.querySelector('form.login div.cui-input:nth-child(3) > input:nth-child(2)').value.trim()
 
@@ -137,8 +150,9 @@ let login = {
     }).then(res => {
       if (res.user) {
         session = res
-        localStorage.setItem('user', session.user)
-        localStorage.setItem('smurf', session.smurf)
+        localStorage.smurf = session.smurf
+        localStorage.user = session.user
+        if (remember) localStorage.pwd = pwd
       }
       login.check()
     })
@@ -152,10 +166,7 @@ let Home = {
   results: [],
   size: 'xl',
   view: (vnode) => {
-    return m('.main', m(AppToaster, {
-        clearOnEscapeKey: true,
-        position: 'top'
-      }), m(Nav), m('.search', m('h1', 'Disponibilita'), m('.search-form', m(SearchForm))),
+    return m('.main', m(Nav), m('.search', m('h1', 'Disponibilita'), m('.search-form', m(SearchForm))),
       m('.results', Home.results.map((item, i) => {
         return m('.sku-wrapper-key', {
           key: item.id
@@ -458,9 +469,9 @@ function SizeButton() {
                       }).then(res => {
                         if (res._id) {
                           console.log(res._id);
-                          show(`Added Search ${sku.string} ${size}!`, 'positive')
+                          showToast(`Added Search ${sku.string} ${size}!`, 'positive')
                         } else {
-                          show(`Couldn't add Search ${sku.string} ${size}!`, 'negative')
+                          showToast(`Couldn't add Search ${sku.string} ${size}!`, 'negative')
                         }
                       })
                     }

@@ -23,196 +23,190 @@ import {
   Tag
 } from 'construct-ui';
 
-import Nav from './Nav'
-let Orders = require('./Orders')
-console.log(Orders);
+import {
+  Nav,
+  showToast
+} from './Nav'
+import {
+  Orders
+} from './Orders'
+
+import {
+  Clients
+} from './Clients'
+
+import {
+  Searches
+} from './Searches'
+
 
 let seaching = false,
   session;
 
 const AppToaster = new Toaster()
 
-let Clients = {
-  clientsList: [],
-  loadClients: () => {
-    m.request({
-      method: "GET",
-      url: `/api/listClients`
-    }).then(res => Clients.clientsList = res)
-  },
-  oninit: () => {
-    if (Clients.clientsList.length === 0) {
-      Clients.loadClients()
-    }
-  },
-  view: () => {
-    return Clients.clientsList.map(client => {
-      return m(Card, {
-          class: 'client-card',
-          url: client._id,
-          elevated: 2,
-          interactive: true,
-          fluid: true
-        },
-        m("h1#client-name", client.name + ' ' + client.surname),
-        m(Button, {
-          class: 'mail-copy-button',
-          label: `mail: ${client.mail}`,
-          iconLeft: Icons.COPY,
-          basic: true,
-          onclick: (e) => {
-            navigator.clipboard.writeText(client.mail)
-          }
-        }),
-        m(Button, {
-          class: 'phone-copy-button',
-          label: `phone: ${client.phone ? client.phone : ''} `,
-          iconLeft: Icons.COPY,
-          basic: true,
-          onclick: (e) => {
-            navigator.clipboard.writeText(client.phone)
-          }
-        })
-      )
-    })
-  }
-}
-let Searches = {
-  searchesList: [],
-  unassignedSearches: [],
-  assignedSearches: {},
-  loadSearches: async () => {
-    m.request({
-      method: "GET",
-      url: `/api/SearchInstances`
-    }).then(res => {
-      console.log(res);
-      Searches.searchesList = res
-      Searches.filterSearches(res)
-      console.log(Searches.assignedSearches);
-    })
-  },
-  filterSearches: (searches) => {
-    console.log('filtering searches');
-    Searches.unassignedSearches = searches.filter(item => item.order === 'unassigned')
-    searches.map(search => {
-      if (search.order != 'unassigned') {
-        if (!Searches.assignedSearches[search.order]) {
-          Searches.assignedSearches[search.order] = []
-          Searches.assignedSearches[search.order].push(search)
-        } else {
-          Searches.assignedSearches[search.order].push(search)
-        }
-      }
-    })
+// let Orders = {
+//   ordersList: [],
+//   loadOrders: () => {
+//     m.request({
+//       method: "GET",
+//       url: "/api/listOrders"
+//     }).then(res => {
+//       console.log(res);
+//       Orders.ordersList = res
+//       return res
+//     })
+//   },
+//   oninit: (vnode) => {
+//     if (Orders.ordersList.length === 0) {
+//       Orders.loadOrders()
+//       Searches.loadSearches()
+//     }
+//   },
+//   order: {
+//     oninit: (vnode) => {
+//       vnode.state.selected = false
+//       vnode.state.pieces = 0
+//       vnode.state.total = 0
+//     },
+//     onupdate: (vnode) => {
+//       vnode.state.pieces = 0
+//       vnode.state.total = 0
+//     },
+//     view: (vnode) => {
+//       let order = vnode.attrs.order
+//       let o = vnode.attrs.o
+//       return m(Card, {
+//           class: `order client-order collapsible`,
+//           id: order._id,
+//           clientId: order.clientId,
+//           interactive: true,
+//           fluid: true,
+//           elevation: 2
+//           // SELECT ORDER
+//         }, m(PopoverMenu, {
+//           closeOnContentClick: true,
+//           content: [
+//             m(Button, {
+//               iconLeft: Icons.TRASH,
+//               intent: 'negative',
+//               label: 'Delete',
+//               basic: true,
+//               align: 'center',
+//               onclick: (e) => {
+//                 // DELETE ORDER
+//                 e.preventDefault();
+//                 e.stopPropagation();
+//                 console.log('deleting order ' + order._id);
+//                 m.request({
+//                   method: "DELETE",
+//                   url: `/api/deleteOrder/${order._id}`
+//                 }).then(res => {
+//                   console.log(res)
+//                   Orders.ordersList.splice(Orders.ordersList.indexOf(res), 1)
+//                 })
+//               }
+//             })
+//           ],
+//           trigger: m(Button, {
+//             iconLeft: Icons.SETTINGS,
+//             style: 'float:right;',
+//           })
+//         }),
+//         [m(`.order-client-name[id=${order.clientId}]`, {
+//             onclick: () => {
+//               m.route.set(`/orders/edit/${order.id}`)
+//             }
+//           }, m(`h1`, order.clientName)),
+//           m(Tag, {
+//             label: order.date,
+//             class: 'date'
+//           }),
+//           m(Tag, {
+//             label: order.user,
+//             intent: 'primary',
+//             class: 'user'
+//           })
+//           //, m(Tag, {
+//           //   label: order._id,
+//           //   class: 'url',
+//           //   size: 'xs',
+//           //   url: order._id
+//           // })
+//         ],
+//         [
+//           m(List, {
+//               size: 'xs',
+//               style: `margin-top:1rem;`,
+//               class: 'collapsible assigned-orders'
+//             },
+//
+//             Searches.assignedSearches[order._id] ? (
+//               Searches.assignedSearches[order._id].map(search => {
+//                 vnode.state.pieces++
+//                 vnode.state.total += parseInt(search.price)
+//                 return m(AssignedSearch, {
+//                   search: search
+//                 })
+//               })
+//             ) : undefined
+//           ), m('.row.searches-totals',
+//             m(Tag, {
+//               label: `total pcs: ${vnode.state.pieces}`
+//             }),
+//             m(Tag, {
+//               label: `total: €${vnode.state.total}`,
+//               intent: 'warning'
+//             })), m(Button, {
+//             fluid: true,
+//             size: 'md',
+//             style: 'margin: auto; display: block; padding: 0; transition: rotate .3s',
+//             iconLeft: Icons.CHEVRON_DOWN,
+//             basic: true,
+//             onclick: (e) => {
+//               e.preventDefault()
+//               e.stopPropagation()
+//               let list = vnode.dom.querySelector('.assigned-orders')
+//               list.classList.toggle('collapsed')
+//               console.log(vnode);
+//               let svg = e.target.children[0]
+//               m.redraw()
+//             }
+//           })
+//         ])
+//     }
+//   },
+//   view: (vnode) => {
+//     // let array
+//     // if (Searches.unassignedSearches.length != 0) {
+//     //   array = Searches.unassignedSearches.map(item => {
+//     //     return m(UnassignedSearch, {
+//     //       item: item,
+//     //     })
+//     //   })
+//     // }
+//
+//     return [m('.orders.flex.reverse', Orders.ordersList.map((order, o) => {
+//       return m(Orders.order, {
+//         order: order,
+//         o: o
+//       })
+//     }))]
+//     // ,
+//     // m('h1', 'Unassigned Searches'),
+//     // m(Card, {
+//     //   fluid: true
+//     // }, m(List, {
+//     //   class: 'unassigned-searches',
+//     //   interactive: false,
+//     //   size: 'xs'
+//     // }, m('.list-items-wrapper',
+//     //   array
+//     // )))
+//
+//   }
+// }
 
-
-  },
-  oninit: () => {
-    if (Searches.searchesList.length === 0) {
-      Searches.loadSearches()
-    }
-  },
-
-  view: () => {
-    return m(List, {
-      interactive: true,
-      size: 'md',
-      class: 'flex reverse',
-      style: 'max-height:none;'
-    }, Searches.searchesList.map(item => {
-      return m(ListItem, {
-        label: `${item.year}${item.season} ${item.model} ${item.color} ${item.size}`,
-        contentRight: m(Tag, {
-          label: '€' + item.price + ',00',
-          intent: 'warning'
-        })
-      })
-    }))
-  }
-}
-
-function AssignedSearch() {
-
-  return {
-    view(vnode) {
-      let item = vnode.attrs.search
-      let contentR = m(Button, {
-        iconLeft: Icons.MINUS,
-        intent: 'negative',
-        size: 'xs',
-        basic: true,
-        onclick: (e) => {
-          //UNASSIGN SEARCH
-          e.preventDefault()
-          e.stopPropagation()
-          console.log(1);
-          m.request({
-            method: 'GET',
-            url: `/api/addToClient/unassigned/${item._id}`
-          }).then(res => {
-            console.log(res);
-          })
-        }
-      })
-
-      return m(ListItem, {
-        label: `${item.year}${item.season} ${item.model} ${item.color} ${item.size}`,
-        // label: 'text',
-        contentLeft: contentR,
-        contentRight: m(Tag, {
-          intent: 'warning',
-          size: 'xs',
-          label: item.price
-        })
-      })
-    }
-  }
-}
-
-function UnassignedSearch() {
-
-  return {
-    view: (vnode) => {
-      let item = vnode.attrs.item
-      let contentR = m(Tag, {
-        label: item.price,
-        intent: 'warning'
-      })
-      // let contentL =
-      return m(ListItem, {
-        label: `${item.year}${item.season} ${item.model} ${item.color} ${item.size}`,
-        contentRight: contentR,
-        contentLeft: m(Button, {
-          iconLeft: Icons.PLUS,
-          intent: 'positive',
-          size: 'xs',
-          label: 'Add',
-          basic: true,
-          onclick: (e) => {
-            // ASSIGN SEARCH
-            let searchId = item._id
-            let orderId = document.querySelector('.selected-order').getAttribute('id')
-
-            console.log('search id is ' + searchId);
-            console.log('order id is ' + orderId);
-
-            m.request({
-              method: 'GET',
-              url: `/api/addToClient/${orderId}/${searchId}`
-            }).then(res => {
-              console.log(res);
-
-            })
-
-
-
-          }
-        })
-      })
-    }
-  }
-}
 
 let ordersSection = {
   view: (vnode) => {
@@ -261,11 +255,10 @@ let ordersSection = {
                         console.log(item)
                         m.request({
                           method: "POST",
-                          url: `/api/createOrder/${item._id}/${session.user}/${item.name}&${item.surname}`
+                          url: `/api/createOrder/${item._id}/${item.name}&${item.surname}`
                         }).then(res => {
                           console.log(res);
                           Orders.ordersList.push(res)
-                          m.mount(document.querySelector('.order-list'), Orders)
                         })
                       },
                       trigger: m(Button, {
@@ -281,11 +274,8 @@ let ordersSection = {
           })]),
           m('.new-order'),
           m(".search-results"),
-          m(".order-list", {
-            oncreate: (vnode) => {
-              // m.mount(vnode.dom, Orders)
-            }
-          }, 'Order List')
+          // m(".order-list", m(Orders))
+          m(".order-list", m(Orders))
         ]))
     ]
   }
@@ -304,6 +294,7 @@ let clientsSection = {
           onclick: async () => {
             vnode.state.loading = !vnode.state.loading
             await Clients.loadClients()
+            console.log(Clients.clientsList);
             vnode.state.loading = !vnode.state.loading
           }
         }),
@@ -328,6 +319,9 @@ let clientsSection = {
                 placeholder: 'Name'
               }),
               m(Input, {
+                contentLeft: m(Icon, {
+                  name: Icons.USER
+                }),
                 type: 'text',
                 name: 'client-surname',
                 placeholder: 'Surname'
@@ -358,17 +352,20 @@ let clientsSection = {
                   let mail = document.querySelector('input[name="client-mail"]').value.trim()
                   let phone = document.querySelector('input[name="client-phone"]').value.trim()
 
-                  let username = mail.split('@')[0]
-                  let provider = mail.split('@')[1].split('.')[0]
-                  let tail = mail.split('@')[1].split('.')[1]
+                  console.log(mail);
 
                   await m.request({
                     method: "GET",
-                    url: `/api/newClient/${name}/${surname}/${username}/${provider}/${tail}/${phone}`
+                    url: `/api/newClient`,
+                    headers: {
+                      name,
+                      surname,
+                      mail,
+                      phone
+                    }
+                  }).then(client => {
+                    Clients.clientsList.push(client)
                   })
-                  // emit a click event for convenience on the clients radio to fetch the clients
-                  document.querySelector('#radio2').click()
-
                 }
               })
             ])
@@ -425,4 +422,3 @@ function s(query, cb) {
 exports.ordersSection = ordersSection
 exports.clientsSection = clientsSection
 exports.historySection = historySection
-// module.exports = Searches

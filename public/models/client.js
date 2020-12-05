@@ -6,9 +6,8 @@ var ClientSchema = new Schema(
   {
     name: {type: String, required: true, maxlength: 100},
     surname: {type: String, required: true, maxlength: 100},
-    username: {type: String, maxlength: 100},
-    provider: {type: String, maxlength: 100},
-    phone: {type: String, maxlength: 20 },
+    mail: {type: String, maxlength: 100},
+    phone: {type: String, default: '+39', maxlength: 20 },
     dateObj: { type: Date, default: new Date() },
     orders: Array
   }, { toJSON: { virtuals: true } }
@@ -31,12 +30,6 @@ ClientSchema
   let date = `${day}/${month}/${year}`
   return date
 })
-
-ClientSchema
-.virtual('mail')
-.get(function () {
-  return this.username + '@' + this.provider;
-});
 
 
 

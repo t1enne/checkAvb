@@ -15052,6 +15052,17 @@ var _logo = _interopRequireDefault(require("../logo.svg"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var AppToaster = new _constructUi.Toaster();
+
+function showToast(msg, intent) {
+  AppToaster.show({
+    message: msg,
+    icon: _constructUi.Icons.BELL,
+    intent: intent,
+    timeout: 5000
+  });
+}
+
 var DrawerContent = {
   drawerOpen: false,
   class: 'drawer',
@@ -15124,255 +15135,65 @@ var DrawerContent = {
         size: vnode.state.size,
         basic: true
       }, (0, _mithril.default)(_constructUi.Tag, {
-        label: localStorage.getItem('user')
+        label: localStorage.user
       }), (0, _mithril.default)(_constructUi.MenuItem, {
         iconLeft: _constructUi.Icons.LOG_OUT,
         label: 'Log Out',
         onclick: function onclick() {
-          localStorage.clear();
-          console.log(localStorage);
-
+          // localStorage.clear()
           _mithril.default.request({
             url: '/api/logout'
-          }).then(_mithril.default.route.set('/login'));
+          }).then(function (res) {
+            console.log(res);
+
+            _mithril.default.route.set('/login');
+          });
         }
       })))))
     })];
   }
 };
 var Nav = {
+  oninit: function oninit() {
+    console.log('mounting');
+  },
   view: function view(vnode) {
-    return (0, _mithril.default)('.nav.flex', (0, _mithril.default)(_constructUi.Breadcrumb, {
-      size: 'xl',
-      class: 'breadcrumbs'
-    }, (0, _mithril.default)(_constructUi.BreadcrumbItem, {
-      href: '/#!/main'
-    }, (0, _mithril.default)(_constructUi.Icon, {
-      name: _constructUi.Icons.HOME
-    })), (0, _mithril.default)(_constructUi.BreadcrumbItem, {}, location.hash.split('/')[1])), (0, _mithril.default)("img.logo[src=".concat(_logo.default, "][alt='logo']")), (0, _mithril.default)(DrawerContent));
+    var submenu = location.hash.split('/')[1];
+    return [(0, _mithril.default)('.nav.flex', //   m(Breadcrumb, {
+    //     size: 'xl',
+    //     class: 'breadcrumbs',
+    //     seperator: m(Icon, { name: Icons.CHEVRON_RIGHT })
+    //   },
+    //   m(BreadcrumbItem, {
+    //     href: '/#!/main'
+    //   }, m(Icon, {
+    //     name: Icons.HOME
+    //   })),
+    //   m(BreadcrumbItem, {
+    //     href: `/#!/${submenu}`
+    //   }, m('a.breadcrumbs', submenu))
+    //
+    // ),
+    (0, _mithril.default)("img.logo[src=".concat(_logo.default, "][alt='logo']")), (0, _mithril.default)(DrawerContent)), (0, _mithril.default)(AppToaster, {
+      position: 'top'
+    })];
   }
 };
-module.exports = Nav;
-},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../logo.svg":"logo.svg"}],"components/Orders.js":[function(require,module,exports) {
+exports.Nav = Nav;
+exports.showToast = showToast;
+},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../logo.svg":"logo.svg"}],"components/Searches.js":[function(require,module,exports) {
 "use strict";
 
 var _mithril = _interopRequireDefault(require("mithril"));
 
 var _constructUi = require("construct-ui");
 
-var _Tabs = _interopRequireDefault(require("./Tabs"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var Orders = {
-  ordersList: [],
-  loadOrders: function loadOrders() {
-    _mithril.default.request({
-      method: "GET",
-      url: "/api/listOrders"
-    }).then(function (res) {
-      console.log(res);
-      Orders.ordersList = res;
-    });
-  },
-  oninit: function oninit(vnode) {
-    if (Orders.ordersList.length === 0) {
-      Orders.loadOrders();
-
-      _Tabs.default.loadSearches();
-    }
-  },
-  order: {
-    oninit: function oninit(vnode) {
-      vnode.state.selected = false;
-      vnode.state.pieces = 0;
-      vnode.state.total = 0;
-    },
-    onupdate: function onupdate(vnode) {
-      vnode.state.pieces = 0;
-      vnode.state.total = 0;
-    },
-    view: function view(vnode) {
-      var order = vnode.attrs.order;
-      var o = vnode.attrs.o;
-      return (0, _mithril.default)(_constructUi.Card, {
-        class: "order client-order collapsible",
-        id: order._id,
-        clientId: order.clientId,
-        interactive: true,
-        fluid: true,
-        elevation: 2 // SELECT ORDER
-
-      }, (0, _mithril.default)(PopoverMenu, {
-        closeOnContentClick: true,
-        content: [(0, _mithril.default)(_constructUi.Button, {
-          iconLeft: _constructUi.Icons.TRASH,
-          intent: 'negative',
-          label: 'Delete',
-          basic: true,
-          align: 'center',
-          onclick: function onclick(e) {
-            // DELETE ORDER
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('deleting order ' + order._id);
-
-            _mithril.default.request({
-              method: "DELETE",
-              url: "/api/deleteOrder/".concat(order._id)
-            }).then(function (res) {
-              console.log(res);
-              Orders.ordersList.splice(Orders.ordersList.indexOf(res), 1);
-            });
-          }
-        })],
-        trigger: (0, _mithril.default)(_constructUi.Button, {
-          iconLeft: _constructUi.Icons.SETTINGS,
-          style: 'float:right;'
-        })
-      }), [(0, _mithril.default)(".order-client-name[id=".concat(order.clientId, "]"), {
-        onclick: function onclick() {
-          _mithril.default.route.set("/orders/edit/".concat(order.id));
-        }
-      }, (0, _mithril.default)("h1", order.clientName)), (0, _mithril.default)(Tag, {
-        label: order.date,
-        class: 'date'
-      }), (0, _mithril.default)(Tag, {
-        label: order.user,
-        intent: 'primary',
-        class: 'user'
-      }) //, m(Tag, {
-      //   label: order._id,
-      //   class: 'url',
-      //   size: 'xs',
-      //   url: order._id
-      // })
-      ], [(0, _mithril.default)(_constructUi.List, {
-        size: 'xs',
-        style: "margin-top:1rem;",
-        class: 'collapsible assigned-orders'
-      }, _Tabs.default.assignedSearches[order._id] ? _Tabs.default.assignedSearches[order._id].map(function (search) {
-        vnode.state.pieces++;
-        vnode.state.total += parseInt(search.price);
-        return (0, _mithril.default)(AssignedSearch, {
-          search: search
-        });
-      }) : undefined), (0, _mithril.default)('.row.searches-totals', (0, _mithril.default)(Tag, {
-        label: "total pcs: ".concat(vnode.state.pieces)
-      }), (0, _mithril.default)(Tag, {
-        label: "total: \u20AC".concat(vnode.state.total),
-        intent: 'warning'
-      })), (0, _mithril.default)(_constructUi.Button, {
-        fluid: true,
-        size: 'md',
-        style: 'margin: auto; display: block; padding: 0; transition: rotate .3s',
-        iconLeft: _constructUi.Icons.CHEVRON_DOWN,
-        basic: true,
-        onclick: function onclick(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          var list = vnode.dom.querySelector('.assigned-orders');
-          list.classList.toggle('collapsed');
-          console.log(vnode);
-          var svg = e.target.children[0];
-
-          _mithril.default.redraw();
-        }
-      })]);
-    }
-  },
-  view: function view(vnode) {
-    var array;
-
-    if (_Tabs.default.unassignedSearches.length != 0) {
-      array = _Tabs.default.unassignedSearches.map(function (item) {
-        return (0, _mithril.default)(UnassignedSearch, {
-          item: item
-        });
-      });
-    }
-
-    return [(0, _mithril.default)('.orders.flex.reverse', Orders.ordersList.map(function (order, o) {
-      return (0, _mithril.default)(Orders.order, {
-        order: order,
-        o: o
-      });
-    })), (0, _mithril.default)('h1', 'Unassigned Searches'), (0, _mithril.default)(_constructUi.Card, {
-      fluid: true
-    }, (0, _mithril.default)(_constructUi.List, {
-      class: 'unassigned-searches',
-      interactive: false,
-      size: 'xs'
-    }, (0, _mithril.default)('.list-items-wrapper', array)))];
-  }
-};
-module.exports = Orders;
-},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Tabs":"components/Tabs.js"}],"components/Tabs.js":[function(require,module,exports) {
-"use strict";
-
-var _mithril = _interopRequireDefault(require("mithril"));
-
-var _constructUi = require("construct-ui");
-
-var _Nav = _interopRequireDefault(require("./Nav"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-var Orders = require('./Orders');
-
-console.log(Orders);
-var seaching = false,
-    session;
-var AppToaster = new _constructUi.Toaster();
-var Clients = {
-  clientsList: [],
-  loadClients: function loadClients() {
-    _mithril.default.request({
-      method: "GET",
-      url: "/api/listClients"
-    }).then(function (res) {
-      return Clients.clientsList = res;
-    });
-  },
-  oninit: function oninit() {
-    if (Clients.clientsList.length === 0) {
-      Clients.loadClients();
-    }
-  },
-  view: function view() {
-    return Clients.clientsList.map(function (client) {
-      return (0, _mithril.default)(_constructUi.Card, {
-        class: 'client-card',
-        url: client._id,
-        elevated: 2,
-        interactive: true,
-        fluid: true
-      }, (0, _mithril.default)("h1#client-name", client.name + ' ' + client.surname), (0, _mithril.default)(_constructUi.Button, {
-        class: 'mail-copy-button',
-        label: "mail: ".concat(client.mail),
-        iconLeft: _constructUi.Icons.COPY,
-        basic: true,
-        onclick: function onclick(e) {
-          navigator.clipboard.writeText(client.mail);
-        }
-      }), (0, _mithril.default)(_constructUi.Button, {
-        class: 'phone-copy-button',
-        label: "phone: ".concat(client.phone ? client.phone : '', " "),
-        iconLeft: _constructUi.Icons.COPY,
-        basic: true,
-        onclick: function onclick(e) {
-          navigator.clipboard.writeText(client.phone);
-        }
-      }));
-    });
-  }
-};
 var Searches = {
   searchesList: [],
   unassignedSearches: [],
@@ -15387,10 +15208,8 @@ var Searches = {
                 method: "GET",
                 url: "/api/SearchInstances"
               }).then(function (res) {
-                console.log(res);
                 Searches.searchesList = res;
                 Searches.filterSearches(res);
-                console.log(Searches.assignedSearches);
               });
 
             case 1:
@@ -15445,6 +15264,21 @@ var Searches = {
     }));
   }
 };
+exports.Searches = Searches;
+},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js"}],"components/Orders.js":[function(require,module,exports) {
+"use strict";
+
+var _mithril = _interopRequireDefault(require("mithril"));
+
+var _constructUi = require("construct-ui");
+
+var _Tabs = require("./Tabs");
+
+var _Searches = require("./Searches");
+
+var _Nav = require("./Nav");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function AssignedSearch() {
   return {
@@ -15454,7 +15288,7 @@ function AssignedSearch() {
         iconLeft: _constructUi.Icons.MINUS,
         intent: 'negative',
         size: 'xs',
-        basic: true,
+        class: 'remove-search',
         onclick: function onclick(e) {
           //UNASSIGN SEARCH
           e.preventDefault();
@@ -15466,12 +15300,13 @@ function AssignedSearch() {
             url: "/api/addToClient/unassigned/".concat(item._id)
           }).then(function (res) {
             console.log(res);
+            (0, _Nav.showToast)("Unassigned ".concat(item.model), 'warning');
           });
         }
       });
       return (0, _mithril.default)(_constructUi.ListItem, {
         label: "".concat(item.year).concat(item.season, " ").concat(item.model, " ").concat(item.color, " ").concat(item.size),
-        // label: 'text',
+        class: "list-item-".concat(vnode.attrs.index),
         contentLeft: contentR,
         contentRight: (0, _mithril.default)(_constructUi.Tag, {
           intent: 'warning',
@@ -15483,66 +15318,455 @@ function AssignedSearch() {
   };
 }
 
-function UnassignedSearch() {
-  return {
-    view: function view(vnode) {
-      var item = vnode.attrs.item;
-      var contentR = (0, _mithril.default)(_constructUi.Tag, {
-        label: item.price,
-        intent: 'warning'
-      }); // let contentL =
+var Orders = {
+  ordersList: [],
+  loadOrders: function loadOrders() {
+    _mithril.default.request({
+      method: "GET",
+      url: "/api/listOrders"
+    }).then(function (res) {
+      Orders.ordersList = res;
+    });
+  },
+  oninit: function oninit(vnode) {
+    console.log(Orders);
 
-      return (0, _mithril.default)(_constructUi.ListItem, {
-        label: "".concat(item.year).concat(item.season, " ").concat(item.model, " ").concat(item.color, " ").concat(item.size),
-        contentRight: contentR,
-        contentLeft: (0, _mithril.default)(_constructUi.Button, {
-          iconLeft: _constructUi.Icons.PLUS,
-          intent: 'positive',
-          size: 'xs',
-          label: 'Add',
+    if (Orders.ordersList.length === 0) {
+      Orders.loadOrders();
+
+      _Searches.Searches.loadSearches();
+    }
+  },
+  order: {
+    oninit: function oninit(vnode) {
+      vnode.state.selected = false;
+      vnode.state.pieces = 0;
+      vnode.state.total = 0;
+    },
+    onupdate: function onupdate(vnode) {
+      vnode.state.pieces = 0;
+      vnode.state.total = 0;
+    },
+    view: function view(vnode) {
+      var order = vnode.attrs.order;
+      var o = vnode.attrs.o;
+      return (0, _mithril.default)(_constructUi.Card, {
+        class: "order client-order",
+        id: order._id,
+        clientId: order.clientId,
+        interactive: true,
+        fluid: true,
+        elevation: 2 // SELECT ORDER
+
+      }, (0, _mithril.default)(_constructUi.PopoverMenu, {
+        closeOnContentClick: true,
+        content: [(0, _mithril.default)(_constructUi.Button, {
+          iconLeft: _constructUi.Icons.TRASH,
+          intent: 'negative',
+          label: 'Delete',
           basic: true,
+          align: 'center',
           onclick: function onclick(e) {
-            // ASSIGN SEARCH
-            var searchId = item._id;
-            var orderId = document.querySelector('.selected-order').getAttribute('id');
-            console.log('search id is ' + searchId);
-            console.log('order id is ' + orderId);
+            // DELETE ORDER
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('deleting order ' + order._id);
 
             _mithril.default.request({
-              method: 'GET',
-              url: "/api/addToClient/".concat(orderId, "/").concat(searchId)
+              method: "DELETE",
+              url: "/api/deleteOrder/".concat(order._id)
             }).then(function (res) {
               console.log(res);
+              Orders.ordersList.splice(Orders.ordersList.indexOf(res), 1);
             });
           }
+        })],
+        trigger: (0, _mithril.default)(_constructUi.Button, {
+          iconLeft: _constructUi.Icons.SETTINGS,
+          style: 'float:right;'
         })
-      });
+      }), [(0, _mithril.default)(".order-client-name[id=".concat(order.clientId, "]"), {
+        onclick: function onclick() {
+          _mithril.default.route.set("/orders/edit/".concat(order.id));
+        }
+      }, (0, _mithril.default)("h1", order.clientName)), (0, _mithril.default)(_constructUi.Tag, {
+        label: order.date,
+        class: 'date'
+      }), (0, _mithril.default)(_constructUi.Tag, {
+        label: order.user,
+        intent: 'primary',
+        class: 'user'
+      }) //, m(Tag, {
+      //   label: order._id,
+      //   class: 'url',
+      //   size: 'xs',
+      //   url: order._id
+      // })
+      ], [(0, _mithril.default)(_constructUi.List, {
+        size: 'xs',
+        style: "margin-top:1rem;",
+        class: 'collapsible assigned-orders'
+      }, _Searches.Searches.assignedSearches[order._id] ? _Searches.Searches.assignedSearches[order._id].map(function (search, i) {
+        if (i === 0) {
+          vnode.state.pieces = 0;
+          vnode.state.total = 0;
+        }
+
+        vnode.state.pieces++;
+        vnode.state.total += parseInt(search.price);
+        return (0, _mithril.default)(AssignedSearch, {
+          search: search
+        });
+      }) : undefined), (0, _mithril.default)('.row.searches-totals', (0, _mithril.default)(_constructUi.Tag, {
+        label: "total pcs: ".concat(vnode.state.pieces)
+      }), (0, _mithril.default)(_constructUi.Tag, {
+        label: "total: \u20AC".concat(vnode.state.total),
+        intent: 'warning'
+      })), (0, _mithril.default)(_constructUi.Button, {
+        fluid: true,
+        class: 'expand-icon',
+        size: 'md',
+        style: 'margin: auto; display: block; padding: 0; transition: rotate .3s',
+        iconLeft: _constructUi.Icons.CHEVRON_UP,
+        basic: true,
+        onclick: function onclick(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var expandIcon = vnode.dom.querySelector('.expand-icon');
+          var list = vnode.dom.querySelector('.assigned-orders');
+          list.classList.toggle('collapsed');
+          expandIcon.classList.toggle('reversed');
+          var svg = e.target.children[0];
+
+          _mithril.default.redraw();
+        }
+      })]);
     }
-  };
-}
+  },
+  view: function view(vnode) {
+    var array; // UNASSIGNED SEARCHES MOVED TO EDIT ORDER
+
+    return [(0, _mithril.default)('.orders.flex.reverse', Orders.ordersList.map(function (order, o) {
+      return (0, _mithril.default)(Orders.order, {
+        order: order,
+        o: o
+      });
+    })) // m('h1', 'Unassigned Searches'),
+    // m(Card, {
+    //   fluid: true
+    // }, m(List, {
+    //   class: 'unassigned-searches',
+    //   interactive: false,
+    //   size: 'xs'
+    // }, m('.list-items-wrapper',
+    //   array
+    // )))
+    ];
+  }
+};
+exports.Orders = Orders; // exports.AssignedSearch = AssignedSearch
+},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Tabs":"components/Tabs.js","./Searches":"components/Searches.js","./Nav":"components/Nav.js"}],"components/Clients.js":[function(require,module,exports) {
+"use strict";
+
+var _mithril = _interopRequireDefault(require("mithril"));
+
+var _constructUi = require("construct-ui");
+
+var _Nav = require("./Nav");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Clients = {
+  clientsList: [],
+  loadClients: function loadClients() {
+    _mithril.default.request({
+      method: "GET",
+      url: "/api/listClients"
+    }).then(function (res) {
+      return Clients.clientsList = res;
+    });
+  },
+  oninit: function oninit() {
+    if (Clients.clientsList.length === 0) {
+      Clients.loadClients();
+    }
+  },
+  view: function view() {
+    return Clients.clientsList.map(function (client, i) {
+      return [(0, _mithril.default)(_constructUi.Card, {
+        class: 'client-card',
+        url: client._id,
+        elevated: 2,
+        interactive: true,
+        fluid: true
+      }, (0, _mithril.default)(_constructUi.PopoverMenu, {
+        closeOnContentClick: true,
+        content: [(0, _mithril.default)(_constructUi.Button, {
+          iconLeft: _constructUi.Icons.EDIT,
+          label: 'Edit',
+          basic: true,
+          align: 'center',
+          onclick: function onclick(e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }), (0, _mithril.default)(_constructUi.Button, {
+          iconLeft: _constructUi.Icons.TRASH,
+          intent: 'negative',
+          label: 'Delete',
+          basic: true,
+          align: 'center',
+          onclick: function onclick(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            _mithril.default.request({
+              method: 'DELETE',
+              url: "/api/delete/".concat(client._id)
+            }).then(function (client) {
+              (0, _Nav.showToast)('Deleted client', 'negative');
+              console.log(client);
+              var removedClient = Clients.clientsList.splice(i, 1)[0];
+              console.log(Clients.clientsList, removedClient);
+
+              _mithril.default.redraw();
+            });
+          }
+        })],
+        trigger: (0, _mithril.default)(_constructUi.Button, {
+          iconLeft: _constructUi.Icons.SETTINGS,
+          style: 'float:right;'
+        })
+      }), (0, _mithril.default)("h1#client-name", client.name + ' ' + client.surname), (0, _mithril.default)(_constructUi.Button, {
+        class: 'mail-copy-button',
+        label: "mail: ".concat(client.mail),
+        iconLeft: _constructUi.Icons.COPY,
+        basic: true,
+        onclick: function onclick(e) {
+          navigator.clipboard.writeText(client.mail);
+        }
+      }), (0, _mithril.default)(_constructUi.Button, {
+        class: 'phone-copy-button',
+        label: "phone: ".concat(client.phone ? client.phone : '', " "),
+        iconLeft: _constructUi.Icons.COPY,
+        basic: true,
+        onclick: function onclick(e) {
+          navigator.clipboard.writeText(client.phone);
+        }
+      }))];
+    });
+  }
+};
+exports.Clients = Clients;
+},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Nav":"components/Nav.js"}],"components/Tabs.js":[function(require,module,exports) {
+"use strict";
+
+var _mithril = _interopRequireDefault(require("mithril"));
+
+var _constructUi = require("construct-ui");
+
+var _Nav = require("./Nav");
+
+var _Orders = require("./Orders");
+
+var _Clients = require("./Clients");
+
+var _Searches = require("./Searches");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+var seaching = false,
+    session;
+var AppToaster = new _constructUi.Toaster(); // let Orders = {
+//   ordersList: [],
+//   loadOrders: () => {
+//     m.request({
+//       method: "GET",
+//       url: "/api/listOrders"
+//     }).then(res => {
+//       console.log(res);
+//       Orders.ordersList = res
+//       return res
+//     })
+//   },
+//   oninit: (vnode) => {
+//     if (Orders.ordersList.length === 0) {
+//       Orders.loadOrders()
+//       Searches.loadSearches()
+//     }
+//   },
+//   order: {
+//     oninit: (vnode) => {
+//       vnode.state.selected = false
+//       vnode.state.pieces = 0
+//       vnode.state.total = 0
+//     },
+//     onupdate: (vnode) => {
+//       vnode.state.pieces = 0
+//       vnode.state.total = 0
+//     },
+//     view: (vnode) => {
+//       let order = vnode.attrs.order
+//       let o = vnode.attrs.o
+//       return m(Card, {
+//           class: `order client-order collapsible`,
+//           id: order._id,
+//           clientId: order.clientId,
+//           interactive: true,
+//           fluid: true,
+//           elevation: 2
+//           // SELECT ORDER
+//         }, m(PopoverMenu, {
+//           closeOnContentClick: true,
+//           content: [
+//             m(Button, {
+//               iconLeft: Icons.TRASH,
+//               intent: 'negative',
+//               label: 'Delete',
+//               basic: true,
+//               align: 'center',
+//               onclick: (e) => {
+//                 // DELETE ORDER
+//                 e.preventDefault();
+//                 e.stopPropagation();
+//                 console.log('deleting order ' + order._id);
+//                 m.request({
+//                   method: "DELETE",
+//                   url: `/api/deleteOrder/${order._id}`
+//                 }).then(res => {
+//                   console.log(res)
+//                   Orders.ordersList.splice(Orders.ordersList.indexOf(res), 1)
+//                 })
+//               }
+//             })
+//           ],
+//           trigger: m(Button, {
+//             iconLeft: Icons.SETTINGS,
+//             style: 'float:right;',
+//           })
+//         }),
+//         [m(`.order-client-name[id=${order.clientId}]`, {
+//             onclick: () => {
+//               m.route.set(`/orders/edit/${order.id}`)
+//             }
+//           }, m(`h1`, order.clientName)),
+//           m(Tag, {
+//             label: order.date,
+//             class: 'date'
+//           }),
+//           m(Tag, {
+//             label: order.user,
+//             intent: 'primary',
+//             class: 'user'
+//           })
+//           //, m(Tag, {
+//           //   label: order._id,
+//           //   class: 'url',
+//           //   size: 'xs',
+//           //   url: order._id
+//           // })
+//         ],
+//         [
+//           m(List, {
+//               size: 'xs',
+//               style: `margin-top:1rem;`,
+//               class: 'collapsible assigned-orders'
+//             },
+//
+//             Searches.assignedSearches[order._id] ? (
+//               Searches.assignedSearches[order._id].map(search => {
+//                 vnode.state.pieces++
+//                 vnode.state.total += parseInt(search.price)
+//                 return m(AssignedSearch, {
+//                   search: search
+//                 })
+//               })
+//             ) : undefined
+//           ), m('.row.searches-totals',
+//             m(Tag, {
+//               label: `total pcs: ${vnode.state.pieces}`
+//             }),
+//             m(Tag, {
+//               label: `total: €${vnode.state.total}`,
+//               intent: 'warning'
+//             })), m(Button, {
+//             fluid: true,
+//             size: 'md',
+//             style: 'margin: auto; display: block; padding: 0; transition: rotate .3s',
+//             iconLeft: Icons.CHEVRON_DOWN,
+//             basic: true,
+//             onclick: (e) => {
+//               e.preventDefault()
+//               e.stopPropagation()
+//               let list = vnode.dom.querySelector('.assigned-orders')
+//               list.classList.toggle('collapsed')
+//               console.log(vnode);
+//               let svg = e.target.children[0]
+//               m.redraw()
+//             }
+//           })
+//         ])
+//     }
+//   },
+//   view: (vnode) => {
+//     // let array
+//     // if (Searches.unassignedSearches.length != 0) {
+//     //   array = Searches.unassignedSearches.map(item => {
+//     //     return m(UnassignedSearch, {
+//     //       item: item,
+//     //     })
+//     //   })
+//     // }
+//
+//     return [m('.orders.flex.reverse', Orders.ordersList.map((order, o) => {
+//       return m(Orders.order, {
+//         order: order,
+//         o: o
+//       })
+//     }))]
+//     // ,
+//     // m('h1', 'Unassigned Searches'),
+//     // m(Card, {
+//     //   fluid: true
+//     // }, m(List, {
+//     //   class: 'unassigned-searches',
+//     //   interactive: false,
+//     //   size: 'xs'
+//     // }, m('.list-items-wrapper',
+//     //   array
+//     // )))
+//
+//   }
+// }
 
 var ordersSection = {
   view: function view(vnode) {
-    return [(0, _mithril.default)(_Nav.default), (0, _mithril.default)('.container.orders', (0, _mithril.default)("h1", "Your Orders"), (0, _mithril.default)(_constructUi.Button, {
+    return [(0, _mithril.default)(_Nav.Nav), (0, _mithril.default)('.container.orders', (0, _mithril.default)("h1", "Your Orders"), (0, _mithril.default)(_constructUi.Button, {
       basic: true,
       iconLeft: _constructUi.Icons.REFRESH_CW,
       style: 'float: right;',
       // loading: vnode.tag.loading,
       onclick: function () {
-        var _onclick = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-          return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        var _onclick = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+          return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
-              switch (_context2.prev = _context2.next) {
+              switch (_context.prev = _context.next) {
                 case 0:
-                  _context2.next = 2;
-                  return Orders.loadOrders();
+                  _context.next = 2;
+                  return _Orders.Orders.loadOrders();
 
                 case 2:
                 case "end":
-                  return _context2.stop();
+                  return _context.stop();
               }
             }
-          }, _callee2);
+          }, _callee);
         }));
 
         function onclick() {
@@ -15558,14 +15782,14 @@ var ordersSection = {
       onclick: function onclick() {
         _mithril.default.mount(document.querySelector('.new-order'), {
           oninit: function oninit() {
-            if (Clients.clientsList.length === 0) {
-              Clients.loadClients();
+            if (_Clients.Clients.clientsList.length === 0) {
+              _Clients.Clients.loadClients();
             }
           },
           view: function view() {
             return (0, _mithril.default)('.order-div', [// CREATE ORDER
             (0, _mithril.default)(_constructUi.SelectList, {
-              items: Clients.clientsList,
+              items: _Clients.Clients.clientsList,
               itemRender: function itemRender(item) {
                 return (0, _mithril.default)(_constructUi.ListItem, {
                   label: item.fullname,
@@ -15583,12 +15807,11 @@ var ordersSection = {
 
                 _mithril.default.request({
                   method: "POST",
-                  url: "/api/createOrder/".concat(item._id, "/").concat(session.user, "/").concat(item.name, "&").concat(item.surname)
+                  url: "/api/createOrder/".concat(item._id, "/").concat(item.name, "&").concat(item.surname)
                 }).then(function (res) {
                   console.log(res);
-                  Orders.ordersList.push(res);
 
-                  _mithril.default.mount(document.querySelector('.order-list'), Orders);
+                  _Orders.Orders.ordersList.push(res);
                 });
               },
               trigger: (0, _mithril.default)(_constructUi.Button, {
@@ -15600,39 +15823,38 @@ var ordersSection = {
           }
         });
       }
-    })]), (0, _mithril.default)('.new-order'), (0, _mithril.default)(".search-results"), (0, _mithril.default)(".order-list", {
-      oncreate: function oncreate(vnode) {// m.mount(vnode.dom, Orders)
-      }
-    }, 'Order List')]))];
+    })]), (0, _mithril.default)('.new-order'), (0, _mithril.default)(".search-results"), // m(".order-list", m(Orders))
+    (0, _mithril.default)(".order-list", (0, _mithril.default)(_Orders.Orders))]))];
   }
 };
 var clientsSection = {
   loading: false,
   view: function view(vnode) {
-    return [(0, _mithril.default)(_Nav.default), (0, _mithril.default)('.container.clients', (0, _mithril.default)("h1", "Client List"), (0, _mithril.default)(_constructUi.Button, {
+    return [(0, _mithril.default)(_Nav.Nav), (0, _mithril.default)('.container.clients', (0, _mithril.default)("h1", "Client List"), (0, _mithril.default)(_constructUi.Button, {
       basic: true,
       iconLeft: _constructUi.Icons.REFRESH_CW,
       style: 'float: right;',
       loading: vnode.state.loading,
       onclick: function () {
-        var _onclick2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
-          return regeneratorRuntime.wrap(function _callee3$(_context3) {
+        var _onclick2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+          return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
-              switch (_context3.prev = _context3.next) {
+              switch (_context2.prev = _context2.next) {
                 case 0:
                   vnode.state.loading = !vnode.state.loading;
-                  _context3.next = 3;
-                  return Clients.loadClients();
+                  _context2.next = 3;
+                  return _Clients.Clients.loadClients();
 
                 case 3:
+                  console.log(_Clients.Clients.clientsList);
                   vnode.state.loading = !vnode.state.loading;
 
-                case 4:
+                case 5:
                 case "end":
-                  return _context3.stop();
+                  return _context2.stop();
               }
             }
-          }, _callee3);
+          }, _callee2);
         }));
 
         function onclick() {
@@ -15657,6 +15879,9 @@ var clientsSection = {
       name: 'client-name',
       placeholder: 'Name'
     }), (0, _mithril.default)(_constructUi.Input, {
+      contentLeft: (0, _mithril.default)(_constructUi.Icon, {
+        name: _constructUi.Icons.USER
+      }),
       type: 'text',
       name: 'client-surname',
       placeholder: 'Surname'
@@ -15679,35 +15904,37 @@ var clientsSection = {
       label: "Add Client",
       // CREATE NEW CLIENT
       onclick: function () {
-        var _onclick3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
-          var name, surname, mail, phone, username, provider, tail;
-          return regeneratorRuntime.wrap(function _callee4$(_context4) {
+        var _onclick3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+          var name, surname, mail, phone;
+          return regeneratorRuntime.wrap(function _callee3$(_context3) {
             while (1) {
-              switch (_context4.prev = _context4.next) {
+              switch (_context3.prev = _context3.next) {
                 case 0:
                   name = document.querySelector('input[name="client-name"]').value.trim();
                   surname = document.querySelector('input[name="client-surname"]').value.trim();
                   mail = document.querySelector('input[name="client-mail"]').value.trim();
                   phone = document.querySelector('input[name="client-phone"]').value.trim();
-                  username = mail.split('@')[0];
-                  provider = mail.split('@')[1].split('.')[0];
-                  tail = mail.split('@')[1].split('.')[1];
-                  _context4.next = 9;
+                  console.log(mail);
+                  _context3.next = 7;
                   return _mithril.default.request({
                     method: "GET",
-                    url: "/api/newClient/".concat(name, "/").concat(surname, "/").concat(username, "/").concat(provider, "/").concat(tail, "/").concat(phone)
+                    url: "/api/newClient",
+                    headers: {
+                      name: name,
+                      surname: surname,
+                      mail: mail,
+                      phone: phone
+                    }
+                  }).then(function (client) {
+                    _Clients.Clients.clientsList.push(client);
                   });
 
-                case 9:
-                  // emit a click event for convenience on the clients radio to fetch the clients
-                  document.querySelector('#radio2').click();
-
-                case 10:
+                case 7:
                 case "end":
-                  return _context4.stop();
+                  return _context3.stop();
               }
             }
-          }, _callee4);
+          }, _callee3);
         }));
 
         function onclick() {
@@ -15716,32 +15943,32 @@ var clientsSection = {
 
         return onclick;
       }()
-    })])]), (0, _mithril.default)("ul.client-list", (0, _mithril.default)(Clients))]))];
+    })])]), (0, _mithril.default)("ul.client-list", (0, _mithril.default)(_Clients.Clients))]))];
   }
 };
 var historySection = {
   historyList: [],
   view: function view() {
-    return [(0, _mithril.default)(_Nav.default), (0, _mithril.default)('.container.searches', (0, _mithril.default)("h1", "A History of your Searches"), (0, _mithril.default)(_constructUi.Button, {
+    return [(0, _mithril.default)(_Nav.Nav), (0, _mithril.default)('.container.searches', (0, _mithril.default)("h1", "A History of your Searches"), (0, _mithril.default)(_constructUi.Button, {
       basic: true,
       iconLeft: _constructUi.Icons.REFRESH_CW,
       style: 'float: right;',
       // loading: vnode.tag.loading,
       onclick: function () {
-        var _onclick4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
-          return regeneratorRuntime.wrap(function _callee5$(_context5) {
+        var _onclick4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
+          return regeneratorRuntime.wrap(function _callee4$(_context4) {
             while (1) {
-              switch (_context5.prev = _context5.next) {
+              switch (_context4.prev = _context4.next) {
                 case 0:
-                  _context5.next = 2;
-                  return Searches.loadSearches();
+                  _context4.next = 2;
+                  return _Searches.Searches.loadSearches();
 
                 case 2:
                 case "end":
-                  return _context5.stop();
+                  return _context4.stop();
               }
             }
-          }, _callee5);
+          }, _callee4);
         }));
 
         function onclick() {
@@ -15750,7 +15977,7 @@ var historySection = {
 
         return onclick;
       }()
-    }), (0, _mithril.default)(Searches))];
+    }), (0, _mithril.default)(_Searches.Searches))];
   }
 };
 
@@ -15774,32 +16001,212 @@ function s(query, cb) {
 
 exports.ordersSection = ordersSection;
 exports.clientsSection = clientsSection;
-exports.historySection = historySection; // module.exports = Searches
-},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Nav":"components/Nav.js","./Orders":"components/Orders.js"}],"components/EditOrder.js":[function(require,module,exports) {
+exports.historySection = historySection;
+},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Nav":"components/Nav.js","./Orders":"components/Orders.js","./Clients":"components/Clients.js","./Searches":"components/Searches.js"}],"components/EditOrder.js":[function(require,module,exports) {
 "use strict";
 
 var _mithril = _interopRequireDefault(require("mithril"));
 
-require("construct-ui");
+var _constructUi = require("construct-ui");
 
-var _Nav = _interopRequireDefault(require("./Nav"));
+var _Nav = require("./Nav");
 
-var _Orders = _interopRequireDefault(require("./Orders"));
+var _Searches = require("./Searches");
+
+var _Orders = require("./Orders");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function AssignedSearch() {
+  return {
+    view: function view(vnode) {
+      var item = vnode.attrs.search;
+      var contentR = (0, _mithril.default)(_constructUi.Button, {
+        iconLeft: _constructUi.Icons.MINUS,
+        intent: 'negative',
+        size: 'xs',
+        class: 'remove-search',
+        onclick: function onclick(e) {
+          //UNASSIGN SEARCH
+          e.preventDefault();
+          e.stopPropagation();
+
+          _mithril.default.request({
+            method: 'GET',
+            url: "/api/addToClient/unassigned/".concat(item._id)
+          }).then(function (res) {
+            var removedSearch = vnode.attrs.assignedSearches.splice(vnode.attrs.index, 1)[0];
+
+            _Searches.Searches.unassignedSearches.push(removedSearch);
+
+            (0, _Nav.showToast)("Unassigned ".concat(item.model), 'warning');
+          });
+        }
+      });
+      return (0, _mithril.default)(_constructUi.ListItem, {
+        label: "".concat(item.year).concat(item.season, " ").concat(item.model, " ").concat(item.color, " ").concat(item.size),
+        class: "list-item-".concat(vnode.attrs.index),
+        contentLeft: contentR,
+        contentRight: (0, _mithril.default)(_constructUi.Tag, {
+          intent: 'warning',
+          size: 'xs',
+          label: item.price
+        })
+      });
+    }
+  };
+}
+
+function UnassignedSearch() {
+  return {
+    assignOrder: function assignOrder(order, searchId, index) {
+      _mithril.default.request({
+        method: 'GET',
+        url: "/api/addToClient/".concat(order.id, "/").concat(searchId)
+      }).then(function (res) {
+        console.log(res);
+
+        var removedSearch = _Searches.Searches.unassignedSearches.splice(index, 1)[0];
+
+        (0, _Nav.showToast)("Assigned ".concat(res.model, "!"), 'positive');
+
+        _Searches.Searches.assignedSearches[order.id].push(removedSearch);
+      });
+    },
+    view: function view(vnode) {
+      var item = vnode.attrs.item;
+      var order = vnode.attrs.order;
+      var contentR = (0, _mithril.default)(_constructUi.Tag, {
+        label: item.price,
+        intent: 'warning'
+      }); // let contentL =
+
+      return (0, _mithril.default)(_constructUi.ListItem, {
+        label: "".concat(item.year).concat(item.season, " ").concat(item.model, " ").concat(item.color, " ").concat(item.size),
+        contentRight: contentR,
+        contentLeft: (0, _mithril.default)(_constructUi.Button, {
+          iconLeft: _constructUi.Icons.PLUS,
+          intent: 'positive',
+          size: 'xs',
+          onclick: function onclick(e) {
+            // ASSIGN SEARCH
+            e.preventDefault();
+            var searchId = item._id;
+            var orderId = order._id;
+            var index = vnode.attrs.i;
+            vnode.state.assignOrder(order, searchId, index);
+          }
+        })
+      });
+    }
+  };
+}
+
 var EditOrder = {
   order: {},
-  oninit: function oninit(vnode) {
-    vnode.state.order = _Orders.default.ordersList.filter(item.id = vnode.attrs.id);
-    console.log(vnode.state.order);
+  maxWidth: 'none',
+  assignedSearches: [],
+  loadAssignedSearches: function loadAssignedSearches(id) {
+    return _mithril.default.request({
+      url: "/api/".concat(id, "/SearchInstances")
+    }).then(function (res) {
+      return res;
+    });
   },
+  loadUnassignedSearches: function loadUnassignedSearches() {
+    return _mithril.default.request({
+      method: 'GET',
+      url: '/api/SearchInstances/unassigned'
+    }).then(function (res) {
+      return res;
+    });
+  },
+  loadOrder: function loadOrder(id) {
+    return _mithril.default.request({
+      method: 'GET',
+      url: "/api/order/".concat(id)
+    }).then(function (res) {
+      return res;
+    });
+  },
+  oninit: function () {
+    var _oninit = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(vnode) {
+      var order;
+      return regeneratorRuntime.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              console.log(_Searches.Searches);
+              order = _Orders.Orders.ordersList.length > 0 ? _Orders.Orders.ordersList.filter(function (item) {
+                return item.id == vnode.attrs.id;
+              })[0] : null;
+              _Searches.Searches.unassignedSearches.length > 0 ? _Searches.Searches.unassignedSearches : _Searches.Searches.loadSearches();
+              _context.t0 = order;
+
+              if (_context.t0) {
+                _context.next = 8;
+                break;
+              }
+
+              _context.next = 7;
+              return vnode.state.loadOrder(vnode.attrs.id);
+
+            case 7:
+              _context.t0 = _context.sent;
+
+            case 8:
+              vnode.state.order = _context.t0;
+              vnode.state.assignedSearches = _Searches.Searches.assignedSearches[vnode.attrs.id] ? _Searches.Searches.assignedSearches[vnode.attrs.id] : _Searches.Searches.assignedSearches[vnode.attrs.id] = [];
+
+            case 10:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee);
+    }));
+
+    function oninit(_x) {
+      return _oninit.apply(this, arguments);
+    }
+
+    return oninit;
+  }(),
   view: function view(vnode) {
-    return [(0, _mithril.default)(_Nav.default), (0, _mithril.default)('.edit-order-wrapper', [(0, _mithril.default)('h1', order.client)])];
+    var order = vnode.state.order;
+    return [(0, _mithril.default)(_Nav.Nav), (0, _mithril.default)('.edit-order-wrapper.container', [(0, _mithril.default)('.title#client-name', (0, _mithril.default)('h2', "".concat(vnode.state.order.clientName, "'s Order")), (0, _mithril.default)(_constructUi.Tag, {
+      label: vnode.state.order._id,
+      size: 'xs'
+    })), (0, _mithril.default)('.searches.flex', [(0, _mithril.default)('.assigned-searches', (0, _mithril.default)('h3', 'Assigned Searches'), (0, _mithril.default)(_constructUi.List, {
+      size: 'sm',
+      interactive: false,
+      style: "max-width: ".concat(vnode.state.maxWidth, ";")
+    }, vnode.state.assignedSearches.length > 0 ? vnode.state.assignedSearches.map(function (search, i) {
+      return (0, _mithril.default)(AssignedSearch, {
+        search: search,
+        index: i,
+        assignedSearches: vnode.state.assignedSearches
+      });
+    }) : null)), (0, _mithril.default)('.unassigned-searches', (0, _mithril.default)('h3', 'Unassigned Searches'), (0, _mithril.default)(_constructUi.List, {
+      size: 'sm',
+      interactive: false,
+      style: "max-height: 65vh; max-width: ".concat(vnode.state.maxWidth, ";")
+    }, _Searches.Searches.unassignedSearches.map(function (item, i) {
+      return (0, _mithril.default)(UnassignedSearch, {
+        item: item,
+        order: order,
+        index: i,
+        unassignedSearches: vnode.state.unassignedSearches
+      });
+    })))])])];
   }
 };
 module.exports = EditOrder;
-},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Nav":"components/Nav.js","./Orders":"components/Orders.js"}],"app.js":[function(require,module,exports) {
+},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Nav":"components/Nav.js","./Searches":"components/Searches.js","./Orders":"components/Orders.js"}],"app.js":[function(require,module,exports) {
 "use strict";
 
 require("regenerator-runtime/runtime");
@@ -15810,7 +16217,7 @@ var _constructUi = require("construct-ui");
 
 require("../node_modules/construct-ui/lib/index.css");
 
-var _Nav = _interopRequireDefault(require("/components/Nav"));
+var _Nav = require("/components/Nav");
 
 var _EditOrder = _interopRequireDefault(require("/components/EditOrder"));
 
@@ -15834,24 +16241,20 @@ var _require = require('/components/Tabs'),
     clientsSection = _require.clientsSection,
     historySection = _require.historySection;
 
-var AppToaster = new _constructUi.Toaster();
 var session;
-
-function show(msg, intent) {
-  console.log('showing toast');
-  AppToaster.show({
-    message: msg,
-    icon: _constructUi.Icons.BELL,
-    intent: intent
-  });
-}
-
 var Login = {
-  view: function view() {
+  remember: false,
+  oninit: function oninit(vnode) {
+    if (localStorage.pwd) {
+      vnode.state.remember = true;
+    }
+  },
+  view: function view(vnode) {
     return [(0, _mithril.default)('form.login', (0, _mithril.default)('.logo-bg', {
       style: 'width: auto; height: 100px; background: url("/logo.86ce68ea.svg") no-repeat center;'
     }), (0, _mithril.default)(_constructUi.Input, {
       style: 'display:block;margin:5px auto;',
+      value: localStorage.user || '',
       contentLeft: (0, _mithril.default)(_constructUi.Icon, {
         name: _constructUi.Icons.USER
       }),
@@ -15859,6 +16262,7 @@ var Login = {
       autocomplete: 'username'
     }), (0, _mithril.default)(_constructUi.Input, {
       style: 'display:block;margin:5px auto;',
+      value: localStorage.pwd || '',
       contentLeft: (0, _mithril.default)(_constructUi.Icon, {
         name: _constructUi.Icons.LOCK
       }),
@@ -15870,36 +16274,19 @@ var Login = {
       style: 'display:block;margin:5px auto;',
       type: 'submit',
       intent: 'primary',
-      onclick: function () {
-        var _onclick = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(e) {
-          return regeneratorRuntime.wrap(function _callee$(_context) {
-            while (1) {
-              switch (_context.prev = _context.next) {
-                case 0:
-                  e.preventDefault();
-
-                  if (session) {
-                    _context.next = 4;
-                    break;
-                  }
-
-                  _context.next = 4;
-                  return login.authenticate();
-
-                case 4:
-                case "end":
-                  return _context.stop();
-              }
-            }
-          }, _callee);
-        }));
-
-        function onclick(_x) {
-          return _onclick.apply(this, arguments);
-        }
-
-        return onclick;
-      }()
+      onclick: function onclick(e) {
+        console.log('clicked');
+        e.preventDefault();
+        login.authenticate(vnode.state.remember);
+        (0, _Nav.showToast)("Welcome back ".concat(localStorage.user, " !"), 'positive');
+      }
+    }), (0, _mithril.default)(_constructUi.Switch, {
+      label: 'Remember me',
+      style: 'display: block;margin: auto;margin-top: 1rem;',
+      checked: vnode.state.remember,
+      onchange: function onchange() {
+        vnode.state.remember = !vnode.state.remember;
+      }
     }))];
   }
 }; // Router
@@ -15922,34 +16309,34 @@ _mithril.default.route(document.body, '/main', {
 
 var login = {
   check: function check() {
-    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-      return regeneratorRuntime.wrap(function _callee2$(_context2) {
+    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+      return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
-          switch (_context2.prev = _context2.next) {
+          switch (_context.prev = _context.next) {
             case 0:
-              _context2.next = 2;
+              _context.next = 2;
               return fetch('/logged').then(function (res) {
                 return res.json();
               });
 
             case 2:
-              session = _context2.sent;
+              session = _context.sent;
               session.user ? _mithril.default.route.set('/main') : _mithril.default.route.set('/login');
 
             case 4:
             case "end":
-              return _context2.stop();
+              return _context.stop();
           }
         }
-      }, _callee2);
+      }, _callee);
     }))();
   },
-  authenticate: function authenticate() {
-    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+  authenticate: function authenticate(remember) {
+    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
       var user, pwd;
-      return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      return regeneratorRuntime.wrap(function _callee2$(_context2) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context2.prev = _context2.next) {
             case 0:
               user = document.querySelector('form.login > div.cui-input:nth-child(2) > input:nth-child(2)').value.trim();
               pwd = document.querySelector('form.login div.cui-input:nth-child(3) > input:nth-child(2)').value.trim();
@@ -15963,8 +16350,9 @@ var login = {
               }).then(function (res) {
                 if (res.user) {
                   session = res;
-                  localStorage.setItem('user', session.user);
-                  localStorage.setItem('smurf', session.smurf);
+                  localStorage.smurf = session.smurf;
+                  localStorage.user = session.user;
+                  if (remember) localStorage.pwd = pwd;
                 }
 
                 login.check();
@@ -15972,10 +16360,10 @@ var login = {
 
             case 3:
             case "end":
-              return _context3.stop();
+              return _context2.stop();
           }
         }
-      }, _callee3);
+      }, _callee2);
     }))();
   }
 };
@@ -15983,10 +16371,7 @@ var Home = {
   results: [],
   size: 'xl',
   view: function view(vnode) {
-    return (0, _mithril.default)('.main', (0, _mithril.default)(AppToaster, {
-      clearOnEscapeKey: true,
-      position: 'top'
-    }), (0, _mithril.default)(_Nav.default), (0, _mithril.default)('.search', (0, _mithril.default)('h1', 'Disponibilita'), (0, _mithril.default)('.search-form', (0, _mithril.default)(SearchForm))), (0, _mithril.default)('.results', Home.results.map(function (item, i) {
+    return (0, _mithril.default)('.main', (0, _mithril.default)(_Nav.Nav), (0, _mithril.default)('.search', (0, _mithril.default)('h1', 'Disponibilita'), (0, _mithril.default)('.search-form', (0, _mithril.default)(SearchForm))), (0, _mithril.default)('.results', Home.results.map(function (item, i) {
       return (0, _mithril.default)('.sku-wrapper-key', {
         key: item.id
       }, (0, _mithril.default)(Sku, {
@@ -16062,11 +16447,11 @@ var SearchForm = {
       type: 'submit',
       loading: vnode.state.loading,
       onclick: function () {
-        var _onclick2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(e) {
+        var _onclick = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(e) {
           var model, color;
-          return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          return regeneratorRuntime.wrap(function _callee3$(_context3) {
             while (1) {
-              switch (_context4.prev = _context4.next) {
+              switch (_context3.prev = _context3.next) {
                 case 0:
                   e.preventDefault();
                   SearchForm.clearResults();
@@ -16074,7 +16459,7 @@ var SearchForm = {
                   model = document.querySelector('.model-input > input').value === '' ? 'm' : document.querySelector('.model-input > input').value;
                   color = document.querySelector('.color-input > input').value === '' ? 'c' : document.querySelector('.color-input > input').value; //
 
-                  _context4.next = 7;
+                  _context3.next = 7;
                   return _mithril.default.request({
                     method: "GET",
                     url: "/api/avb/".concat(model, "/").concat(color)
@@ -16088,14 +16473,14 @@ var SearchForm = {
 
                 case 8:
                 case "end":
-                  return _context4.stop();
+                  return _context3.stop();
               }
             }
-          }, _callee4);
+          }, _callee3);
         }));
 
-        function onclick(_x2) {
-          return _onclick2.apply(this, arguments);
+        function onclick(_x) {
+          return _onclick.apply(this, arguments);
         }
 
         return onclick;
@@ -16234,14 +16619,14 @@ function SizeButton() {
         size: 'xs',
         requestSize: sizeForReq,
         onclick: function () {
-          var _onclick3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(e) {
+          var _onclick2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(e) {
             var string;
-            return regeneratorRuntime.wrap(function _callee5$(_context5) {
+            return regeneratorRuntime.wrap(function _callee4$(_context4) {
               while (1) {
-                switch (_context5.prev = _context5.next) {
+                switch (_context4.prev = _context4.next) {
                   case 0:
                     isLoading = !isLoading;
-                    _context5.next = 3;
+                    _context4.next = 3;
                     return getShops(sku, i);
 
                   case 3:
@@ -16273,9 +16658,9 @@ function SizeButton() {
                               }).then(function (res) {
                                 if (res._id) {
                                   console.log(res._id);
-                                  show("Added Search ".concat(sku.string, " ").concat(size, "!"), 'positive');
+                                  (0, _Nav.showToast)("Added Search ".concat(sku.string, " ").concat(size, "!"), 'positive');
                                 } else {
-                                  show("Couldn't add Search ".concat(sku.string, " ").concat(size, "!"), 'negative');
+                                  (0, _Nav.showToast)("Couldn't add Search ".concat(sku.string, " ").concat(size, "!"), 'negative');
                                 }
                               });
                             }
@@ -16292,14 +16677,14 @@ function SizeButton() {
 
                   case 5:
                   case "end":
-                    return _context5.stop();
+                    return _context4.stop();
                 }
               }
-            }, _callee5);
+            }, _callee4);
           }));
 
-          function onclick(_x3) {
-            return _onclick3.apply(this, arguments);
+          function onclick(_x2) {
+            return _onclick2.apply(this, arguments);
           }
 
           return onclick;
@@ -16311,16 +16696,16 @@ function SizeButton() {
 
 
 var displayShops = /*#__PURE__*/function () {
-  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6() {
+  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
     var shopsPromises, y, shopsObject, res;
-    return regeneratorRuntime.wrap(function _callee6$(_context6) {
+    return regeneratorRuntime.wrap(function _callee5$(_context5) {
       while (1) {
-        switch (_context6.prev = _context6.next) {
+        switch (_context5.prev = _context5.next) {
           case 0:
             skuElement = document.querySelector(".sku-".concat(i));
 
             if (skuElement.classList.contains('fetched')) {
-              _context6.next = 18;
+              _context5.next = 18;
               break;
             }
 
@@ -16331,30 +16716,30 @@ var displayShops = /*#__PURE__*/function () {
 
           case 5:
             if (!(y < sku.sizesForRequests.length)) {
-              _context6.next = 15;
+              _context5.next = 15;
               break;
             }
 
             shopsObject = fetch("/api/".concat(sku.year, "/").concat(sku.season, "/").concat(sku.model, "/").concat(sku.color, "/").concat(sku.sizesForRequests[y])).then(function (res) {
               return res.json();
             });
-            _context6.t0 = shopsPromises;
-            _context6.next = 10;
+            _context5.t0 = shopsPromises;
+            _context5.next = 10;
             return shopsObject;
 
           case 10:
-            _context6.t1 = _context6.sent;
+            _context5.t1 = _context5.sent;
 
-            _context6.t0.push.call(_context6.t0, _context6.t1);
+            _context5.t0.push.call(_context5.t0, _context5.t1);
 
           case 12:
             y++;
-            _context6.next = 5;
+            _context5.next = 5;
             break;
 
           case 15:
             res = [];
-            _context6.next = 18;
+            _context5.next = 18;
             return Promise.all(shopsPromises).then(function (shops) {
               res = shops;
               return res;
@@ -16362,10 +16747,10 @@ var displayShops = /*#__PURE__*/function () {
 
           case 18:
           case "end":
-            return _context6.stop();
+            return _context5.stop();
         }
       }
-    }, _callee6);
+    }, _callee5);
   }));
 
   return function displayShops() {
@@ -16537,7 +16922,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "5051" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "5827" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
