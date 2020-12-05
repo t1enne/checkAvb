@@ -15122,6 +15122,15 @@ var DrawerContent = {
         align: 'left',
         label: 'History',
         size: vnode.state.size
+      })), (0, _mithril.default)(_mithril.default.route.Link, {
+        href: '/dhlTracking'
+      }, (0, _mithril.default)(_constructUi.Button, {
+        iconLeft: _constructUi.Icons.ARCHIVE,
+        fluid: true,
+        basic: true,
+        align: 'left',
+        label: 'DHL tracking',
+        size: vnode.state.size
       })), (0, _mithril.default)('.last-row', ((0, _mithril.default)(_constructUi.Button, {
         intent: 'primary',
         size: vnode.state.size,
@@ -15154,9 +15163,6 @@ var DrawerContent = {
   }
 };
 var Nav = {
-  oninit: function oninit() {
-    console.log('mounting');
-  },
   view: function view(vnode) {
     var submenu = location.hash.split('/')[1];
     return [(0, _mithril.default)('.nav.flex', //   m(Breadcrumb, {
@@ -16002,7 +16008,117 @@ function s(query, cb) {
 exports.ordersSection = ordersSection;
 exports.clientsSection = clientsSection;
 exports.historySection = historySection;
-},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Nav":"components/Nav.js","./Orders":"components/Orders.js","./Clients":"components/Clients.js","./Searches":"components/Searches.js"}],"components/EditOrder.js":[function(require,module,exports) {
+},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Nav":"components/Nav.js","./Orders":"components/Orders.js","./Clients":"components/Clients.js","./Searches":"components/Searches.js"}],"components/Dhl.js":[function(require,module,exports) {
+"use strict";
+
+var _mithril = _interopRequireDefault(require("mithril"));
+
+var _constructUi = require("construct-ui");
+
+var _Nav = require("./Nav");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function getDhl(awb) {
+  _mithril.default.request({
+    method: 'GET',
+    url: "/api/tracking/".concat(awb)
+  }).then(function (res) {
+    console.log(res[0]);
+    return res[0];
+  });
+}
+
+function Results() {
+  return {
+    view: function view(vnode) {
+      var res = vnode.attrs.res;
+      var delivered = res.delivery.status === 'delivered' ? 'positive' : 'warning';
+      return [(0, _mithril.default)(_constructUi.Tag, {
+        label: 'destination: ' + res.destination.value || null
+      }), (0, _mithril.default)(_constructUi.Tag, {
+        label: res.delivery.status || null,
+        intent: delivered
+      }), (0, _mithril.default)(_constructUi.Tag, {
+        label: 'pieces: ' + res.pieces.value || null
+      }), (0, _mithril.default)(_constructUi.Tag, {
+        label: 'updated: ' + res.checkpoints[0].date
+      }), (0, _mithril.default)(_constructUi.List, {
+        fluid: true,
+        interactive: true
+      }, res.checkpoints.map(function (item) {
+        console.log(item);
+        return (0, _mithril.default)(_constructUi.ListItem, {
+          label: item.description
+        });
+      }))];
+    }
+  };
+}
+
+var Dhl = {
+  tracking: '',
+  view: function view(vnode) {
+    return [(0, _mithril.default)(_Nav.Nav), (0, _mithril.default)('.container', (0, _mithril.default)(_constructUi.Card, {
+      fluid: true
+    }, (0, _mithril.default)(_constructUi.Input, {
+      onchange: function onchange(e) {
+        e.preventDefault();
+        vnode.state.tracking = e.originalTarget.value;
+      },
+      contentLeft: (0, _mithril.default)(_constructUi.Icon, {
+        name: _constructUi.Icons.ARCHIVE
+      }),
+      placeholder: 'dhl tracking'
+    }), (0, _mithril.default)(_constructUi.Button, {
+      label: 'Search',
+      iconLeft: _constructUi.Icons.SEARCH,
+      onclick: function () {
+        var _onclick = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(e) {
+          var awb;
+          return regeneratorRuntime.wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  e.preventDefault();
+                  awb = vnode.state.tracking.split(' ').join('');
+
+                  _mithril.default.request({
+                    method: 'GET',
+                    url: "/api/tracking/".concat(awb)
+                  }).then(function (res) {
+                    vnode.state.results = res[0];
+
+                    _mithril.default.render(document.querySelector('.dhl-results'), (0, _mithril.default)(Results, {
+                      res: vnode.state.results
+                    }));
+                  }); // vnode.state.results = await getDhl(vnode.state.tracking)
+                  // console.log(vnode.state);
+
+
+                case 3:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee);
+        }));
+
+        function onclick(_x) {
+          return _onclick.apply(this, arguments);
+        }
+
+        return onclick;
+      }()
+    }), (0, _mithril.default)('.dhl-results')))];
+  }
+};
+exports.Dhl = Dhl;
+},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Nav":"components/Nav.js"}],"components/EditOrder.js":[function(require,module,exports) {
 "use strict";
 
 var _mithril = _interopRequireDefault(require("mithril"));
@@ -16217,7 +16333,11 @@ var _constructUi = require("construct-ui");
 
 require("../node_modules/construct-ui/lib/index.css");
 
+var _logo = _interopRequireDefault(require("./logo.svg"));
+
 var _Nav = require("/components/Nav");
+
+var _Dhl = require("/components/Dhl");
 
 var _EditOrder = _interopRequireDefault(require("/components/EditOrder"));
 
@@ -16251,7 +16371,7 @@ var Login = {
   },
   view: function view(vnode) {
     return [(0, _mithril.default)('form.login', (0, _mithril.default)('.logo-bg', {
-      style: 'width: auto; height: 100px; background: url("/logo.86ce68ea.svg") no-repeat center;'
+      style: "width: auto; height: 100px; background: url(".concat(_logo.default, ") no-repeat center;")
     }), (0, _mithril.default)(_constructUi.Input, {
       style: 'display:block;margin:5px auto;',
       value: localStorage.user || '',
@@ -16303,6 +16423,7 @@ _mithril.default.route(document.body, '/main', {
   '/orders': ordersSection,
   '/clients': clientsSection,
   '/history': historySection,
+  '/dhlTracking': _Dhl.Dhl,
   '/orders/edit/:id': _EditOrder.default
 }); //check if session exists
 
@@ -16894,7 +17015,7 @@ function s(query, cb) {
     cb(item);
   });
 }
-},{"regenerator-runtime/runtime":"../node_modules/regenerator-runtime/runtime.js","mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../node_modules/construct-ui/lib/index.css":"../node_modules/construct-ui/lib/index.css","/components/Tabs":"components/Tabs.js","/components/Nav":"components/Nav.js","/components/EditOrder":"components/EditOrder.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"regenerator-runtime/runtime":"../node_modules/regenerator-runtime/runtime.js","mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../node_modules/construct-ui/lib/index.css":"../node_modules/construct-ui/lib/index.css","./logo.svg":"logo.svg","/components/Tabs":"components/Tabs.js","/components/Nav":"components/Nav.js","/components/Dhl":"components/Dhl.js","/components/EditOrder":"components/EditOrder.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -16922,7 +17043,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "5827" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "9519" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -6,30 +6,23 @@ let data = {
 }
 
 async function getCookie(user, pwd) {
-  try {
-    let cookie = await fetch("https://websmart.brunellocucinelli.it/bcweb/LOGIN.pgm", {
-      "credentials": "include",
-      "headers": {
-        "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Upgrade-Insecure-Requests": "1",
-      },
-      "referrer": "https://websmart.brunellocucinelli.it/bcweb/login.pgm?msg_info=&errore=",
-      "body": `task=controllo&url_richiesto=&utente=${user}&password=${pwd}`,
-      "method": "POST",
-      "mode": "cors"
-    }).then(res => {
-      console.log(res.headers.raw()['set-cookie']);
-      res.headers.raw()['set-cookie'][0].split(';')[0]
-    })
-    return {
-      'cookie': cookie
-    };
-  } catch (e) {
-    console.log(e)
-  }
+  let cookie = await fetch("https://websmart.brunellocucinelli.it/bcweb/LOGIN.pgm", {
+    "credentials": "include",
+    "headers": {
+      "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+      "Accept-Language": "en-US,en;q=0.5",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Upgrade-Insecure-Requests": "1",
+    },
+    "referrer": "https://websmart.brunellocucinelli.it/bcweb/login.pgm?msg_info=&errore=",
+    "body": `task=controllo&url_richiesto=&utente=${user}&password=${pwd}`,
+    "method": "POST",
+    "mode": "cors"
+  }).then(res => res.headers.raw()['set-cookie'][0].split(';')[0])
+  return {
+    'cookie': cookie
+  };
 }
 
 async function getPrice(cookie, year, season, model) {
@@ -312,10 +305,29 @@ async function availabilityRequest(cookie, model, color) {
   }
 }
 
+async function getDhl(tracking) {
+
+  let awb = await fetch(`https://www.dhl.com/shipmentTracking?AWB=${tracking}&countryCode=g0&languageCode=en&_=1607198868925`, {
+    "credentials": "include",
+    "headers": {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:81.0) Gecko/20100101 Firefox/81.0",
+      "Accept": "application/json, text/javascript, */*; q=0.01",
+      "Accept-Language": "en-US,en;q=0.5",
+      "X-Requested-With": "XMLHttpRequest",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "referrer": "https://www.dhl.com/en/express/tracking.html?AWB=5699937106&brand=DHL",
+    "method": "GET",
+    "mode": "cors"
+  }).then(res => res.json())
+
+  return awb
+}
+
 async function getAvb(cookie, model, color, withImage) {
   try {
     let results = await availabilityRequest(cookie, model, color);
-    console.log(results);
     return results
   } catch (e) {
     console.log(e.message);
@@ -323,6 +335,7 @@ async function getAvb(cookie, model, color, withImage) {
 }
 
 module.exports.getAvb = getAvb;
+module.exports.getDhl = getDhl;
 module.exports.getShops = getShops;
 module.exports.getCookie = getCookie;
 module.exports.getImage = getImage;

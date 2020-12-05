@@ -291,6 +291,12 @@ app.get(`/api/listClients`, async (req, res) => {
   })
 });
 
+// GET TRACKING STATUS
+app.get('/api/tracking/:awb', async (req, res) => {
+  let awb = await getter.getDhl(req.params.awb)
+  res.json(awb.results)
+})
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`);

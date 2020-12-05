@@ -30,6 +30,8 @@ import {
 
 import '../node_modules/construct-ui/lib/index.css'
 
+import logo from './logo.svg'
+
 FocusManager.alwaysShowFocus();
 
 // import ordersSection from '/components/Tabs';
@@ -45,6 +47,10 @@ import {
   Nav,
   showToast
 } from '/components/Nav';
+
+import {
+  Dhl
+} from '/components/Dhl'
 
 import EditOrder from '/components/EditOrder';
 
@@ -65,7 +71,7 @@ let Login = {
   view: (vnode) => {
     return [
       m('form.login', m('.logo-bg', {
-          style: 'width: auto; height: 100px; background: url("/logo.86ce68ea.svg") no-repeat center;'
+          style: `width: auto; height: 100px; background: url(${logo}) no-repeat center;`
         }),
         m(Input, {
           style: 'display:block;margin:5px auto;',
@@ -127,6 +133,7 @@ m.route(document.body, '/main', {
   '/orders': ordersSection,
   '/clients': clientsSection,
   '/history': historySection,
+  '/dhlTracking': Dhl,
   '/orders/edit/:id': EditOrder
 })
 

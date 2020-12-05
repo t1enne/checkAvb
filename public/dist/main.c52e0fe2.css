@@ -195,8 +195,8 @@ img.sku-picture.hidden {
 }
 
 form.login {
-  margin: 10% auto !important;
-  max-width: 400px;
+  margin: 0% auto !important;
+  max-width: 500px;
   padding: 10%;
 }
 
@@ -453,15 +453,12 @@ ul.client-list .client-card span {
   width: 1.5rem !important;
 }
 
-.loader {
-  width: 5rem;
-  height: 5rem;
-  display: block;
-  margin: 2rem auto;
+.dhl-results {
+  margin-top: 1rem;
 }
 
-.loader.hidden {
-  display: none;
+.dhl-results .cui-list div {
+  font-size: 9px;
 }
 
 /* .user-icon svg path,

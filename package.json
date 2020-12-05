@@ -13,6 +13,7 @@
   "dependencies": {
     "animejs": "^3.2.1",
     "cheerio": "^1.0.0-rc.3",
+    "components": "^0.1.0",
     "construct-ui": "^0.3.0",
     "cookie-parser": "^1.4.5",
     "depcheck": "^1.2.0",
