@@ -6,23 +6,32 @@ let data = {
 }
 
 async function getCookie(user, pwd) {
-  let cookie = await fetch("https://websmart.brunellocucinelli.it/bcweb/LOGIN.pgm", {
-    "credentials": "include",
-    "headers": {
-      "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0",
-      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-      "Accept-Language": "en-US,en;q=0.5",
-      "Content-Type": "application/x-www-form-urlencoded",
-      "Upgrade-Insecure-Requests": "1",
-    },
-    "referrer": "https://websmart.brunellocucinelli.it/bcweb/login.pgm?msg_info=&errore=",
-    "body": `task=controllo&url_richiesto=&utente=${user}&password=${pwd}`,
-    "method": "POST",
-    "mode": "cors"
-  }).then(res => res.headers.raw()['set-cookie'][0].split(';')[0])
-  return {
-    'cookie': cookie
-  };
+  try {
+    let cookie = await fetch("https://websmart.brunellocucinelli.it/bcweb/LOGIN.pgm", {
+      "credentials": "include",
+      "headers": {
+        "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:79.0) Gecko/20100101 Firefox/79.0",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Upgrade-Insecure-Requests": "1",
+      },
+      "referrer": "https://websmart.brunellocucinelli.it/bcweb/login.pgm?msg_info=&errore=",
+      "body": `task=controllo&url_richiesto=&utente=${user}&password=${pwd}`,
+      "method": "POST",
+      "mode": "cors"
+    }).then(res => {
+      if (res.headers.raw()['set-cookie']) {
+        res.headers.raw()['set-cookie'][0].split(';')[0]
+      }
+      // else console.log(res)
+    })
+    return {
+      'cookie': cookie
+    }
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 async function getPrice(cookie, year, season, model) {

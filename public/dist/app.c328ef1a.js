@@ -15071,6 +15071,7 @@ var DrawerContent = {
     return [(0, _mithril.default)(_constructUi.Button, {
       size: vnode.state.size,
       iconLeft: _constructUi.Icons.MENU,
+      style: 'display:block;margin-left:auto;',
       basic: true,
       onclick: function onclick() {
         vnode.state.drawerOpen = !vnode.state.drawerOpen;
@@ -15125,7 +15126,7 @@ var DrawerContent = {
       })), (0, _mithril.default)(_mithril.default.route.Link, {
         href: '/dhlTracking'
       }, (0, _mithril.default)(_constructUi.Button, {
-        iconLeft: _constructUi.Icons.ARCHIVE,
+        iconLeft: _constructUi.Icons.BOX,
         fluid: true,
         basic: true,
         align: 'left',
@@ -15165,7 +15166,7 @@ var DrawerContent = {
 var Nav = {
   view: function view(vnode) {
     var submenu = location.hash.split('/')[1];
-    return [(0, _mithril.default)('.nav.flex', //   m(Breadcrumb, {
+    return [(0, _mithril.default)('.nav', //   m(Breadcrumb, {
     //     size: 'xl',
     //     class: 'breadcrumbs',
     //     seperator: m(Icon, { name: Icons.CHEVRON_RIGHT })
@@ -15367,6 +15368,14 @@ var Orders = {
       }, (0, _mithril.default)(_constructUi.PopoverMenu, {
         closeOnContentClick: true,
         content: [(0, _mithril.default)(_constructUi.Button, {
+          iconLeft: _constructUi.Icons.EDIT,
+          label: 'Edit',
+          basic: true,
+          align: 'center',
+          onclick: function onclick() {
+            _mithril.default.route.set("/orders/edit/".concat(order.id));
+          }
+        }), (0, _mithril.default)(_constructUi.Button, {
           iconLeft: _constructUi.Icons.TRASH,
           intent: 'negative',
           label: 'Delete',
@@ -15391,11 +15400,7 @@ var Orders = {
           iconLeft: _constructUi.Icons.SETTINGS,
           style: 'float:right;'
         })
-      }), [(0, _mithril.default)(".order-client-name[id=".concat(order.clientId, "]"), {
-        onclick: function onclick() {
-          _mithril.default.route.set("/orders/edit/".concat(order.id));
-        }
-      }, (0, _mithril.default)("h1", order.clientName)), (0, _mithril.default)(_constructUi.Tag, {
+      }), [(0, _mithril.default)(".order-client-name[id=".concat(order.clientId, "]"), (0, _mithril.default)("h1", order.clientName)), (0, _mithril.default)(_constructUi.Tag, {
         label: order.date,
         class: 'date'
       }), (0, _mithril.default)(_constructUi.Tag, {
@@ -16051,7 +16056,6 @@ function Results() {
         fluid: true,
         interactive: true
       }, res.checkpoints.map(function (item) {
-        console.log(item);
         return (0, _mithril.default)(_constructUi.ListItem, {
           label: item.description
         });
@@ -16066,12 +16070,13 @@ var Dhl = {
     return [(0, _mithril.default)(_Nav.Nav), (0, _mithril.default)('.container', (0, _mithril.default)(_constructUi.Card, {
       fluid: true
     }, (0, _mithril.default)(_constructUi.Input, {
-      onchange: function onchange(e) {
-        e.preventDefault();
-        vnode.state.tracking = e.originalTarget.value;
+      oninput: function oninput(e) {
+        e.preventDefault(); // console.log(e);
+
+        vnode.state.tracking = e.srcElement.value;
       },
       contentLeft: (0, _mithril.default)(_constructUi.Icon, {
-        name: _constructUi.Icons.ARCHIVE
+        name: _constructUi.Icons.BOX
       }),
       placeholder: 'dhl tracking'
     }), (0, _mithril.default)(_constructUi.Button, {
@@ -16180,18 +16185,16 @@ function AssignedSearch() {
 function UnassignedSearch() {
   return {
     assignOrder: function assignOrder(order, searchId, index) {
-      _mithril.default.request({
-        method: 'GET',
-        url: "/api/addToClient/".concat(order.id, "/").concat(searchId)
-      }).then(function (res) {
-        console.log(res);
-
-        var removedSearch = _Searches.Searches.unassignedSearches.splice(index, 1)[0];
-
-        (0, _Nav.showToast)("Assigned ".concat(res.model, "!"), 'positive');
-
-        _Searches.Searches.assignedSearches[order.id].push(removedSearch);
-      });
+      // m.request({
+      //   method: 'GET',
+      //   url: `/api/addToClient/${order.id}/${searchId}`
+      // }).then(res => {
+      //   console.log(res);
+      //   let removedSearch = Searches.unassignedSearches.splice(index, 1)[0]
+      //   showToast(`Assigned ${res.model}!`, 'positive')
+      //   Searches.assignedSearches[order.id].push(removedSearch)
+      // })
+      console.log(searchId, index);
     },
     view: function view(vnode) {
       var item = vnode.attrs.item;
@@ -16202,7 +16205,7 @@ function UnassignedSearch() {
       }); // let contentL =
 
       return (0, _mithril.default)(_constructUi.ListItem, {
-        label: "".concat(item.year).concat(item.season, " ").concat(item.model, " ").concat(item.color, " ").concat(item.size),
+        label: "".concat(item.year).concat(item.season, " ").concat(item.model, " ").concat(item.color, " ").concat(item.size, " ").concat(item.id),
         contentRight: contentR,
         contentLeft: (0, _mithril.default)(_constructUi.Button, {
           iconLeft: _constructUi.Icons.PLUS,
@@ -16364,6 +16367,8 @@ var _require = require('/components/Tabs'),
 var session;
 var Login = {
   remember: false,
+  user: '',
+  pwd: '',
   oninit: function oninit(vnode) {
     if (localStorage.pwd) {
       vnode.state.remember = true;
@@ -16374,21 +16379,36 @@ var Login = {
       style: "width: auto; height: 100px; background: url(".concat(_logo.default, ") no-repeat center;")
     }), (0, _mithril.default)(_constructUi.Input, {
       style: 'display:block;margin:5px auto;',
-      value: localStorage.user || '',
+      value: vnode.state.user,
       contentLeft: (0, _mithril.default)(_constructUi.Icon, {
         name: _constructUi.Icons.USER
       }),
       placeholder: 'Your ASWEB Username',
-      autocomplete: 'username'
+      autocomplete: 'username',
+      oncreate: function oncreate(e) {
+        // console.log(e);
+        e.dom.value = localStorage.user;
+      },
+      oninput: function oninput(e) {
+        vnode.state.user = e.srcElement.value;
+      }
     }), (0, _mithril.default)(_constructUi.Input, {
       style: 'display:block;margin:5px auto;',
-      value: localStorage.pwd || '',
+      value: vnode.state.pwd,
       contentLeft: (0, _mithril.default)(_constructUi.Icon, {
         name: _constructUi.Icons.LOCK
       }),
       placeholder: 'Password',
       type: 'password',
-      autocomplete: "current-password"
+      autocomplete: "current-password",
+      oncreate: function oncreate(e) {
+        // console.log(e);
+        e.dom.value = localStorage.pwd;
+      },
+      oninput: function oninput(e) {
+        localStorage.pwd = '';
+        vnode.state.pwd = e.srcElement.value;
+      }
     }), (0, _mithril.default)(_constructUi.Button, {
       label: 'LOGIN',
       style: 'display:block;margin:5px auto;',
@@ -16397,7 +16417,7 @@ var Login = {
       onclick: function onclick(e) {
         console.log('clicked');
         e.preventDefault();
-        login.authenticate(vnode.state.remember);
+        login.authenticate(vnode.state.remember, vnode.state.user, vnode.state.pwd);
         (0, _Nav.showToast)("Welcome back ".concat(localStorage.user, " !"), 'positive');
       }
     }), (0, _mithril.default)(_constructUi.Switch, {
@@ -16409,24 +16429,7 @@ var Login = {
       }
     }))];
   }
-}; // Router
-
-_mithril.default.route(document.body, '/main', {
-  '/main': {
-    onmatch: function onmatch() {
-      if (!session) {
-        login.check();
-      } else return Home;
-    }
-  },
-  '/login': Login,
-  '/orders': ordersSection,
-  '/clients': clientsSection,
-  '/history': historySection,
-  '/dhlTracking': _Dhl.Dhl,
-  '/orders/edit/:id': _EditOrder.default
-}); //check if session exists
-
+}; //check if session exists
 
 var login = {
   check: function check() {
@@ -16452,16 +16455,14 @@ var login = {
       }, _callee);
     }))();
   },
-  authenticate: function authenticate(remember) {
+  authenticate: function authenticate(remember, user, pwd) {
     return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-      var user, pwd;
       return regeneratorRuntime.wrap(function _callee2$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
-              user = document.querySelector('form.login > div.cui-input:nth-child(2) > input:nth-child(2)').value.trim();
-              pwd = document.querySelector('form.login div.cui-input:nth-child(3) > input:nth-child(2)').value.trim();
-
+              // let user = document.querySelector('form.login > div.cui-input:nth-child(2) > input:nth-child(2)').value.trim()
+              // let pwd = document.querySelector('form.login div.cui-input:nth-child(3) > input:nth-child(2)').value.trim()
               _mithril.default.request({
                 url: "/api/login",
                 headers: {
@@ -16479,7 +16480,7 @@ var login = {
                 login.check();
               });
 
-            case 3:
+            case 1:
             case "end":
               return _context2.stop();
           }
@@ -16501,41 +16502,7 @@ var Home = {
       }));
     })));
   }
-}; // m.mount(document.querySelector('.results'), {
-//   loading: false,
-//   view: (vnode) => {
-//     if (resultsArray) {
-//       return m('.res-wrap', resultsArray.map((item, i) => {
-//         return m('.sku-wrapper-key', {
-//           key: item.id
-//         }, m(Sku, {
-//           sku: item,
-//           i: i
-//         }))
-//       }))
-//     }
-//   }
-// })
-// userIcons
-// m.mount(document.querySelector('.user-panel-dropdown'), {
-//   view: () => {
-//     return [m('.user-icons', {
-//       onclick: () => {
-//         classy('.user-panel', 'hidden', 'toggle')
-//         document.querySelector('#radio1').click()
-//       }
-//     }, m(Icon, {
-//       name: Icons.CHEVRON_DOWN,
-//       size: 'xl'
-//     }), m(Icon, {
-//       name: Icons.USER,
-//       size: 'xl'
-//     }), m('.login-user'))]
-//
-//   }
-// })
-// m.mount(document.querySelector('.user-personal-bucket'), Tabs)
-
+};
 var resultsArray;
 var SearchForm = {
   loading: false,
@@ -16608,7 +16575,7 @@ var SearchForm = {
       }()
     })])]);
   }
-}; // m.mount(document.querySelector('.search-form'), SearchForm)
+};
 
 function Sku() {
   return {
@@ -16813,148 +16780,7 @@ function SizeButton() {
       })];
     }
   };
-} // getShops
-
-
-var displayShops = /*#__PURE__*/function () {
-  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
-    var shopsPromises, y, shopsObject, res;
-    return regeneratorRuntime.wrap(function _callee5$(_context5) {
-      while (1) {
-        switch (_context5.prev = _context5.next) {
-          case 0:
-            skuElement = document.querySelector(".sku-".concat(i));
-
-            if (skuElement.classList.contains('fetched')) {
-              _context5.next = 18;
-              break;
-            }
-
-            classy(skuElement, 'fetched', 'add'); // array for promises
-
-            shopsPromises = [];
-            y = 0;
-
-          case 5:
-            if (!(y < sku.sizesForRequests.length)) {
-              _context5.next = 15;
-              break;
-            }
-
-            shopsObject = fetch("/api/".concat(sku.year, "/").concat(sku.season, "/").concat(sku.model, "/").concat(sku.color, "/").concat(sku.sizesForRequests[y])).then(function (res) {
-              return res.json();
-            });
-            _context5.t0 = shopsPromises;
-            _context5.next = 10;
-            return shopsObject;
-
-          case 10:
-            _context5.t1 = _context5.sent;
-
-            _context5.t0.push.call(_context5.t0, _context5.t1);
-
-          case 12:
-            y++;
-            _context5.next = 5;
-            break;
-
-          case 15:
-            res = [];
-            _context5.next = 18;
-            return Promise.all(shopsPromises).then(function (shops) {
-              res = shops;
-              return res;
-            });
-
-          case 18:
-          case "end":
-            return _context5.stop();
-        }
-      }
-    }, _callee5);
-  }));
-
-  return function displayShops() {
-    return _ref.apply(this, arguments);
-  };
-}(); // document.querySelector(`.sizes-wrapper-${i}`).addEventListener('click', async (event) => {
-//    FETCH SHOPS if not already fetched
-//   if (!skuElement.classList.contains('fetched')) {
-//     classy(skuElement, 'fetched', 'add');
-//      array for promises
-//     let shopsPromises = [];
-//
-//     for (var y = 0; y < sku.sizesForRequests.length; y++) {
-//       let shopsObject = fetch(`/api/${sku.year}/${sku.season}/${sku.model}/${sku.color}/${sku.sizesForRequests[y]}`).then(res => res.json());
-//       shopsPromises.push(await shopsObject);
-//     }
-//
-//     let res = [];
-//
-//     await Promise.all(shopsPromises).then(shops => {
-//       res = shops;
-//     });
-//
-//      print out the shops
-//
-//     res.forEach((item, z) => {
-//       let index = Object.keys(item)[0];
-//
-//       let size = Object.keys(item[index])
-//       console.log(sku);
-//
-//       let sizeLabelElement = make('li', `size-${z}`, sizesWrapper)
-//       let sizeRow = maker("div", {
-//         class: "size size-row flex"
-//       }, sizeLabelElement)
-//       let sizeLabel = maker("label", {
-//         class: "label label-size",
-//         size: sku.sizesForRequests[z],
-//          click to add to orders
-//         on: [
-//           "click", async () => {
-//             if (toAddPopup.classList.contains('add')) {
-//               toAddPopup.classList.remove('add')
-//             } else
-//               toAddPopup.classList.add('add');
-//             }
-//           ],
-//         text: size
-//       }, sizeRow);
-//
-//       let toAddPopup = maker("span", {
-//         class: "label to-add-popout",
-//         text: "Add to orders",
-//         on: [
-//           "click", () => {
-//             let price = priceElement.textContent.slice(1);
-//             fetch(`/api/addSearch/${session.user}/${sku.year}/${sku.season}/${sku.model}/${sku.color}/${size}/${sku.sizesForRequests[z]}/price`).then(res => res.json()).then(json => console.log(json))
-//             toAddPopup.classList.remove('add')
-//
-//           }
-//         ]
-//       }, sizeRow);
-//
-//       let sizeList = make('ul', 'size=list', sizeLabelElement)
-//
-//       let shops = Object.values(item[index])[0]
-//       shops.forEach(item => {
-//         let shop = make('li', 'shop', sizeList)
-//         if (item == 'NEGOZIO SOLOMEO') {
-//           shop.classList.add('negsol')
-//         }
-//         shop.textContent = item
-//       });
-//
-//     });
-//     dotLoader.classList.add('hidden')
-//      sizeswrapper set maxHeight for the first time
-//     sizesWrapper.style.maxHeight = sizesWrapper.scrollHeight + 'px';
-//   }
-// });
-//
-//
-// let getReceivables = async () => {
+} // let getReceivables = async () => {
 //   let url = `/api/request/${sku.year}/${sku.season}/${sku.model}/${sku.color}`;
 //   let res = await fetch(url).then(r => r.json());
 //   if (res.total != "") {
@@ -16979,23 +16805,6 @@ var displayShops = /*#__PURE__*/function () {
 //     sizeElement.textContent = item
 //   });
 // });
-// document.querySelectorAll('.total-receivables').forEach((item) => {
-//   item.addEventListener('click', async (event) => {
-//     let model = event.target.getAttribute('model')
-//     let color = event.target.getAttribute('color')
-//     let rnd = event.target.getAttribute('rnd')
-//     let receivables = await fetch(`api/toReceive/${model}/${color}/${rnd}`).then(res => res.json());
-//     console.log(receivables);
-//     if (receivables) {
-//       item.textContent = ''
-//       Object.keys(receivables).forEach(s => {
-//         let size = s;
-//         let qty = Object.values(receivables[s])
-//         item.textContent += `${qty}/${size} `
-//       });
-//     }
-//   }, true);
-// });
 
 
 function classy(elem, c, addRemoveToggle) {
@@ -17014,7 +16823,24 @@ function s(query, cb) {
   e.length = 1 ? cb(e) : e.forEach(function (item) {
     cb(item);
   });
-}
+} // Router
+
+
+_mithril.default.route(document.body, '/main', {
+  '/main': {
+    onmatch: function onmatch() {
+      if (!session) {
+        login.check();
+      } else return Home;
+    }
+  },
+  '/login': Login,
+  '/orders': ordersSection,
+  '/clients': clientsSection,
+  '/history': historySection,
+  '/dhlTracking': _Dhl.Dhl,
+  '/orders/edit/:id': _EditOrder.default
+});
 },{"regenerator-runtime/runtime":"../node_modules/regenerator-runtime/runtime.js","mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../node_modules/construct-ui/lib/index.css":"../node_modules/construct-ui/lib/index.css","./logo.svg":"logo.svg","/components/Tabs":"components/Tabs.js","/components/Nav":"components/Nav.js","/components/Dhl":"components/Dhl.js","/components/EditOrder":"components/EditOrder.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -17043,7 +16869,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "9519" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "11580" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -59,6 +59,10 @@ li {
   list-style: none;
 }
 
+a:hover {
+  text-decoration: none !important;
+}
+
 .container {
   width: 95%;
   margin: auto;
@@ -458,7 +462,7 @@ ul.client-list .client-card span {
 }
 
 .dhl-results .cui-list div {
-  font-size: 9px;
+  font-size: 12px;
 }
 
 /* .user-icon svg path,

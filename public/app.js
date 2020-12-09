@@ -54,19 +54,17 @@ import {
 
 import EditOrder from '/components/EditOrder';
 
-
-
 let session;
 
 
 let Login = {
   remember: false,
+  user: '',
+  pwd: '',
   oninit: (vnode) => {
     if (localStorage.pwd) {
       vnode.state.remember = true
-
     }
-
   },
   view: (vnode) => {
     return [
@@ -75,22 +73,37 @@ let Login = {
         }),
         m(Input, {
           style: 'display:block;margin:5px auto;',
-          value: localStorage.user || '',
+          value: vnode.state.user,
           contentLeft: m(Icon, {
             name: Icons.USER
           }),
           placeholder: 'Your ASWEB Username',
-          autocomplete: 'username'
+          autocomplete: 'username',
+          oncreate: (e) => {
+            // console.log(e);
+            e.dom.value = localStorage.user
+          },
+          oninput: (e) => {
+            vnode.state.user = e.srcElement.value
+          }
         }),
         m(Input, {
           style: 'display:block;margin:5px auto;',
-          value: localStorage.pwd || '',
+          value: vnode.state.pwd,
           contentLeft: m(Icon, {
             name: Icons.LOCK
           }),
           placeholder: 'Password',
           type: 'password',
-          autocomplete: "current-password"
+          autocomplete: "current-password",
+          oncreate: (e) => {
+            // console.log(e);
+            e.dom.value = localStorage.pwd
+          },
+          oninput: (e) => {
+            localStorage.pwd = ''
+            vnode.state.pwd = e.srcElement.value
+          }
         }),
         m(Button, {
           label: 'LOGIN',
@@ -100,7 +113,8 @@ let Login = {
           onclick: (e) => {
             console.log('clicked');
             e.preventDefault();
-            login.authenticate(vnode.state.remember)
+
+            login.authenticate(vnode.state.remember, vnode.state.user, vnode.state.pwd)
             showToast(`Welcome back ${localStorage.user} !`, 'positive')
           }
         }),
@@ -117,36 +131,15 @@ let Login = {
   }
 }
 
-
-
-// Router
-
-m.route(document.body, '/main', {
-  '/main': {
-    onmatch: () => {
-      if (!session) {
-        login.check()
-      } else return Home
-    }
-  },
-  '/login': Login,
-  '/orders': ordersSection,
-  '/clients': clientsSection,
-  '/history': historySection,
-  '/dhlTracking': Dhl,
-  '/orders/edit/:id': EditOrder
-})
-
-
 //check if session exists
 let login = {
   async check() {
     session = await fetch('/logged').then(res => res.json())
     session.user ? m.route.set('/main') : m.route.set('/login')
   },
-  async authenticate(remember) {
-    let user = document.querySelector('form.login > div.cui-input:nth-child(2) > input:nth-child(2)').value.trim()
-    let pwd = document.querySelector('form.login div.cui-input:nth-child(3) > input:nth-child(2)').value.trim()
+  async authenticate(remember, user, pwd) {
+    // let user = document.querySelector('form.login > div.cui-input:nth-child(2) > input:nth-child(2)').value.trim()
+    // let pwd = document.querySelector('form.login div.cui-input:nth-child(3) > input:nth-child(2)').value.trim()
 
     m.request({
       url: `/api/login`,
@@ -185,44 +178,6 @@ let Home = {
   }
 }
 
-
-// m.mount(document.querySelector('.results'), {
-//   loading: false,
-//   view: (vnode) => {
-//     if (resultsArray) {
-//       return m('.res-wrap', resultsArray.map((item, i) => {
-//         return m('.sku-wrapper-key', {
-//           key: item.id
-//         }, m(Sku, {
-//           sku: item,
-//           i: i
-//         }))
-//       }))
-//     }
-//   }
-// })
-
-// userIcons
-
-// m.mount(document.querySelector('.user-panel-dropdown'), {
-//   view: () => {
-//     return [m('.user-icons', {
-//       onclick: () => {
-//         classy('.user-panel', 'hidden', 'toggle')
-//         document.querySelector('#radio1').click()
-//       }
-//     }, m(Icon, {
-//       name: Icons.CHEVRON_DOWN,
-//       size: 'xl'
-//     }), m(Icon, {
-//       name: Icons.USER,
-//       size: 'xl'
-//     }), m('.login-user'))]
-//
-//   }
-// })
-
-// m.mount(document.querySelector('.user-personal-bucket'), Tabs)
 
 let resultsArray;
 
@@ -292,11 +247,6 @@ let SearchForm = {
     ])
   }
 }
-
-// m.mount(document.querySelector('.search-form'), SearchForm)
-
-
-
 
 function Sku() {
   return {
@@ -503,107 +453,7 @@ function SizeButton() {
     }
   }
 }
-// getShops
-let displayShops = async () => {
-  skuElement = document.querySelector(`.sku-${i}`)
-  if (!skuElement.classList.contains('fetched')) {
-    classy(skuElement, 'fetched', 'add');
-    // array for promises
-    let shopsPromises = [];
 
-    for (var y = 0; y < sku.sizesForRequests.length; y++) {
-      let shopsObject = fetch(`/api/${sku.year}/${sku.season}/${sku.model}/${sku.color}/${sku.sizesForRequests[y]}`).then(res => res.json());
-      shopsPromises.push(await shopsObject);
-    }
-
-    let res = [];
-
-    await Promise.all(shopsPromises).then(shops => {
-      res = shops;
-      return res
-    });
-  }
-}
-
-// document.querySelector(`.sizes-wrapper-${i}`).addEventListener('click', async (event) => {
-//    FETCH SHOPS if not already fetched
-//   if (!skuElement.classList.contains('fetched')) {
-//     classy(skuElement, 'fetched', 'add');
-//      array for promises
-//     let shopsPromises = [];
-//
-//     for (var y = 0; y < sku.sizesForRequests.length; y++) {
-//       let shopsObject = fetch(`/api/${sku.year}/${sku.season}/${sku.model}/${sku.color}/${sku.sizesForRequests[y]}`).then(res => res.json());
-//       shopsPromises.push(await shopsObject);
-//     }
-//
-//     let res = [];
-//
-//     await Promise.all(shopsPromises).then(shops => {
-//       res = shops;
-//     });
-//
-//      print out the shops
-//
-//     res.forEach((item, z) => {
-//       let index = Object.keys(item)[0];
-//
-//       let size = Object.keys(item[index])
-//       console.log(sku);
-//
-//       let sizeLabelElement = make('li', `size-${z}`, sizesWrapper)
-//       let sizeRow = maker("div", {
-//         class: "size size-row flex"
-//       }, sizeLabelElement)
-//       let sizeLabel = maker("label", {
-//         class: "label label-size",
-//         size: sku.sizesForRequests[z],
-//          click to add to orders
-//         on: [
-//           "click", async () => {
-//             if (toAddPopup.classList.contains('add')) {
-//               toAddPopup.classList.remove('add')
-//             } else
-//               toAddPopup.classList.add('add');
-//             }
-//           ],
-//         text: size
-//       }, sizeRow);
-//
-//       let toAddPopup = maker("span", {
-//         class: "label to-add-popout",
-//         text: "Add to orders",
-//         on: [
-//           "click", () => {
-//             let price = priceElement.textContent.slice(1);
-//             fetch(`/api/addSearch/${session.user}/${sku.year}/${sku.season}/${sku.model}/${sku.color}/${size}/${sku.sizesForRequests[z]}/price`).then(res => res.json()).then(json => console.log(json))
-//             toAddPopup.classList.remove('add')
-//
-//           }
-//         ]
-//       }, sizeRow);
-//
-//       let sizeList = make('ul', 'size=list', sizeLabelElement)
-//
-//       let shops = Object.values(item[index])[0]
-//       shops.forEach(item => {
-//         let shop = make('li', 'shop', sizeList)
-//         if (item == 'NEGOZIO SOLOMEO') {
-//           shop.classList.add('negsol')
-//         }
-//         shop.textContent = item
-//       });
-//
-//     });
-//     dotLoader.classList.add('hidden')
-//      sizeswrapper set maxHeight for the first time
-//     sizesWrapper.style.maxHeight = sizesWrapper.scrollHeight + 'px';
-//   }
-// });
-//
-
-
-//
 // let getReceivables = async () => {
 //   let url = `/api/request/${sku.year}/${sku.season}/${sku.model}/${sku.color}`;
 //   let res = await fetch(url).then(r => r.json());
@@ -631,24 +481,6 @@ let displayShops = async () => {
 //   });
 // });
 
-// document.querySelectorAll('.total-receivables').forEach((item) => {
-//   item.addEventListener('click', async (event) => {
-//     let model = event.target.getAttribute('model')
-//     let color = event.target.getAttribute('color')
-//     let rnd = event.target.getAttribute('rnd')
-//     let receivables = await fetch(`api/toReceive/${model}/${color}/${rnd}`).then(res => res.json());
-//     console.log(receivables);
-//     if (receivables) {
-//       item.textContent = ''
-//       Object.keys(receivables).forEach(s => {
-//         let size = s;
-//         let qty = Object.values(receivables[s])
-//         item.textContent += `${qty}/${size} `
-//       });
-//     }
-//   }, true);
-// });
-
 function classy(elem, c, addRemoveToggle) {
   if (typeof elem === 'object') {
     elem.classList[addRemoveToggle](c)
@@ -668,3 +500,23 @@ function s(query, cb) {
       cb(item)
     });
 }
+
+
+
+// Router
+
+m.route(document.body, '/main', {
+  '/main': {
+    onmatch: () => {
+      if (!session) {
+        login.check()
+      } else return Home
+    }
+  },
+  '/login': Login,
+  '/orders': ordersSection,
+  '/clients': clientsSection,
+  '/history': historySection,
+  '/dhlTracking': Dhl,
+  '/orders/edit/:id': EditOrder
+})
