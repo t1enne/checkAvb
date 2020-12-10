@@ -15123,16 +15123,17 @@ var DrawerContent = {
         align: 'left',
         label: 'History',
         size: vnode.state.size
-      })), (0, _mithril.default)(_mithril.default.route.Link, {
-        href: '/dhlTracking'
-      }, (0, _mithril.default)(_constructUi.Button, {
-        iconLeft: _constructUi.Icons.BOX,
-        fluid: true,
-        basic: true,
-        align: 'left',
-        label: 'DHL tracking',
-        size: vnode.state.size
-      })), (0, _mithril.default)('.last-row', ((0, _mithril.default)(_constructUi.Button, {
+      })), // m(m.route.Link, {
+      //   href: '/dhlTracking'
+      // }, m(Button, {
+      //   iconLeft: Icons.BOX,
+      //   fluid: true,
+      //   basic: true,
+      //   align: 'left',
+      //   label: 'DHL tracking',
+      //   size: vnode.state.size
+      // })),
+      (0, _mithril.default)('.last-row', ((0, _mithril.default)(_constructUi.Button, {
         intent: 'primary',
         size: vnode.state.size,
         iconLeft: _constructUi.Icons.USER,
@@ -16869,7 +16870,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "11580" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "8033" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

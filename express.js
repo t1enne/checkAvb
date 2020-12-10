@@ -86,8 +86,10 @@ app.get('/logged', (req, res) => {
 // LOGIN
 app.get('/api/login', async (req, res) => {
   let smurfId = await getter.getCookie(req.headers.user, req.headers.pwd);
+  console.log(smurfId);
   req.session.smurf = smurfId.cookie;
   req.session.user = req.headers.user;
+  // console.log(req.session);
   res.json(req.session)
 });
 

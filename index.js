@@ -21,10 +21,7 @@ async function getCookie(user, pwd) {
       "method": "POST",
       "mode": "cors"
     }).then(res => {
-      if (res.headers.raw()['set-cookie']) {
-        res.headers.raw()['set-cookie'][0].split(';')[0]
-      }
-      // else console.log(res)
+      return res.headers.raw()['set-cookie'][0].split(';')[0]
     })
     return {
       'cookie': cookie
@@ -337,7 +334,6 @@ async function getDhl(tracking) {
 async function getAvb(cookie, model, color, withImage) {
   try {
     let results = await availabilityRequest(cookie, model, color);
-    console.log(results);
     return results
   } catch (e) {
     console.log(e.message);
