@@ -120,7 +120,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 })({"manifest.json":[function(require,module,exports) {
 module.exports = {
   "name": "Disponibilità BC",
-  "short_name": "PWA",
+  "short_name": "DispBC",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "white",
@@ -165,7 +165,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "8033" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "1765" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

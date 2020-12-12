@@ -3,28 +3,19 @@ import m from 'mithril';
 
 import {
   Button,
-  Drawer,
-  DrawerPosition,
   Input,
   Icon,
-  IconName,
   Icons,
   FocusManager,
-  Form,
-  FormGroup,
-  FormLabel,
+  // Form,
+  // FormGroup,
+  // FormLabel,
   Card,
-  Collapse,
-  Classes,
-  ControlGroup,
   Tag,
-  Menu,
-  MenuItem,
-  Size,
-  Toaster,
+  // Menu,
+  // MenuItem,
+  // Size,
   Popover,
-  PopoverInteraction,
-  PopoverPosition,
   Switch
 } from 'construct-ui';
 
@@ -34,28 +25,17 @@ import logo from './logo.svg'
 
 FocusManager.alwaysShowFocus();
 
-// import ordersSection from '/components/Tabs';
-// import clientsSection from '/components/Tabs';
-// import historySection from '/components/Tabs';
-const {
-  ordersSection,
-  clientsSection,
-  historySection
-} = require('/components/Tabs')
+const {ordersSection, clientsSection, historySection} = require('/components/Tabs')
 
-import {
-  Nav,
-  showToast
-} from '/components/Nav';
+import {Nav, showToast} from '/components/Nav';
 
-import {
-  Dhl
-} from '/components/Dhl'
+import {Dhl} from '/components/Dhl'
 
 import EditOrder from '/components/EditOrder';
 
-let session;
+import {NOSALE} from './noSaleAI20';
 
+let session;
 
 let Login = {
   remember: false,
@@ -67,67 +47,54 @@ let Login = {
     }
   },
   view: (vnode) => {
-    return [
-      m('form.login', m('.logo-bg', {
-          style: `width: auto; height: 100px; background: url(${logo}) no-repeat center;`
-        }),
-        m(Input, {
-          style: 'display:block;margin:5px auto;',
-          value: vnode.state.user,
-          contentLeft: m(Icon, {
-            name: Icons.USER
-          }),
-          placeholder: 'Your ASWEB Username',
-          autocomplete: 'username',
-          oncreate: (e) => {
-            // console.log(e);
-            e.dom.value = localStorage.user
-          },
-          oninput: (e) => {
-            vnode.state.user = e.srcElement.value
-          }
-        }),
-        m(Input, {
-          style: 'display:block;margin:5px auto;',
-          value: vnode.state.pwd,
-          contentLeft: m(Icon, {
-            name: Icons.LOCK
-          }),
-          placeholder: 'Password',
-          type: 'password',
-          autocomplete: "current-password",
-          oncreate: (e) => {
-            // console.log(e);
-            e.dom.value = localStorage.pwd
-          },
-          oninput: (e) => {
-            localStorage.pwd = ''
-            vnode.state.pwd = e.srcElement.value
-          }
-        }),
-        m(Button, {
-          label: 'LOGIN',
-          style: 'display:block;margin:5px auto;',
-          type: 'submit',
-          intent: 'primary',
-          onclick: (e) => {
-            console.log('clicked');
-            e.preventDefault();
+    return [m('form.login', m('.logo-bg', {style: `width: auto; height: 100px; background: url(${logo}) no-repeat center;`}), m(Input, {
+        style: 'display:block;margin:5px auto;',
+        value: vnode.state.user,
+        contentLeft: m(Icon, {name: Icons.USER}),
+        placeholder: 'Your ASWEB Username',
+        autocomplete: 'username',
+        oncreate: (e) => {
+          // console.log(e);
+          e.dom.value = localStorage.user
+        },
+        oninput: (e) => {
+          vnode.state.user = e.srcElement.value
+        }
+      }), m(Input, {
+        style: 'display:block;margin:5px auto;',
+        value: vnode.state.pwd,
+        contentLeft: m(Icon, {name: Icons.LOCK}),
+        placeholder: 'Password',
+        type: 'password',
+        autocomplete: "current-password",
+        oncreate: (e) => {
+          // console.log(e);
+          e.dom.value = localStorage.pwd
+        },
+        oninput: (e) => {
+          localStorage.pwd = ''
+          vnode.state.pwd = e.srcElement.value
+        }
+      }), m(Button, {
+        label: 'LOGIN',
+        style: 'display:block;margin:5px auto;',
+        type: 'submit',
+        intent: 'primary',
+        onclick: (e) => {
+          console.log('clicked');
+          e.preventDefault();
 
-            login.authenticate(vnode.state.remember, vnode.state.user, vnode.state.pwd)
-            showToast(`Welcome back ${localStorage.user} !`, 'positive')
-          }
-        }),
-        m(Switch, {
-          label: 'Remember me',
-          style: 'display: block;margin: auto;margin-top: 1rem;',
-          checked: vnode.state.remember,
-          onchange: () => {
-            vnode.state.remember = !vnode.state.remember
-          }
-        })
-      )
-    ]
+          login.authenticate(vnode.state.remember, vnode.state.user, vnode.state.pwd)
+          showToast(`Welcome back ${localStorage.user} !`, 'positive')
+        }
+      }), m(Switch, {
+        label: 'Remember me',
+        style: 'display: block;margin: auto;margin-top: 1rem;',
+        checked: vnode.state.remember,
+        onchange: () => {
+          vnode.state.remember = !vnode.state.remember
+        }
+      }))]
   }
 }
 
@@ -135,12 +102,11 @@ let Login = {
 let login = {
   async check() {
     session = await fetch('/logged').then(res => res.json())
-    session.user ? m.route.set('/main') : m.route.set('/login')
+    session.user
+      ? m.route.set('/main')
+      : m.route.set('/login')
   },
   async authenticate(remember, user, pwd) {
-    // let user = document.querySelector('form.login > div.cui-input:nth-child(2) > input:nth-child(2)').value.trim()
-    // let pwd = document.querySelector('form.login div.cui-input:nth-child(3) > input:nth-child(2)').value.trim()
-
     m.request({
       url: `/api/login`,
       headers: {
@@ -152,34 +118,28 @@ let login = {
         session = res
         localStorage.smurf = session.smurf
         localStorage.user = session.user
-        if (remember) localStorage.pwd = pwd
-      }
+        if (remember)
+          localStorage.pwd = pwd
+      } 
       login.check()
     })
   }
 }
 
-
-
-
 let Home = {
   results: [],
   size: 'xl',
-  view: (vnode) => {
-    return m('.main', m(Nav), m('.search', m('h1', 'Disponibilita'), m('.search-form', m(SearchForm))),
-      m('.results', Home.results.map((item, i) => {
-        return m('.sku-wrapper-key', {
-          key: item.id
-        }, m(Sku, {
-          sku: item,
-          i: i
-        }))
-      })))
+  view: () => {
+    return m('.main', m(Nav), m('.search', m('h1', 'Disponibilita'), m('.search-form', m(SearchForm))), m('.results', Home.results.map((item, i) => {
+      return m('.sku-wrapper-key', {
+        key: item.id
+      }, m(Sku, {
+        sku: item,
+        i: i
+      }))
+    })))
   }
 }
-
-
-let resultsArray;
 
 let SearchForm = {
   loading: false,
@@ -187,20 +147,20 @@ let SearchForm = {
   view: (vnode) => {
     return m("form", [
       m("div.model",
-        //m("input.model-input.twelve.columns[placeholder='Model'][type='text']")
-        m(Input, {
-          class: 'model-input',
-          style: 'width:75%;max-width:300px;',
-          placeholder: 'Model'
-        })),
+      //m("input.model-input.twelve.columns[placeholder='Model'][type='text']")
+      m(Input, {
+        class: 'model-input',
+        style: 'width:75%;max-width:300px;',
+        placeholder: 'Model'
+      })),
       m("div.color",
-        // m("input.color-input.twelve.columns[placeholder='Color'][type='text']")
-        m(Input, {
-          class: 'color-input',
-          style: 'width:75%;max-width:300px;',
-          placeholder: 'Color'
-        })),
-      m(".row.rower", ),
+      // m("input.color-input.twelve.columns[placeholder='Color'][type='text']")
+      m(Input, {
+        class: 'color-input',
+        style: 'width:75%;max-width:300px;',
+        placeholder: 'Color'
+      })),
+      m(".row.rower",),
       m("div.row.buttons-group", [
         // GET AVB
         // m("Button.clear-button.button[type='button'][style='width:150px;margin:5px 10px;']",
@@ -222,23 +182,18 @@ let SearchForm = {
             SearchForm.clearResults()
             vnode.state.loading = !vnode.state.loading
 
-            let model = document.querySelector('.model-input > input').value === '' ?
-              'm' :
-              document.querySelector('.model-input > input').value
-            let color = document.querySelector('.color-input > input').value === '' ?
-              'c' :
-              document.querySelector('.color-input > input').value
+            let model = document.querySelector('.model-input > input').value === ''
+              ? 'm'
+              : document.querySelector('.model-input > input').value
+            let color = document.querySelector('.color-input > input').value === ''
+              ? 'c'
+              : document.querySelector('.color-input > input').value
 
             //
 
-            await m.request({
-                method: "GET",
-                url: `/api/avb/${model}/${color}`
-              })
-              .then(res => {
-                Home.results = Object.values(res)
-                console.log(Home.results);
-              })
+            await m.request({method: "GET", url: `/api/avb/${model}/${color}`}).then(res => {
+              Home.results = Object.values(res)
+            })
 
             vnode.state.loading = !vnode.state.loading;
           }
@@ -258,17 +213,12 @@ function Sku() {
       // vnode.state.price = '--,--'
       // vnode.state.sku = vnode.attrs.sku
       vnode.state.getPrice = () => {
-        m.request({
-            method: 'GET',
-            url: `/api/price/${vnode.attrs.sku.year}/${vnode.attrs.sku.season}/${vnode.attrs.sku.model}`
-          })
-          .then(res => {
-            vnode.state.price = res
-          })
+        m.request({method: 'GET', url: `/api/price/${vnode.attrs.sku.year}/${vnode.attrs.sku.season}/${vnode.attrs.sku.model}`}).then(res => {
+          vnode.state.price = res
+        })
       }
-
     },
-    oncreate: (vnode) => {
+    oncreate: () => {
       // vnode.state.imgSrc = ''
     },
     view: (vnode) => {
@@ -278,86 +228,87 @@ function Sku() {
       sku.price = ''
       let content = m(`img.sku-image-${i}[src=${vnode.state.imgSrc}]`)
       return m(Card, {
-          class: `sku-wrapper`,
-          interactive: true,
-          elevated: 2,
-          fluid: true
-        }, m(`.sku`, m(`.sku-title.flex.row`, {
-            style: 'margin:10px'
-          },
-          // here will go skuString , svgButton and skuPrice
-          m('.string', sku.string),
-          m(Popover, {
-            class: 'sku-picture',
-            hasArrow: true,
-            hasBackdrop: false,
-            position: 'top',
-            interactionType: 'click',
-            hasBackdrop: false,
-            content,
-            trigger: m(Button, {
-              class: 'get-image',
-              iconLeft: Icons.IMAGE,
-              basic: true,
-              size: 'xl',
-              loading: vnode.state.loading,
-              onclick: (e) => {
-
-                if (!vnode.state.imgFetched) {
-                  vnode.state.loading = !vnode.state.loading;
-                  // e.preventDefault();
-                  // e.stopPropagation();
-                  fetch(`api/image/${sku.year}/${sku.season}/${sku.model}`)
-                    .then(res => res.text())
-                    .then(url => {
-                      vnode.state.imgFetched = true
-                      vnode.state.imgSrc = url;
-                      vnode.state.loading = !vnode.state.loading;
-                      m.redraw()
-                    })
-                }
+        class: `sku-wrapper`,
+        interactive: true,
+        elevated: 2,
+        fluid: true
+      }, m(`.sku`, m(`.sku-title.flex.row`, {
+        style: 'margin:10px'
+      },
+      // here will go skuString , svgButton and skuPrice
+      m('.string', sku.string), m(Popover, {
+        class: 'sku-picture',
+        hasArrow: true,
+        hasBackdrop: false,
+        position: 'top',
+        interactionType: 'click',
+        content,
+        trigger: m(Button, {
+          class: 'get-image',
+          iconLeft: Icons.IMAGE,
+          basic: true,
+          size: 'xl',
+          loading: vnode.state.loading,
+          onclick: () => {
+            if (!vnode.state.imgFetched) {
+              vnode.state.loading = !vnode.state.loading;
+              // e.preventDefault();
+              // e.stopPropagation();
+              fetch(`api/image/${sku.year}/${sku.season}/${sku.model}`).then(res => res.text()).then(url => {
+                vnode.state.imgFetched = true
+                vnode.state.imgSrc = url;
+                vnode.state.loading = !vnode.state.loading;
+                m.redraw()
+              })
+            }
+          }
+        })
+      }),
+      // m(PriceLabel, {
+      //   sku: sku,
+      //   price: vnode.state.price
+      // })
+      m(Tag, {
+        class: 'price-' + string,
+        intent: vnode.state.salable
+          ? 'negative'
+          : 'warning',
+        oninit: () => {
+          if (!vnode.state.price) {
+            m.request({method: "GET", url: `/api/price/${sku.year}/${sku.season}/${sku.model}`}).then(res => {
+              if (NOSALE.filter(e => e == sku.model + sku.color).length > 0) {
+                vnode.state.price = `€${res}`
+              } else if (sku.year + sku.season === '202') {
+                let sales = parseInt(res) * 0.7
+                vnode.state.price = `€${sales},00`
+                vnode.state.salable = true
+              } else {
+                vnode.state.price = `€${res}`
               }
             })
-          }),
-          // m(PriceLabel, {
-          //   sku: sku,
-          //   price: vnode.state.price
-          // })
-          m(Tag, {
-            class: 'price-' + string,
-            intent: 'warning',
-            oninit: () => {
-              if (!vnode.state.price) {
-                m.request({
-                  method: "GET",
-                  url: `/api/price/${sku.year}/${sku.season}/${sku.model}`
-                }).then(res => {
-                  vnode.state.price = res
-                })
-              }
-            },
-            label: vnode.state.price
+          }
+        },
+        label: vnode.state.price
+      }))), m('.row[style="display: block;"]', [
+        // here go sku.desc and sizes
+        m(Tag, {
+          label: sku.descr,
+          intent: 'warning',
+          size: 'xs'
+        }),
+        // Size Buttons
+        sku.sizes.map((item, i) => {
+          return m(SizeButton, {
+            sku: sku,
+            i: i
           })
-        )),
-        m('.row[style="display: block;"]', [
-          // here go sku.desc and sizes
-          m(Tag, {
-            label: sku.descr,
-            intent: 'warning',
-            size: 'xs'
-          }),
-          // Size Buttons
-          sku.sizes.map((item, i) => {
-            return m(SizeButton, {
-              sku: sku,
-              i: i,
-            })
-          }), m('.sizes-wrapper', {}, sku.sizes.map((item, i) => {
-            let string = sku.string.split(' ').join('')
-            return m(`ul.size-wrapper.size-${i}-${string}`)
-          }))
+        }),
+        m('.sizes-wrapper', {}, sku.sizes.map((item, i) => {
+          let string = sku.string.split(' ').join('')
+          return m(`ul.size-wrapper.size-${i}-${string}`)
+        }))
 
-        ]))
+      ]))
     }
   }
 }
@@ -365,18 +316,14 @@ function Sku() {
 function SizeButton() {
 
   let shops = []
-  let isOpen = false
+  // let isOpen = false
   let isLoading = false
 
   function getShops(sku, i) {
-    m.request({
-        method: 'GET',
-        url: `/api/${sku.year}/${sku.season}/${sku.model}/${sku.color}/${sku.sizesForRequests[i]}`
-      })
-      .then(res => {
-        shops = Object.values(res)[0]
-        isLoading = !isLoading
-      })
+    m.request({method: 'GET', url: `/api/${sku.year}/${sku.season}/${sku.model}/${sku.color}/${sku.sizesForRequests[i]}`}).then(res => {
+      shops = Object.values(res)[0]
+      isLoading = !isLoading
+    })
   }
 
   return {
@@ -387,69 +334,63 @@ function SizeButton() {
       let sizeForReq = vnode.attrs.sku.sizesForRequests[i]
 
       return [m(Button, {
-        label: size,
-        style: 'margin: 0 2px;',
-        loading: isLoading,
-        intent: 'positive',
-        size: 'xs',
-        requestSize: sizeForReq,
-        onclick: async (e) => {
-          isLoading = !isLoading
-          await getShops(sku, i)
-          let string = sku.string.split(' ').join('')
-          m.mount(document.querySelector(`ul.size-${i}-${string}`), {
-            oninit: (vnode) => {
-              vnode.state.intent = 'warning'
-            },
-            view: () => {
-              let string = sku.string.split(' ').join('')
+          label: size,
+          style: 'margin: 0 2px;',
+          loading: isLoading,
+          intent: 'positive',
+          size: 'xs',
+          requestSize: sizeForReq,
+          onclick: async () => {
+            isLoading = !isLoading
+            await getShops(sku, i)
+            let string = sku.string.split(' ').join('')
+            m.mount(document.querySelector(`ul.size-${i}-${string}`), {
+              oninit: (vnode) => {
+                vnode.state.intent = 'warning'
+              },
+              view: () => {
+                let string = sku.string.split(' ').join('')
 
+                if (Object.keys(shops)[0]) {
+                  return [
+                    m(Tag, {
+                      label: Object.keys(shops)[0],
+                      intent: 'positive'
+                    }),
+                    m(Button, {
+                      iconLeft: Icons.PLUS,
+                      size: 'xs',
+                      basic: true,
+                      outline: true,
+                      onclick: () => {
+                        // ADD SEARCH
+                        let price = document.querySelector('.price-' + string).textContent.split(',')[0].split('.').join('')
 
-              if (Object.keys(shops)[0]) {
-                return [
-                  m(Tag, {
-                    label: Object.keys(shops)[0],
-                    intent: 'positive'
-                  }),
-                  m(Button, {
-                    iconLeft: Icons.PLUS,
-                    size: 'xs',
-                    basic: true,
-                    outline: true,
-                    onclick: () => {
-                      // ADD SEARCH
-                      let price = document.querySelector('.price-' + string).textContent.split(',')[0].split('.').join('')
-
-                      m.request({
-                        method: "GET",
-                        url: `/api/addSearch/${session.user}/${sku.year}/${sku.season}/${sku.model}/${sku.color}/${size}/${sizeForReq}/${price}`
-                      }).then(res => {
-                        if (res._id) {
-                          console.log(res._id);
-                          showToast(`Added Search ${sku.string} ${size}!`, 'positive')
-                        } else {
-                          showToast(`Couldn't add Search ${sku.string} ${size}!`, 'negative')
-                        }
-                      })
-                    }
-                  }),
-                  Object.values(shops)[0].map(item => {
-                    if (item.search('NEGOZIO SOLOMEO') != -1) {
-                      return m('.list-item.solomeo', item)
-                    } else {
-                      return m(`.list-item`, item)
-                    }
-                  })
-                ]
+                        m.request({method: "GET", url: `/api/addSearch/${session.user}/${sku.year}/${sku.season}/${sku.model}/${sku.color}/${size}/${sizeForReq}/${price}`}).then(res => {
+                          if (res._id) {
+                            console.log(res._id);
+                            showToast(`Added Search ${sku.string} ${size}!`, 'positive')
+                          } else {
+                            showToast(`Couldn't add Search ${sku.string} ${size}!`, 'negative')
+                          }
+                        })
+                      }
+                    }),
+                    Object.values(shops)[0].map(item => {
+                      if (item.search('NEGOZIO SOLOMEO') != -1) {
+                        return m('.list-item.solomeo', item)
+                      } else {
+                        return m(`.list-item`, item)
+                      }
+                    })
+                  ]
+                }
               }
-            }
 
+            })
 
-
-          })
-
-        }
-      })]
+          }
+        })]
     }
   }
 }
@@ -481,28 +422,6 @@ function SizeButton() {
 //   });
 // });
 
-function classy(elem, c, addRemoveToggle) {
-  if (typeof elem === 'object') {
-    elem.classList[addRemoveToggle](c)
-  } else {
-    let e = document.querySelectorAll(elem)
-    e.forEach((item) => {
-      item.classList[addRemoveToggle](c)
-    });
-  }
-}
-
-function s(query, cb) {
-  let e = document.querySelectorAll(query);
-  e.length = 1 ?
-    cb(e) :
-    e.forEach(item => {
-      cb(item)
-    });
-}
-
-
-
 // Router
 
 m.route(document.body, '/main', {
@@ -510,7 +429,8 @@ m.route(document.body, '/main', {
     onmatch: () => {
       if (!session) {
         login.check()
-      } else return Home
+      } else
+        return Home
     }
   },
   '/login': Login,

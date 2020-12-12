@@ -1,22 +1,21 @@
 {
-	"name":"Disponibilità BC",
-	"short_name":"PWA",
-	"start_url":"index.html",
-	"display":"standalone",
-	"background_color":"white",
-	"theme_color":"white",
-	"scope": ".",
-	"description":"This is a PWA tutorial.",
-	"icons":[
-	{
-	"src":"favicon192.png",
-	"sizes":"192x192",
-	"type":"image/png"
-	},
-	{
-	"src":"favicon.png",
-	"sizes":"559x566",
-	"type":"image/png"
-	}
-]
+  "name": "Disponibilità BC",
+  "short_name": "DispBC",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "white",
+  "theme_color": "white",
+  "scope": ".",
+  "description": "This is a PWA tutorial.",
+  "icons": [{
+      "src": "favicon192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon.png",
+      "sizes": "559x566",
+      "type": "image/png"
+    }
+  ]
 }

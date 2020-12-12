@@ -118,18 +118,25 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   return newRequire;
 })({"serviceworker.js":[function(require,module,exports) {
-var staticCacheName = "pwa";
-self.addEventListener("install", function (e) {
-  e.waitUntil(caches.open(staticCacheName).then(function (cache) {
-    return cache.addAll(["/"]);
-  }));
-});
-self.addEventListener("fetch", function (event) {
-  console.log(event.request.url);
-  event.respondWith(caches.match(event.request).then(function (response) {
-    return response || fetch(event.request);
-  }));
-});
+// var staticCacheName = "pwa";
+//
+// self.addEventListener("install", function (e) {
+// e.waitUntil(
+// 	caches.open(staticCacheName).then(function (cache) {
+// 	return cache.addAll(["/"]);
+// 	})
+// );
+// });
+//
+// self.addEventListener("fetch", function (event) {
+// console.log(event.request.url);
+//
+// event.respondWith(
+// 	caches.match(event.request).then(function (response) {
+// 	return response || fetch(event.request);
+// 	})
+// );
+// });
 },{}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -158,7 +165,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "8033" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "1765" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
