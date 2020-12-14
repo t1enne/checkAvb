@@ -129,7 +129,16 @@ img.sku-picture.hidden {
   align-items: center;
 }
 
+.cui-overlay-open {
+  padding-right: 0px !important;
+}
+
+.cui-drawer-content {
+  padding: 0px !important;
+}
+
 .drawer-nav {
+  padding: 1rem;
   position: relative;
   height: 100%;
 }
@@ -255,6 +264,10 @@ input[name=css-tabs] {
   align-items: center;
 }
 
+.sizes-buttons {
+  margin: 15px 0;
+}
+
 .sizes-wrapper {
   margin-top: 1rem;
 }
@@ -300,6 +313,15 @@ input[name=css-tabs] {
 
 .new-client-inputs input[name="client-mail"] {
   text-transform: lowercase;
+}
+
+.client-edit-wrapper .inputs input {
+  text-transform: capitalize;
+  margin: 10px 0;
+}
+
+.mail-input input {
+  text-transform: lowercase !important;
 }
 
 ul.client-list {
@@ -368,6 +390,15 @@ ul.client-list .client-card span {
   justify-content: center;
   padding-top: 1.5rem;
   border-top: 1px dotted lightgray;
+}
+
+.assigned-searches,
+.unassigned-searches {
+  min-width: 45vw;
+}
+
+.cui-list-item-content-right {
+  text-align: right;
 }
 
 .searches-order-id {
@@ -507,6 +538,10 @@ svg.get-image path {
 .flex {
   display: flex;
   flex-wrap: wrap;
+}
+
+.space-b {
+  justify-content: space-between;
 }
 
 .flex.reverse {

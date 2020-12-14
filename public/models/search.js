@@ -7,6 +7,7 @@ let SearchInstanceSchema = new mongoose.Schema({
   color: String,
   size: String,
   sizeForReq: String,
+  descr: String,
   price: String,
   user: String,
   clientName: {type: String, default: "unassigned"},

@@ -20,8 +20,9 @@ async function getCookie(user, pwd) {
       body: `task=controllo&url_richiesto=&utente=${user}&password=${pwd}`,
       method: 'POST',
       mode: 'cors',
-    })
-    if(cookie.headers.raw()['set-cookie']){
+    }).then(res => res.headers.raw()['set-cookie'][0].split(';')[0])
+    if(cookie != undefined){
+      console.log(cookie);
       return {
         cookie
       }
@@ -51,6 +52,9 @@ async function getPrice(cookie, year, season, model) {
 
     let $ = cheerio.load(html);
 
+    const cc = $(`#tab6 > table a`)
+    console.log(cc);
+
     const buttonUrl = $('.actions > a').attr('href');
     const price = await fetch(`https://websmart.brunellocucinelli.it/bcweb/${buttonUrl}`, {
         credentials: 'include',
@@ -65,7 +69,7 @@ async function getPrice(cookie, year, season, model) {
       .then((priceHtml) => {
         $ = cheerio.load(priceHtml);
         const p = $('.mainlist:nth-child(1) tr:contains("SOLOMEO") > td:nth-child(2)').text();
-        return p;
+        return p.split('.').join('');
       });
     return price;
   } catch (e) {
@@ -215,6 +219,7 @@ async function availabilityRequest(cookie, model, color) {
     'Upgrade-Insecure-Requests': '1',
     Cookie: cookie,
   };
+
   try {
     const html = await fetch('https://websmart.brunellocucinelli.it/bcweb/WRTICMO10R.pgm', {
       credentials: 'include',
@@ -224,6 +229,8 @@ async function availabilityRequest(cookie, model, color) {
       method: 'POST',
       mode: 'cors',
     }).then((res) => res.text());
+
+    if( html.search('nonvalid') != -1 ) return 401
 
     // LOGGIN OUT RESULTS
     const $ = cheerio.load(html);
@@ -305,7 +312,8 @@ async function availabilityRequest(cookie, model, color) {
 
     return data.results;
   } catch (e) {
-    console.log(e.message);
+    console.log('error while fetching avb: ' + e.message);
+    return 404
   }
 }
 

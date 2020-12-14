@@ -25,15 +25,28 @@ import logo from './logo.svg'
 
 FocusManager.alwaysShowFocus();
 
-const {ordersSection, clientsSection, historySection} = require('/components/Tabs')
+const {
+  ordersSection,
+  clientsSection,
+  historySection
+} = require('/components/Tabs')
 
-import {Nav, showToast} from '/components/Nav';
+import {
+  Nav,
+  showToast
+} from '/components/Nav';
 
-import {Dhl} from '/components/Dhl'
+import {
+  Dhl
+} from '/components/Dhl'
+
+import EditClient from '/components/EditClient'
 
 import EditOrder from '/components/EditOrder';
 
-import {NOSALE} from './noSaleAI20';
+import {
+  NOSALE
+} from './noSaleAI20';
 
 let session;
 
@@ -47,64 +60,85 @@ let Login = {
     }
   },
   view: (vnode) => {
-    return [m('form.login', m('.logo-bg', {style: `width: auto; height: 100px; background: url(${logo}) no-repeat center;`}), m(Input, {
-        style: 'display:block;margin:5px auto;',
-        value: vnode.state.user,
-        contentLeft: m(Icon, {name: Icons.USER}),
-        placeholder: 'Your ASWEB Username',
-        autocomplete: 'username',
-        oncreate: (e) => {
-          // console.log(e);
-          e.dom.value = localStorage.user
-        },
-        oninput: (e) => {
-          vnode.state.user = e.srcElement.value
-        }
-      }), m(Input, {
-        style: 'display:block;margin:5px auto;',
-        value: vnode.state.pwd,
-        contentLeft: m(Icon, {name: Icons.LOCK}),
-        placeholder: 'Password',
-        type: 'password',
-        autocomplete: "current-password",
-        oncreate: (e) => {
-          // console.log(e);
-          e.dom.value = localStorage.pwd
-        },
-        oninput: (e) => {
-          localStorage.pwd = ''
-          vnode.state.pwd = e.srcElement.value
-        }
-      }), m(Button, {
-        label: 'LOGIN',
-        style: 'display:block;margin:5px auto;',
-        type: 'submit',
-        intent: 'primary',
-        onclick: (e) => {
-          console.log('clicked');
-          e.preventDefault();
+    return [m('form.login', m('.logo-bg', {
+      style: `width: auto; height: 100px; background: url(${logo}) no-repeat center;`
+    }), m(Input, {
+      style: 'display:block;margin:5px auto;',
+      value: vnode.state.user,
+      contentLeft: m(Icon, {
+        name: Icons.USER
+      }),
+      placeholder: 'Your ASWEB Username',
+      autocomplete: 'username',
+      oncreate: (e) => {
+        // console.log(e);
+        e.dom.value = localStorage.user
+      },
+      oninput: (e) => {
+        vnode.state.user = e.srcElement.value
+      }
+    }), m(Input, {
+      style: 'display:block;margin:5px auto;',
+      value: vnode.state.pwd,
+      contentLeft: m(Icon, {
+        name: Icons.LOCK
+      }),
+      placeholder: 'Password',
+      type: 'password',
+      autocomplete: "current-password",
+      oncreate: (e) => {
+        // console.log(e);
+        e.dom.value = localStorage.pwd
+      },
+      oninput: (e) => {
+        localStorage.pwd = ''
+        vnode.state.pwd = e.srcElement.value
+      }
+    }), m(Button, {
+      label: 'LOGIN',
+      style: 'display:block;margin:5px auto;',
+      type: 'submit',
+      intent: 'primary',
+      onclick: async (e) => {
+        console.log('clicked');
+        e.preventDefault();
 
-          login.authenticate(vnode.state.remember, vnode.state.user, vnode.state.pwd)
-          showToast(`Welcome back ${localStorage.user} !`, 'positive')
-        }
-      }), m(Switch, {
-        label: 'Remember me',
-        style: 'display: block;margin: auto;margin-top: 1rem;',
-        checked: vnode.state.remember,
-        onchange: () => {
-          vnode.state.remember = !vnode.state.remember
-        }
-      }))]
+        await login.authenticate(vnode.state.remember, vnode.state.user, vnode.state.pwd)
+        showToast(`Welcome back ${localStorage.user} !`, 'primary')
+      }
+    }), m(Switch, {
+      label: 'Remember me',
+      style: 'display: block;margin: auto;margin-top: 1rem;',
+      checked: vnode.state.remember,
+      onchange: () => {
+        vnode.state.remember = !vnode.state.remember
+      }
+    }))]
   }
 }
 
 //check if session exists
 let login = {
   async check() {
+    console.log('running check');
+    if (localStorage.smurf) {
+      console.log('setting session');
+      await m.request({
+        method: 'POST',
+        url: '/api/session',
+        headers: {
+          smurf: localStorage.smurf,
+          user: localStorage.user
+        }
+      }).then(res => {
+        console.log(res);
+        m.route.set('/main')
+      })
+    }
     session = await fetch('/logged').then(res => res.json())
-    session.user
-      ? m.route.set('/main')
-      : m.route.set('/login')
+    session.user ?
+      m.route.set('/main') :
+      m.route.set('/login')
   },
   async authenticate(remember, user, pwd) {
     m.request({
@@ -120,7 +154,7 @@ let login = {
         localStorage.user = session.user
         if (remember)
           localStorage.pwd = pwd
-      } 
+      }
       login.check()
     })
   }
@@ -144,23 +178,24 @@ let Home = {
 let SearchForm = {
   loading: false,
   clearResults: () => Home.results = [],
+  oninit: login.check,
   view: (vnode) => {
     return m("form", [
       m("div.model",
-      //m("input.model-input.twelve.columns[placeholder='Model'][type='text']")
-      m(Input, {
-        class: 'model-input',
-        style: 'width:75%;max-width:300px;',
-        placeholder: 'Model'
-      })),
+        //m("input.model-input.twelve.columns[placeholder='Model'][type='text']")
+        m(Input, {
+          class: 'model-input',
+          style: 'width:75%;max-width:300px;',
+          placeholder: 'Model'
+        })),
       m("div.color",
-      // m("input.color-input.twelve.columns[placeholder='Color'][type='text']")
-      m(Input, {
-        class: 'color-input',
-        style: 'width:75%;max-width:300px;',
-        placeholder: 'Color'
-      })),
-      m(".row.rower",),
+        // m("input.color-input.twelve.columns[placeholder='Color'][type='text']")
+        m(Input, {
+          class: 'color-input',
+          style: 'width:75%;max-width:300px;',
+          placeholder: 'Color'
+        })),
+      m(".row.rower", ),
       m("div.row.buttons-group", [
         // GET AVB
         // m("Button.clear-button.button[type='button'][style='width:150px;margin:5px 10px;']",
@@ -182,17 +217,32 @@ let SearchForm = {
             SearchForm.clearResults()
             vnode.state.loading = !vnode.state.loading
 
-            let model = document.querySelector('.model-input > input').value === ''
-              ? 'm'
-              : document.querySelector('.model-input > input').value
-            let color = document.querySelector('.color-input > input').value === ''
-              ? 'c'
-              : document.querySelector('.color-input > input').value
+            let model = document.querySelector('.model-input > input').value === '' ?
+              'm' :
+              document.querySelector('.model-input > input').value
+            let color = document.querySelector('.color-input > input').value === '' ?
+              'c' :
+              document.querySelector('.color-input > input').value
 
             //
 
-            await m.request({method: "GET", url: `/api/avb/${model}/${color}`}).then(res => {
-              Home.results = Object.values(res)
+            await m.request({
+              method: "GET",
+              url: `/api/avb/${model}/${color}`
+            }).then(res => {
+              console.log(res);
+              if (res === 404) {
+                showToast(`Cant connect to websmart!`, 'negative')
+              } else if (res === 401) {
+                showToast('Search Again!')
+                // localStorage.clear()
+                m.route.set('/login')
+              } else {
+                Home.results = Object.values(res)
+                if (Home.results.length === 0) {
+                  showToast('No results found!', 'negative')
+                }
+              }
             })
 
             vnode.state.loading = !vnode.state.loading;
@@ -210,10 +260,14 @@ function Sku() {
       vnode.state.imgSrc = ''
       vnode.state.availability = []
       vnode.state.imgFetched = false
+      vnode.state.discountedPrice = ''
       // vnode.state.price = '--,--'
       // vnode.state.sku = vnode.attrs.sku
       vnode.state.getPrice = () => {
-        m.request({method: 'GET', url: `/api/price/${vnode.attrs.sku.year}/${vnode.attrs.sku.season}/${vnode.attrs.sku.model}`}).then(res => {
+        m.request({
+          method: 'GET',
+          url: `/api/price/${vnode.attrs.sku.year}/${vnode.attrs.sku.season}/${vnode.attrs.sku.model}`
+        }).then(res => {
           vnode.state.price = res
         })
       }
@@ -226,89 +280,103 @@ function Sku() {
       let sku = vnode.attrs.sku
       let string = sku.string.split(' ').join('')
       sku.price = ''
+      let discountedPrice = null
       let content = m(`img.sku-image-${i}[src=${vnode.state.imgSrc}]`)
       return m(Card, {
-        class: `sku-wrapper`,
-        interactive: true,
-        elevated: 2,
-        fluid: true
-      }, m(`.sku`, m(`.sku-title.flex.row`, {
-        style: 'margin:10px'
-      },
-      // here will go skuString , svgButton and skuPrice
-      m('.string', sku.string), m(Popover, {
-        class: 'sku-picture',
-        hasArrow: true,
-        hasBackdrop: false,
-        position: 'top',
-        interactionType: 'click',
-        content,
-        trigger: m(Button, {
-          class: 'get-image',
-          iconLeft: Icons.IMAGE,
-          basic: true,
-          size: 'xl',
-          loading: vnode.state.loading,
-          onclick: () => {
-            if (!vnode.state.imgFetched) {
-              vnode.state.loading = !vnode.state.loading;
-              // e.preventDefault();
-              // e.stopPropagation();
-              fetch(`api/image/${sku.year}/${sku.season}/${sku.model}`).then(res => res.text()).then(url => {
-                vnode.state.imgFetched = true
-                vnode.state.imgSrc = url;
-                vnode.state.loading = !vnode.state.loading;
-                m.redraw()
-              })
-            }
-          }
-        })
-      }),
-      // m(PriceLabel, {
-      //   sku: sku,
-      //   price: vnode.state.price
-      // })
-      m(Tag, {
-        class: 'price-' + string,
-        intent: vnode.state.salable
-          ? 'negative'
-          : 'warning',
-        oninit: () => {
-          if (!vnode.state.price) {
-            m.request({method: "GET", url: `/api/price/${sku.year}/${sku.season}/${sku.model}`}).then(res => {
-              if (NOSALE.filter(e => e == sku.model + sku.color).length > 0) {
-                vnode.state.price = `€${res}`
-              } else if (sku.year + sku.season === '202') {
-                let sales = parseInt(res) * 0.7
-                vnode.state.price = `€${sales},00`
-                vnode.state.salable = true
-              } else {
-                vnode.state.price = `€${res}`
+          class: `sku-wrapper`,
+          interactive: true,
+          elevated: 2,
+          fluid: true
+        }, m(`.sku`, m(`.sku-title.flex.row`,
+          // here will go skuString , svgButton and skuPrice
+          m('.string', sku.string),
+          m('.basic'),
+          m(Popover, {
+            class: 'sku-picture',
+            hasArrow: true,
+            hasBackdrop: false,
+            position: 'top',
+            interactionType: 'click',
+            content,
+            trigger: m(Button, {
+              class: 'get-image',
+              iconLeft: Icons.IMAGE,
+              basic: true,
+              size: 'xl',
+              compact: true,
+              loading: vnode.state.loading,
+              onclick: () => {
+                if (!vnode.state.imgFetched) {
+                  vnode.state.loading = !vnode.state.loading;
+                  // e.preventDefault();
+                  // e.stopPropagation();
+                  fetch(`api/image/${sku.year}/${sku.season}/${sku.model}`).then(res => res.text()).then(url => {
+                    vnode.state.imgFetched = true
+                    vnode.state.imgSrc = url;
+                    vnode.state.loading = !vnode.state.loading;
+                    m.redraw()
+                  })
+                }
               }
             })
-          }
-        },
-        label: vnode.state.price
-      }))), m('.row[style="display: block;"]', [
-        // here go sku.desc and sizes
-        m(Tag, {
-          label: sku.descr,
-          intent: 'warning',
-          size: 'xs'
-        }),
-        // Size Buttons
-        sku.sizes.map((item, i) => {
-          return m(SizeButton, {
-            sku: sku,
-            i: i
+          }))),
+        m('.row.labels-rows.flex.space-b', [
+          // here go sku.desc and sizes
+          m(Button, {
+            label: sku.descr,
+            intent: 'warning',
+            size: 'xs'
+          }),
+          m(Button, {
+            class: 'price-' + string,
+            size: 'xs',
+            intent: vnode.state.salable ?
+              'negative' : 'warning',
+            oncreate: () => {
+              console.log('creating');
+              if (!vnode.state.price) {
+                vnode.state.price = 'fetching'
+                m.request({
+                  method: "GET",
+                  url: `/api/price/${sku.year}/${sku.season}/${sku.model}`
+                }).then(res => {
+                  if (NOSALE.filter(e => e == sku.model + sku.color).length > 0 && sku.year + sku.season === '202') {
+                    vnode.dom.querySelector('.basic').textContent = 'BASICO'
+                    vnode.state.price = res
+                  } else if (sku.year + sku.season === '202') {
+                    vnode.state.salable = true
+                    vnode.state.price = res
+                  } else {
+                    vnode.state.price = res
+                  }
+                })
+              }
+            },
+            sublabel: `€${vnode.state.price}`,
+            label: vnode.state.discountedPrice,
+            onclick() {
+              if (vnode.state.salable) {
+                vnode.state.discountedPrice = parseInt(vnode.state.price) * 0.7
+                let sub = vnode.dom.querySelector('.cui-button-sublabel')
+                sub.style.textDecoration = 'line-through'
+              }
+            }
           })
-        }),
+        ]),
+        // Size Buttons
+        m('.sizes-buttons',
+          sku.sizes.map((item, i) => {
+            return m(SizeButton, {
+              sku: sku,
+              i: i
+            })
+          })),
         m('.sizes-wrapper', {}, sku.sizes.map((item, i) => {
           let string = sku.string.split(' ').join('')
           return m(`ul.size-wrapper.size-${i}-${string}`)
         }))
 
-      ]))
+      )
     }
   }
 }
@@ -320,7 +388,10 @@ function SizeButton() {
   let isLoading = false
 
   function getShops(sku, i) {
-    m.request({method: 'GET', url: `/api/${sku.year}/${sku.season}/${sku.model}/${sku.color}/${sku.sizesForRequests[i]}`}).then(res => {
+    m.request({
+      method: 'GET',
+      url: `/api/${sku.year}/${sku.season}/${sku.model}/${sku.color}/${sku.sizesForRequests[i]}`
+    }).then(res => {
       shops = Object.values(res)[0]
       isLoading = !isLoading
     })
@@ -330,67 +401,88 @@ function SizeButton() {
     view(vnode) {
       let i = vnode.attrs.i
       let sku = vnode.attrs.sku
+      let {
+        year,
+        season,
+        model,
+        color,
+        descr
+      } = sku
       let size = vnode.attrs.sku.sizes[i]
       let sizeForReq = vnode.attrs.sku.sizesForRequests[i]
 
       return [m(Button, {
-          label: size,
-          style: 'margin: 0 2px;',
-          loading: isLoading,
-          intent: 'positive',
-          size: 'xs',
-          requestSize: sizeForReq,
-          onclick: async () => {
-            isLoading = !isLoading
-            await getShops(sku, i)
-            let string = sku.string.split(' ').join('')
-            m.mount(document.querySelector(`ul.size-${i}-${string}`), {
-              oninit: (vnode) => {
-                vnode.state.intent = 'warning'
-              },
-              view: () => {
-                let string = sku.string.split(' ').join('')
+        label: size,
+        style: 'margin: 0 2px;',
+        loading: isLoading,
+        intent: 'positive',
+        size: 'xs',
+        requestSize: sizeForReq,
+        onclick: async () => {
+          isLoading = !isLoading
+          await getShops(sku, i)
+          let string = sku.string.split(' ').join('')
+          m.mount(document.querySelector(`ul.size-${i}-${string}`), {
+            oninit: (vnode) => {
+              vnode.state.intent = 'warning'
+            },
+            view: () => {
+              let string = sku.string.split(' ').join('')
 
-                if (Object.keys(shops)[0]) {
-                  return [
-                    m(Tag, {
-                      label: Object.keys(shops)[0],
-                      intent: 'positive'
-                    }),
-                    m(Button, {
-                      iconLeft: Icons.PLUS,
-                      size: 'xs',
-                      basic: true,
-                      outline: true,
-                      onclick: () => {
-                        // ADD SEARCH
-                        let price = document.querySelector('.price-' + string).textContent.split(',')[0].split('.').join('')
+              if (Object.keys(shops)[0]) {
+                return [
+                  m(Tag, {
+                    label: Object.keys(shops)[0],
+                    intent: 'positive'
+                  }),
+                  m(Button, {
+                    iconLeft: Icons.PLUS,
+                    size: 'xs',
+                    basic: true,
+                    outline: true,
+                    onclick: () => {
+                      // ADD SEARCH
+                      let price = document.querySelector('.price-' + string).textContent.split('€')[1].split(',')[0].split('.').join('')
+                      console.log(price);
 
-                        m.request({method: "GET", url: `/api/addSearch/${session.user}/${sku.year}/${sku.season}/${sku.model}/${sku.color}/${size}/${sizeForReq}/${price}`}).then(res => {
-                          if (res._id) {
-                            console.log(res._id);
-                            showToast(`Added Search ${sku.string} ${size}!`, 'positive')
-                          } else {
-                            showToast(`Couldn't add Search ${sku.string} ${size}!`, 'negative')
-                          }
-                        })
-                      }
-                    }),
-                    Object.values(shops)[0].map(item => {
-                      if (item.search('NEGOZIO SOLOMEO') != -1) {
-                        return m('.list-item.solomeo', item)
-                      } else {
-                        return m(`.list-item`, item)
-                      }
-                    })
-                  ]
-                }
+                      m.request({
+                        method: "GET",
+                        url: `/api/addSearch`,
+                        headers: {
+                          year,
+                          season,
+                          model,
+                          price,
+                          color,
+                          descr,
+                          size,
+                          sizeForReq
+                        }
+                      }).then(res => {
+                        if (res._id) {
+                          console.log(res._id);
+                          showToast(`Added Search ${sku.string} ${size}!`, 'primary')
+                        } else {
+                          showToast(`Couldn't add Search ${sku.string} ${size}!`, 'negative')
+                        }
+                      })
+                    }
+                  }),
+                  Object.values(shops)[0].map(item => {
+                    if (item.search('NEGOZIO SOLOMEO') != -1) {
+                      return m('.list-item.solomeo', item)
+                    } else {
+                      return m(`.list-item`, item)
+                    }
+                  })
+                ]
               }
+            }
 
-            })
+          })
 
-          }
-        })]
+        }
+      })]
     }
   }
 }
@@ -427,7 +519,7 @@ function SizeButton() {
 m.route(document.body, '/main', {
   '/main': {
     onmatch: () => {
-      if (!session) {
+      if (!localStorage.smurf) {
         login.check()
       } else
         return Home
@@ -438,5 +530,6 @@ m.route(document.body, '/main', {
   '/clients': clientsSection,
   '/history': historySection,
   '/dhlTracking': Dhl,
-  '/orders/edit/:id': EditOrder
+  '/orders/edit/:id': EditOrder,
+  '/clients/edit/:id': EditClient
 })

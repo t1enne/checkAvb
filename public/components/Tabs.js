@@ -344,6 +344,7 @@ let clientsSection = {
               }),
               m(Button, {
                 type: 'submit',
+                style: 'display:block;',
                 label: "Add Client",
                 // CREATE NEW CLIENT
                 onclick: async () => {
@@ -351,9 +352,6 @@ let clientsSection = {
                   let surname = document.querySelector('input[name="client-surname"]').value.trim()
                   let mail = document.querySelector('input[name="client-mail"]').value.trim()
                   let phone = document.querySelector('input[name="client-phone"]').value.trim()
-
-                  console.log(mail);
-
                   await m.request({
                     method: "GET",
                     url: `/api/newClient`,
@@ -365,6 +363,8 @@ let clientsSection = {
                     }
                   }).then(client => {
                     Clients.clientsList.push(client)
+                    document.querySelector('.new-client.row').classList.toggle('reveal-inputs')
+                    showToast(`Added ${client.fullname}!`, 'primary')
                   })
                 }
               })
@@ -383,6 +383,18 @@ let historySection = {
     return [m(Nav),
       m('.container.searches',
         m("h1", "A History of your Searches"),
+        m(Button, {
+          basic: true,
+          iconLeft: Icons.TRASH,
+          compact: true,
+          label: 'Clear Unassigned Searches',
+          onclick() {
+            m.request({
+              method: 'DELETE',
+              url: '/api/deleteSearches'
+            }).then(res => showToast(`Deleted ${res} Searches!`, 'negative'))
+          }
+        }),
         m(Button, {
           basic: true,
           iconLeft: Icons.REFRESH_CW,

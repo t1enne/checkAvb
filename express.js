@@ -34,7 +34,7 @@ app.use(cookieParser());
 app.use(session({
   secret: 'keyboard cat',
   cookie: {
-    maxAge: 1000 * 60 * 24 * 30,
+    maxAge: 1000 * 60 * 5,
     sameSite: 'strict'
   },
   rolling: true,
@@ -52,6 +52,12 @@ app.get('/logged', (req, res) => {
   } else {
     res.end('Not Logged!')
   }
+})
+
+app.post('/api/session', (req, res) => {
+  req.session.smurf = req.headers.smurf
+  req.session.user = req.headers.user
+  res.json(req.session)
 })
 
 
@@ -100,6 +106,9 @@ app.get('/api/logout', async (req, res) => {
 
 //GET IMAGE
 app.get(`/api/image/:year/:season/:model/`, async (req, res) => {
+  if(!req.session.smurf) {
+    req.session.smurf = req.headers.smurf
+  }
   let b64 = await getter.getImage(req.session.smurf, req.params.year, req.params.season, req.params.model);
   // setTimeout(() => {
   //
@@ -114,6 +123,9 @@ app.get('/api/avb/:model/:color/', async (req, res) => {
   res.json(avb)
 });
 
+// app.get('/api/anagrafica', async (req, res) => {
+//
+// })
 // GET receivables
 app.get(`/api/request/:year/:season/:model/:color/`, async (req, res) => {
   const tr = await getter.getReceivables(req.session.smurf, req.params.year, req.params.season, req.params.model, req.params.color);
@@ -133,16 +145,19 @@ app.get(`/api/price/:year/:season/:model/`, async (req, res) => {
 });
 
 // Add Search
-app.get(`/api/addSearch/:user/:year/:season/:model/:color/:size/:sizeForReq/:price`, async (req, res) => {
+app.get(`/api/addSearch`, async (req, res) => {
+  console.log(req.headers)
+
   let order = await new SearchInstance({
-    year: req.params.year,
-    season: req.params.season,
-    model: req.params.model,
-    color: req.params.color,
-    size: req.params.size,
-    price: req.params.price,
-    sizeForReq: req.params.sizeForReq,
-    user: req.params.user
+    year: req.headers.year,
+    season: req.headers.season,
+    model: req.headers.model,
+    color: req.headers.color,
+    size: req.headers.size,
+    price: req.headers.price,
+    sizeForReq: req.headers.sizeForReq,
+    descr: req.headers.descr,
+    user: req.session.user
   });
   order.save((err, search) => {
     if (err)
@@ -190,7 +205,6 @@ app.get('/api/addToClient/:orderId/:searchId', async (req, res) => {
     }, updateSearch, null,
     function(err, order) {
       if (err) console.error(err);
-      console.log('assigned ' + order);
       res.json(order)
     })
 })
@@ -245,8 +259,7 @@ app.get(`/api/:order/SearchInstances`, async (req, res) => {
     order: req.params.order
   }, (err, searches) => {
     console.log('Getting assigned searches for order ' + req.params.order);
-    if (err)
-      console.error(err);
+    if (err) console.error(err);
     res.json(searches)
   })
 });
@@ -256,8 +269,7 @@ app.get(`/api/:user/SearchInstances`, async (req, res) => {
   await SearchInstance.find({
     user: req.params.user
   }, (err, searches) => {
-    if (err)
-      console.error(err);
+    if (err) console.error(err);
     res.json(searches)
   })
 });
@@ -280,8 +292,26 @@ app.get(`/api/SearchInstances`, async (req, res) => {
     if (err)
       console.error(err);
     res.json(searches)
-  })
+  }).sort({ dateObj: -1 })
 });
+
+app.delete('/api/deleteSearches', async (req, res) => {
+  await SearchInstance.deleteMany({ order: 'unassigned' }, (err, searches) => {
+    if(err) console.error(err);
+    console.log('deleted ' + searches.n);
+    res.json(searches.n)
+  })
+})
+
+
+app.delete('/api/deleteAssignedSearches/', async (req, res) => {
+  console.log(req.headers);
+  await SearchInstance.deleteMany({ order: req.headers.order }, (err, searches) => {
+    if(err) console.error(err);
+    console.log('deleted ' + searches.n);
+    res.json(searches.n)
+  })
+})
 
 // DISPLAY ALL CLIENTS
 app.get(`/api/listClients`, async (req, res) => {
@@ -291,6 +321,30 @@ app.get(`/api/listClients`, async (req, res) => {
     res.json(clients)
   })
 });
+
+// DISPLAY ONE CLIENT
+app.get(`/api/client/:id`, async (req, res) => {
+  await Client.find({ _id: req.params.id}, (err, client) => {
+    if (err) console.error(err);
+    res.json(client)
+  })
+})
+
+// UPDATE ONE CLIENT
+app.post('/api/updateClient', async (req, res) => {
+  let update = {
+    name: req.headers.name,
+    surname: req.headers.surname,
+    mail: req.headers.mail,
+    phone: req.headers.phone
+  }
+  await Client.findOneAndUpdate({ _id: req.headers.id }, update, {
+    new: true
+  }, (err, client) => {
+    if(err) console.error(err);
+    res.json(client)
+  })
+})
 
 // GET TRACKING STATUS
 app.get('/api/tracking/:awb', async (req, res) => {
