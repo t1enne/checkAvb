@@ -58,6 +58,7 @@ let Login = {
     if (localStorage.pwd) {
       vnode.state.remember = true
     }
+    login.check()
   },
   view: (vnode) => {
     return [m('form.login', m('.logo-bg', {
