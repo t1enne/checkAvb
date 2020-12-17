@@ -1,12 +1,12 @@
 {
   "name": "Disponibilità BC",
-  "short_name": "DispBC",
+  "short_name": "DispoBC",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "white",
   "theme_color": "white",
   "scope": ".",
-  "description": "This is a PWA tutorial.",
+  "description": "Simple Wrapper for WEBSMART",
   "icons": [{
       "src": "favicon192.png",
       "sizes": "192x192",

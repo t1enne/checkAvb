@@ -155,7 +155,7 @@ app.get(`/api/addSearch`, async (req, res) => {
     color: req.headers.color,
     size: req.headers.size,
     price: req.headers.price,
-    sizeForReq: req.headers.sizeForReq,
+    sizeForReq: req.headers.sizeforreq,
     descr: req.headers.descr,
     user: req.session.user
   });

@@ -22,6 +22,7 @@ import {
 import '../node_modules/construct-ui/lib/index.css'
 
 import logo from './logo.svg'
+import {login} from '/components/login'
 
 FocusManager.alwaysShowFocus();
 
@@ -42,13 +43,13 @@ import {
 
 import EditClient from '/components/EditClient'
 
+import {Searches} from '/components/Searches'
+
 import EditOrder from '/components/EditOrder';
 
 import {
   NOSALE
 } from './noSaleAI20';
-
-let session;
 
 let Login = {
   remember: false,
@@ -118,54 +119,11 @@ let Login = {
   }
 }
 
-//check if session exists
-let login = {
-  async check() {
-    console.log('running check');
-    if (localStorage.smurf) {
-      console.log('setting session');
-      await m.request({
-        method: 'POST',
-        url: '/api/session',
-        headers: {
-          smurf: localStorage.smurf,
-          user: localStorage.user
-        }
-      }).then(res => {
-        console.log(res);
-        m.route.set('/main')
-      })
-    }
-    session = await fetch('/logged').then(res => res.json())
-    session.user ?
-      m.route.set('/main') :
-      m.route.set('/login')
-  },
-  async authenticate(remember, user, pwd) {
-    m.request({
-      url: `/api/login`,
-      headers: {
-        'user': user,
-        'pwd': pwd
-      }
-    }).then(res => {
-      if (res.user) {
-        session = res
-        localStorage.smurf = session.smurf
-        localStorage.user = session.user
-        if (remember)
-          localStorage.pwd = pwd
-      }
-      login.check()
-    })
-  }
-}
-
 let Home = {
   results: [],
   size: 'xl',
   view: () => {
-    return m('.main', m(Nav), m('.search', m('h1', 'Disponibilita'), m('.search-form', m(SearchForm))), m('.results', Home.results.map((item, i) => {
+    return m('.main', m(Nav), m('.search', m('h1', 'Disponibilità'), m('.search-form', m(SearchForm))), m('.results', Home.results.map((item, i) => {
       return m('.sku-wrapper-key', {
         key: item.id
       }, m(Sku, {
@@ -334,9 +292,7 @@ function Sku() {
             intent: vnode.state.salable ?
               'negative' : 'warning',
             oncreate: () => {
-              console.log('creating');
               if (!vnode.state.price) {
-                vnode.state.price = 'fetching'
                 m.request({
                   method: "GET",
                   url: `/api/price/${sku.year}/${sku.season}/${sku.model}`
@@ -357,7 +313,7 @@ function Sku() {
             label: vnode.state.discountedPrice,
             onclick() {
               if (vnode.state.salable) {
-                vnode.state.discountedPrice = parseInt(vnode.state.price) * 0.7
+                vnode.state.discountedPrice = parseInt(parseInt(vnode.state.price) * 0.7)
                 let sub = vnode.dom.querySelector('.cui-button-sublabel')
                 sub.style.textDecoration = 'line-through'
               }
@@ -462,7 +418,8 @@ function SizeButton() {
                       }).then(res => {
                         if (res._id) {
                           console.log(res._id);
-                          showToast(`Added Search ${sku.string} ${size}!`, 'primary')
+                          showToast(`Added Search ${sku.string} ${size}!`, 'positive')
+                          Searches.searchesList.splice(0, 0, res)
                         } else {
                           showToast(`Couldn't add Search ${sku.string} ${size}!`, 'negative')
                         }

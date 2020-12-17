@@ -142,17 +142,6 @@ let Orders = {
           label: order.date,
           class: 'date'
         })
-        // m(Tag, {
-        //   label: order.user,
-        //   intent: 'primary',
-        //   class: 'user'
-        // })
-        //, m(Tag, {
-        //   label: order._id,
-        //   class: 'url',
-        //   size: 'xs',
-        //   url: order._id
-        // })
       ], [
         m(
           List, {
@@ -192,8 +181,6 @@ let Orders = {
             let list = vnode.dom.querySelector('.assigned-searches')
             list.classList.toggle('collapsed')
             expandIcon.classList.toggle('reversed')
-            // let svg = e.target.children[0]
-            m.redraw()
           }
         })
       ])
@@ -209,16 +196,6 @@ let Orders = {
           o: o
         })
       }))
-      // m('h1', 'Unassigned Searches'),
-      // m(Card, {
-      //   fluid: true
-      // }, m(List, {
-      //   class: 'unassigned-searches',
-      //   interactive: false,
-      //   size: 'xs'
-      // }, m('.list-items-wrapper',
-      //   array
-      // )))
     ]
   }
 }

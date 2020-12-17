@@ -53,7 +53,7 @@ async function getPrice(cookie, year, season, model) {
     let $ = cheerio.load(html);
 
     const cc = $(`#tab6 > table a`)
-    console.log(cc);
+    // console.log(cc);
 
     const buttonUrl = $('.actions > a').attr('href');
     const price = await fetch(`https://websmart.brunellocucinelli.it/bcweb/${buttonUrl}`, {
