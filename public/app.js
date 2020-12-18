@@ -59,7 +59,7 @@ let Login = {
     if (localStorage.pwd) {
       vnode.state.remember = true
     }
-    login.check()
+    // login.check()
   },
   view: (vnode) => {
     return [m('form.login', m('.logo-bg', {
@@ -134,7 +134,7 @@ let Home = {
 let SearchForm = {
   loading: false,
   clearResults: () => Home.results = [],
-  oninit: login.check,
+  // oninit: login.check,
   view: (vnode) => {
     return m("form", [
       m("div.model",

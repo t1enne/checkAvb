@@ -10,10 +10,14 @@ let session = null
 let login = {
   async check() {
     console.log('running check');
+    console.log(session);
+    if(!session.smurf) {
     session = await fetch('/logged').then(res => res.json())
+    }
     session.user && location.hash === '#!/login' ?
       m.route.set('/main') :
       m.route.set('/login')
+
   },
   async setDev() {
     if (localStorage.smurf) {

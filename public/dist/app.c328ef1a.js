@@ -15050,8 +15050,6 @@ var _constructUi = require("construct-ui");
 
 var _logo = _interopRequireDefault(require("../logo.svg"));
 
-var _login = require("./login");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var AppToaster = new _constructUi.Toaster();
@@ -15184,8 +15182,6 @@ var Nav = {
   },
   // navHomeButton: true ? { IconLeft: Icons.HOME } : { iconLeft: Icons.CHEVRON_LEFT },
   oninit: function oninit(vnode) {
-    _login.login.check();
-
     if (location.hash != '#!/main') vnode.state.buttonOptions = {
       iconLeft: _constructUi.Icons.CHEVRON_LEFT,
       label: 'Back',
@@ -15220,7 +15216,7 @@ var Nav = {
 };
 exports.Nav = Nav;
 exports.showToast = showToast;
-},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../logo.svg":"logo.svg","./login":"components/login.js"}],"components/login.js":[function(require,module,exports) {
+},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../logo.svg":"logo.svg"}],"components/login.js":[function(require,module,exports) {
 "use strict";
 
 var _mithril = _interopRequireDefault(require("mithril"));
@@ -15243,16 +15239,25 @@ var login = {
           switch (_context.prev = _context.next) {
             case 0:
               console.log('running check');
-              _context.next = 3;
+              console.log(session);
+
+              if (session.smurf) {
+                _context.next = 6;
+                break;
+              }
+
+              _context.next = 5;
               return fetch('/logged').then(function (res) {
                 return res.json();
               });
 
-            case 3:
+            case 5:
               session = _context.sent;
+
+            case 6:
               session.user && location.hash === '#!/login' ? _mithril.default.route.set('/main') : _mithril.default.route.set('/login');
 
-            case 5:
+            case 7:
             case "end":
               return _context.stop();
           }
@@ -16764,9 +16769,8 @@ var Login = {
   oninit: function oninit(vnode) {
     if (localStorage.pwd) {
       vnode.state.remember = true;
-    }
+    } // login.check()
 
-    _login.login.check();
   },
   view: function view(vnode) {
     return [(0, _mithril.default)('form.login', (0, _mithril.default)('.logo-bg', {
@@ -16859,7 +16863,7 @@ var SearchForm = {
   clearResults: function clearResults() {
     return Home.results = [];
   },
-  oninit: _login.login.check,
+  // oninit: login.check,
   view: function view(vnode) {
     return (0, _mithril.default)("form", [(0, _mithril.default)("div.model", //m("input.model-input.twelve.columns[placeholder='Model'][type='text']")
     (0, _mithril.default)(_constructUi.Input, {
@@ -17251,7 +17255,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "13007" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "14651" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

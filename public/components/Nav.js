@@ -1,6 +1,17 @@
 import m from 'mithril'
 
-import { Button, Icon, Icons, Menu, MenuItem, Drawer, Tag, Breadcrumb, BreadcrumbItem, Toaster } from 'construct-ui'
+import {
+  Button,
+  Icon,
+  Icons,
+  Menu,
+  MenuItem,
+  Drawer,
+  Tag,
+  Breadcrumb,
+  BreadcrumbItem,
+  Toaster
+} from 'construct-ui'
 
 import logo from '../logo.svg'
 
@@ -41,7 +52,9 @@ let DrawerContent = {
           iconLeft: Icons.CHEVRON_RIGHT,
           basic: true,
           style: 'float:right;',
-          onclick() {vnode.state.drawerOpen = false}
+          onclick() {
+            vnode.state.drawerOpen = false
+          }
         }),
         m(m.route.Link, {
           href: '/main'
@@ -111,11 +124,13 @@ let DrawerContent = {
             label: 'Log Out',
             onclick: () => {
               // localStorage.clear()
-              m.request({url: '/api/logout'})
-              .then(res => {
-                console.log(res);
-                m.route.set('/login')
-              })
+              m.request({
+                  url: '/api/logout'
+                })
+                .then(res => {
+                  console.log(res);
+                  m.route.set('/login')
+                })
             }
           })))))
     })]
@@ -127,19 +142,21 @@ let Nav = {
     iconLeft: Icons.HOME,
     size: 'lg',
     basic: true,
-    onclick() {m.route.set('/home')}
+    onclick() {
+      m.route.set('/home')
+    }
   },
   // navHomeButton: true ? { IconLeft: Icons.HOME } : { iconLeft: Icons.CHEVRON_LEFT },
   oninit(vnode) {
-    if(localStorage.smurf) {
 
-    }
-    if(location.hash != '#!/main') vnode.state.buttonOptions = {
+    if (location.hash != '#!/main') vnode.state.buttonOptions = {
       iconLeft: Icons.CHEVRON_LEFT,
       label: 'Back',
       size: 'lg',
       basic: true,
-      onclick() { history.back() }
+      onclick() {
+        history.back()
+      }
     }
   },
   view: (vnode) => {
@@ -164,9 +181,10 @@ let Nav = {
         m(Button, vnode.state.buttonOptions),
         m(`img.logo[src=${logo}][alt='logo']`),
         m(DrawerContent)),
-        m(AppToaster, {
-          position: 'top'
-        })]
+      m(AppToaster, {
+        position: 'top'
+      })
+    ]
   }
 }
 
