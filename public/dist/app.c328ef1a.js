@@ -15241,23 +15241,11 @@ var login = {
               console.log('running check');
               console.log(session);
 
-              if (session.smurf) {
-                _context.next = 6;
-                break;
+              if (session.smurf && location.hash === '#!/login') {
+                _mithril.default.route.set('/main');
               }
 
-              _context.next = 5;
-              return fetch('/logged').then(function (res) {
-                return res.json();
-              });
-
-            case 5:
-              session = _context.sent;
-
-            case 6:
-              session.user && location.hash === '#!/login' ? _mithril.default.route.set('/main') : _mithril.default.route.set('/login');
-
-            case 7:
+            case 3:
             case "end":
               return _context.stop();
           }
@@ -17255,7 +17243,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "14651" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "1071" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

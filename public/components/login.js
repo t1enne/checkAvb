@@ -13,7 +13,7 @@ let login = {
     console.log(session);
     if(session.smurf && location.hash === '#!/login') {
         m.route.set('/main')
-    } 
+    }
   },
   async setDev() {
     if (localStorage.smurf) {
