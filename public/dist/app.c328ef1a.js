@@ -15250,7 +15250,7 @@ var login = {
 
             case 3:
               session = _context.sent;
-              session.user && location.hash === '#!/login' ? _mithril.default.route.set('/main') : login.set();
+              session.user && location.hash === '#!/login' ? _mithril.default.route.set('/main') : _mithril.default.route.set('/login');
 
             case 5:
             case "end":
@@ -15260,7 +15260,7 @@ var login = {
       }, _callee);
     }))();
   },
-  set: function set() {
+  setDev: function setDev() {
     return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
       return regeneratorRuntime.wrap(function _callee2$(_context2) {
         while (1) {
@@ -15318,6 +15318,7 @@ var login = {
                   localStorage.smurf = session.smurf;
                   localStorage.user = session.user;
                   if (remember) localStorage.pwd = pwd;
+                  (0, _Nav.showToast)("Welcome back ".concat(localStorage.user, " !"), 'primary');
                 }
 
                 login.check();
@@ -16481,6 +16482,7 @@ function AssignedSearch() {
         }
       }), (0, _mithril.default)('.left-content[style=align-items:center;]', (0, _mithril.default)('.sku-detail.label', "".concat(item.year).concat(item.season, " ").concat(item.model, " ").concat(item.color, " ").concat(item.size)), (0, _mithril.default)(_constructUi.Select, {
         size: 'xs',
+        basic: true,
         style: 'margin-right:10px;',
         options: ['N/A', 'NEG1', 'DOS', 'ECOMM', 'HQ']
       })), (0, _mithril.default)('.right-content[style=overflow:hidden;]', // m(Select, {
@@ -16757,8 +16759,8 @@ var _require = require('/components/Tabs'),
 
 var Login = {
   remember: false,
-  user: '',
-  pwd: '',
+  user: localStorage.user,
+  pwd: localStorage.pwd,
   oninit: function oninit(vnode) {
     if (localStorage.pwd) {
       vnode.state.remember = true;
@@ -16778,7 +16780,7 @@ var Login = {
       placeholder: 'Your ASWEB Username',
       autocomplete: 'username',
       oncreate: function oncreate(e) {
-        // console.log(e);
+        console.log(e, localStorage);
         e.dom.value = localStorage.user;
       },
       oninput: function oninput(e) {
@@ -16793,12 +16795,9 @@ var Login = {
       placeholder: 'Password',
       type: 'password',
       autocomplete: "current-password",
-      oncreate: function oncreate(e) {
-        // console.log(e);
-        e.dom.value = localStorage.pwd;
+      oncreate: function oncreate(e) {// console.log(e);
       },
       oninput: function oninput(e) {
-        localStorage.pwd = '';
         vnode.state.pwd = e.srcElement.value;
       }
     }), (0, _mithril.default)(_constructUi.Button, {
@@ -16818,9 +16817,6 @@ var Login = {
                   return _login.login.authenticate(vnode.state.remember, vnode.state.user, vnode.state.pwd);
 
                 case 4:
-                  (0, _Nav.showToast)("Welcome back ".concat(localStorage.user, " !"), 'primary');
-
-                case 5:
                 case "end":
                   return _context.stop();
               }
@@ -16952,8 +16948,7 @@ function Sku() {
       vnode.state.imgSrc = '';
       vnode.state.availability = [];
       vnode.state.imgFetched = false;
-      vnode.state.discountedPrice = ''; // vnode.state.price = '--,--'
-      // vnode.state.sku = vnode.attrs.sku
+      vnode.state.discountedPrice = ''; // vnode.state.sku = vnode.attrs.sku
 
       vnode.state.getPrice = function () {
         _mithril.default.request({
@@ -17021,6 +17016,8 @@ function Sku() {
         intent: vnode.state.salable ? 'negative' : 'warning',
         oncreate: function oncreate() {
           if (!vnode.state.price) {
+            vnode.state.price = 'fetching';
+
             _mithril.default.request({
               method: "GET",
               url: "/api/price/".concat(sku.year, "/").concat(sku.season, "/").concat(sku.model)
@@ -17254,7 +17251,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "11683" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "13007" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

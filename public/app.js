@@ -53,8 +53,8 @@ import {
 
 let Login = {
   remember: false,
-  user: '',
-  pwd: '',
+  user: localStorage.user,
+  pwd: localStorage.pwd,
   oninit: (vnode) => {
     if (localStorage.pwd) {
       vnode.state.remember = true
@@ -73,7 +73,7 @@ let Login = {
       placeholder: 'Your ASWEB Username',
       autocomplete: 'username',
       oncreate: (e) => {
-        // console.log(e);
+        console.log(e, localStorage);
         e.dom.value = localStorage.user
       },
       oninput: (e) => {
@@ -90,10 +90,8 @@ let Login = {
       autocomplete: "current-password",
       oncreate: (e) => {
         // console.log(e);
-        e.dom.value = localStorage.pwd
       },
       oninput: (e) => {
-        localStorage.pwd = ''
         vnode.state.pwd = e.srcElement.value
       }
     }), m(Button, {
@@ -106,7 +104,6 @@ let Login = {
         e.preventDefault();
 
         await login.authenticate(vnode.state.remember, vnode.state.user, vnode.state.pwd)
-        showToast(`Welcome back ${localStorage.user} !`, 'primary')
       }
     }), m(Switch, {
       label: 'Remember me',
@@ -220,7 +217,6 @@ function Sku() {
       vnode.state.availability = []
       vnode.state.imgFetched = false
       vnode.state.discountedPrice = ''
-      // vnode.state.price = '--,--'
       // vnode.state.sku = vnode.attrs.sku
       vnode.state.getPrice = () => {
         m.request({
@@ -293,6 +289,7 @@ function Sku() {
               'negative' : 'warning',
             oncreate: () => {
               if (!vnode.state.price) {
+                vnode.state.price = 'fetching'
                 m.request({
                   method: "GET",
                   url: `/api/price/${sku.year}/${sku.season}/${sku.model}`
@@ -419,7 +416,7 @@ function SizeButton() {
                         if (res._id) {
                           console.log(res._id);
                           showToast(`Added Search ${sku.string} ${size}!`, 'positive')
-                          Searches.searchesList.splice(0, 0, res)
+                          Searches.searchesList.splice(0, 0 ,res)
                         } else {
                           showToast(`Couldn't add Search ${sku.string} ${size}!`, 'negative')
                         }

@@ -13,9 +13,9 @@ let login = {
     session = await fetch('/logged').then(res => res.json())
     session.user && location.hash === '#!/login' ?
       m.route.set('/main') :
-      login.set()
+      m.route.set('/login')
   },
-  async set() {
+  async setDev() {
     if (localStorage.smurf) {
       console.log('setting session');
       await m.request({
@@ -44,8 +44,8 @@ let login = {
         session = res
         localStorage.smurf = session.smurf
         localStorage.user = session.user
-        if (remember)
-          localStorage.pwd = pwd
+        if (remember)  localStorage.pwd = pwd
+        showToast(`Welcome back ${localStorage.user} !`, 'primary')
       }
       login.check()
     })

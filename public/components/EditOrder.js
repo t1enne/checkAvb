@@ -73,6 +73,7 @@ function AssignedSearch() {
           m('.sku-detail.label', `${item.year}${item.season} ${item.model} ${item.color} ${item.size}`),
           m(Select, {
             size: 'xs',
+            basic: true,
             style: 'margin-right:10px;',
             options: ['N/A', 'NEG1', 'DOS', 'ECOMM', 'HQ']
           })
