@@ -11,7 +11,7 @@ let login = {
   async check() {
     console.log('running check');
     console.log(session);
-    if(session.smurf && location.hash === '#!/login') {
+    if(session && location.hash === '#!/login') {
         m.route.set('/main')
     }
   },
