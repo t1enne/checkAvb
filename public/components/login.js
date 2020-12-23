@@ -10,9 +10,10 @@ let session = null
 let login = {
   async check() {
     console.log('running check');
-    console.log(session);
     if(session && location.hash === '#!/login') {
         m.route.set('/main')
+    } else {
+      m.route.set('/login')
     }
   },
   async setDev() {

@@ -15239,13 +15239,14 @@ var login = {
           switch (_context.prev = _context.next) {
             case 0:
               console.log('running check');
-              console.log(session);
 
-              if (session.smurf && location.hash === '#!/login') {
+              if (session && location.hash === '#!/login') {
                 _mithril.default.route.set('/main');
+              } else {
+                _mithril.default.route.set('/login');
               }
 
-            case 3:
+            case 2:
             case "end":
               return _context.stop();
           }
@@ -15434,7 +15435,7 @@ function AssignedSearch() {
   return {
     view: function view(vnode) {
       var item = vnode.attrs.search;
-      var contentR = (0, _mithril.default)(_constructUi.Button, {
+      var contentL = (0, _mithril.default)(_constructUi.Button, {
         iconLeft: _constructUi.Icons.MINUS,
         intent: 'negative',
         size: 'xs',
@@ -15455,9 +15456,9 @@ function AssignedSearch() {
         }
       });
       return (0, _mithril.default)(_constructUi.ListItem, {
-        label: "".concat(item.year).concat(item.season, " ").concat(item.model, " ").concat(item.color, " ").concat(item.size),
+        label: "".concat(item.model, " ").concat(item.color, " ").concat(item.size),
         class: "list-item-".concat(vnode.attrs.index),
-        contentLeft: contentR,
+        contentLeft: contentL,
         contentRight: [(0, _mithril.default)(_constructUi.Tag, {
           size: 'xs',
           label: item.descr
@@ -17243,7 +17244,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "1071" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "4291" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -21,7 +21,7 @@ function AssignedSearch() {
   return {
     view(vnode) {
       let item = vnode.attrs.search
-      let contentR = m(Button, {
+      let contentL = m(Button, {
         iconLeft: Icons.MINUS,
         intent: 'negative',
         size: 'xs',
@@ -42,9 +42,9 @@ function AssignedSearch() {
       })
 
       return m(ListItem, {
-        label: `${item.year}${item.season} ${item.model} ${item.color} ${item.size}`,
+        label: `${item.model} ${item.color} ${item.size}`,
         class: `list-item-${vnode.attrs.index}`,
-        contentLeft: contentR,
+        contentLeft: contentL,
         contentRight: [
           m(Tag, {
             size: 'xs',
