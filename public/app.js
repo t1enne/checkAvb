@@ -45,6 +45,8 @@ import EditClient from '/components/EditClient'
 
 import {Searches} from '/components/Searches'
 
+import {Richieste} from '/components/Richieste'
+
 import EditOrder from '/components/EditOrder';
 
 import {
@@ -486,5 +488,6 @@ m.route(document.body, '/main', {
   '/history': historySection,
   '/dhlTracking': Dhl,
   '/orders/edit/:id': EditOrder,
-  '/clients/edit/:id': EditClient
+  '/clients/edit/:id': EditClient,
+  '/richieste': Richieste,
 })

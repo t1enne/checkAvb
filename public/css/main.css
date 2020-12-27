@@ -512,6 +512,71 @@ ul.client-list .client-card span {
   font-size: 12px;
 }
 
+/* RICHIESTE.js */
+.searches-wrapper {
+  padding: 1rem;
+  width: 100%;
+  overflow: auto;
+}
+
+.menu-wrapper {
+  margin: 0rem 0px;
+}
+
+.table {
+  display: grid;
+  /* border: 1px solid grey; */
+  width: min-content;
+  border-collapse: collapse;
+  /* order: actions nr day season line model color size user cliente feedback ordine status */
+  grid-template-columns: 70px 50px 100px 80px 50px 100px 90px 50px 100px 150px 300px 250px 100px;
+}
+
+.requests-wrapper {
+  margin: 2rem auto;
+}
+
+.table .cui-input input,
+.table button,
+.table .cui-input input {
+  border-radius: 0px !important;
+  text-align: center;
+}
+
+input.diffed {
+  background: #ffffb0 !important;
+}
+
+.input-wrapper {
+  flex-wrap: nowrap !important;
+}
+
+.input-wrapper .cui-input,
+.request .cui-input {
+  border-collapse: collapse;
+  /* width: 100px;
+  min-width: 100px; */
+}
+
+.request-nr, .request-season, .request-line, .request-size,
+.header-nr, .header-season, .header-line, .header-size {
+  /* min-width: 50px !important;
+  width: 50px; */
+}
+
+.cui-input.request-__v {
+  display: none;
+}
+
+/*  .cui-input.header-nr input {
+  width: 50px;
+}
+
+.cui-input.request-nr input {
+  background: #d7d6d6 !important;
+  font-style: italic;
+  width: 50px;
+} */
 /* .user-icon svg path,
 .button>svg>path {
   fill: black;
@@ -549,11 +614,30 @@ svg.get-image path {
 
 .flex {
   display: flex;
+}
+
+.wrap {
   flex-wrap: wrap;
 }
 
 .space-b {
   justify-content: space-between;
+}
+
+.wrap-nw {
+  wrap: nowrap;
+}
+
+.overflow-h {
+  overflow: hidden;
+}
+
+.overflow-s {
+  overflow: scroll;
+}
+
+.flex.column {
+  flex-direction: column;
 }
 
 .flex.reverse {

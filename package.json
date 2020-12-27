@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "run": "nodemon express.js"
+    "dev": "parcel public/index.html",
+    "start": "nodemon express.js"
   },
   "keywords": [],
   "author": "",

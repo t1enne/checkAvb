@@ -97,6 +97,17 @@ let DrawerContent = {
           size: vnode.state.size
         })),
         // m(m.route.Link, {
+        //   href: '/richieste'
+        // },
+        // m(Button, {
+        //   iconLeft: Icons.TRUCK,
+        //   fluid: true,
+        //   basic: true,
+        //   align: 'left',
+        //   label: 'Richieste',
+        //   size: vnode.state.size
+        // })),
+        // m(m.route.Link, {
         //   href: '/dhlTracking'
         // }, m(Button, {
         //   iconLeft: Icons.BOX,

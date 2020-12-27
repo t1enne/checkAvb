@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const Client = require("./public/models/client");
 const SearchInstance = require("./public/models/search");
 const OrderInstance = require("./public/models/order");
+const Request = require("./public/models/request")
 
 // MONGOOSE
 let mongoUrl = process.env.MONGOLAB_URI
@@ -45,7 +46,6 @@ app.use(session({
 app.use(express.static('public/dist'));
 
 //CHECK IF LOGGED
-
 app.get('/logged', (req, res) => {
   if (req.session) {
     res.json(req.session)
@@ -59,34 +59,6 @@ app.post('/api/session', (req, res) => {
   req.session.user = req.headers.user
   res.json(req.session)
 })
-
-
-// app.get('/logged', (req, res) => {
-//   let session = {
-//     "cookie": {
-//       "originalMaxAge": 43200000,
-//       "expires": "2020-11-28T07:21:40.690Z",
-//       "httpOnly": true,
-//       "path": "/",
-//       "sameSite": "strict"
-//     },
-//     "smurf": "SmurfID=0020925c832a4aa1e112ba7d5b01efcbc6f20a9fb12f56235ba649d3789821c9",
-//     "user": "ntaov"
-//
-//   }
-//   res.json(session)
-// })
-
-// GET COOKIE
-// app.get('/api/login/:user/:pwd', async (req, res) => {
-//   console.log('login req');
-//   let smurfId = await getter.getCookie(req.params.user, req.params.pwd);
-//   req.session.smurf = smurfId.cookie;
-//   req.session.user = req.params.user;
-//   console.log(req.session);
-//
-//   res.json(req.session)
-// });
 
 
 // LOGIN
@@ -104,9 +76,15 @@ app.get('/api/logout', async (req, res) => {
   res.json(req.session)
 })
 
-//GET IMAGE
+
+/*
+<===========>
+  GET IMAGE
+<===========>
+*/
+
 app.get(`/api/image/:year/:season/:model/`, async (req, res) => {
-  if(!req.session.smurf) {
+  if (!req.session.smurf) {
     req.session.smurf = req.headers.smurf
   }
   let b64 = await getter.getImage(req.session.smurf, req.params.year, req.params.season, req.params.model);
@@ -117,7 +95,11 @@ app.get(`/api/image/:year/:season/:model/`, async (req, res) => {
 });
 
 
-// GET AVB
+/*
+<===========>
+  GET AVB
+<===========>
+*/
 app.get('/api/avb/:model/:color/', async (req, res) => {
   const avb = await getter.getAvb(req.session.smurf, req.params.model, req.params.color);
   res.json(avb)
@@ -126,7 +108,13 @@ app.get('/api/avb/:model/:color/', async (req, res) => {
 // app.get('/api/anagrafica', async (req, res) => {
 //
 // })
-// GET receivables
+
+/*
+<===========>
+  GET receivables
+<===========>
+*/
+
 app.get(`/api/request/:year/:season/:model/:color/`, async (req, res) => {
   const tr = await getter.getReceivables(req.session.smurf, req.params.year, req.params.season, req.params.model, req.params.color);
   res.json(tr);
@@ -292,12 +280,16 @@ app.get(`/api/SearchInstances`, async (req, res) => {
     if (err)
       console.error(err);
     res.json(searches)
-  }).sort({ dateObj: -1 })
+  }).sort({
+    dateObj: -1
+  })
 });
 
 app.delete('/api/deleteSearches', async (req, res) => {
-  await SearchInstance.deleteMany({ order: 'unassigned' }, (err, searches) => {
-    if(err) console.error(err);
+  await SearchInstance.deleteMany({
+    order: 'unassigned'
+  }, (err, searches) => {
+    if (err) console.error(err);
     console.log('deleted ' + searches.n);
     res.json(searches.n)
   })
@@ -306,8 +298,10 @@ app.delete('/api/deleteSearches', async (req, res) => {
 
 app.delete('/api/deleteAssignedSearches/', async (req, res) => {
   console.log(req.headers);
-  await SearchInstance.deleteMany({ order: req.headers.order }, (err, searches) => {
-    if(err) console.error(err);
+  await SearchInstance.deleteMany({
+    order: req.headers.order
+  }, (err, searches) => {
+    if (err) console.error(err);
     console.log('deleted ' + searches.n);
     res.json(searches.n)
   })
@@ -324,7 +318,9 @@ app.get(`/api/listClients`, async (req, res) => {
 
 // DISPLAY ONE CLIENT
 app.get(`/api/client/:id`, async (req, res) => {
-  await Client.find({ _id: req.params.id}, (err, client) => {
+  await Client.find({
+    _id: req.params.id
+  }, (err, client) => {
     if (err) console.error(err);
     res.json(client)
   })
@@ -338,10 +334,12 @@ app.post('/api/updateClient', async (req, res) => {
     mail: req.headers.mail,
     phone: req.headers.phone
   }
-  await Client.findOneAndUpdate({ _id: req.headers.id }, update, {
+  await Client.findOneAndUpdate({
+    _id: req.headers.id
+  }, update, {
     new: true
   }, (err, client) => {
-    if(err) console.error(err);
+    if (err) console.error(err);
     res.json(client)
   })
 })
@@ -356,3 +354,85 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`);
 });
+
+
+/*
+<===========>
+  Requests handler
+<===========>
+*/
+
+// load requests
+
+app.get('/api/listRequests', async (req, res) => {
+  await Request.find({}, (err, requests) => {
+    if (err) console.error(err);
+    res.json(requests)
+  })
+})
+
+// add request
+
+app.get(`/api/newRequest`, async (req, res) => {
+  let request = await new Request({
+    user: req.headers.user
+  });
+  request.save((err, request) => {
+    if (err) console.error(err)
+    console.log(request);
+    res.json(request)
+  })
+})
+
+
+// update request
+
+app.get('/api/updateRequest', async (req, res) => {
+
+  await Request.findOneAndUpdate({
+    id: req.headers.id
+  }, update, {
+    new: true
+  }, (err, request) => {
+    if (err) console.error(err);
+    res.json(request)
+  })
+})
+
+// update requests
+
+app.post('/api/updateRequests', async (req, res) => {
+  // idValues is an array joined with '&'
+  let {
+    id,
+    idfields,
+    idvalues,
+    last
+  } = req.headers
+  let update = {}
+
+  idfields = idfields.split(',')
+  idvalues = idvalues.split('&')
+
+  idfields.forEach((field, i) => {
+    update[field] = idvalues[i]
+  });
+
+  await Request.findOneAndUpdate({
+    _id: id
+  }, update, {
+    new: true
+  }, (err, request) => {
+    if (err) console.error(err);
+    res.json(request)
+  })
+})
+
+// delete request
+
+app.delete('/api/deleteRequest', async (req, res) => {
+  await Request.findByIdAndRemove(req.headers.id, (err, request) => {
+    if (err) console.error(err)
+    res.json(request)
+  })
+})
