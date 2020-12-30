@@ -536,11 +536,15 @@ ul.client-list .client-card span {
   margin: 2rem auto;
 }
 
-.table .cui-input input,
 .table button,
 .table .cui-input input {
   border-radius: 0px !important;
   text-align: center;
+}
+
+.table .req-input {
+  text-align: center;
+  border: 1px solid #dad2d2;
 }
 
 input.diffed {
@@ -564,7 +568,7 @@ input.diffed {
   width: 50px; */
 }
 
-.cui-input.request-__v {
+.request-__v {
   display: none;
 }
 

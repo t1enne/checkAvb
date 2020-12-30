@@ -1,5 +1,15 @@
 import 'regenerator-runtime/runtime';
 import m from 'mithril';
+import io from 'socket.io-client'
+
+const socket = io('http://localhost:3000')
+
+
+socket.on('connect', () => {})
+
+socket.on('message-client-connected', (msg) => {
+  console.log(msg);
+})
 
 import {
   Button,
@@ -22,7 +32,9 @@ import {
 import '../node_modules/construct-ui/lib/index.css'
 
 import logo from './logo.svg'
-import {login} from '/components/login'
+import {
+  login
+} from '/components/login'
 
 FocusManager.alwaysShowFocus();
 
@@ -43,9 +55,13 @@ import {
 
 import EditClient from '/components/EditClient'
 
-import {Searches} from '/components/Searches'
+import {
+  Searches
+} from '/components/Searches'
 
-import {Richieste} from '/components/Richieste'
+import {
+  Richieste
+} from '/components/Richieste'
 
 import EditOrder from '/components/EditOrder';
 
@@ -418,7 +434,7 @@ function SizeButton() {
                         if (res._id) {
                           console.log(res._id);
                           showToast(`Added Search ${sku.string} ${size}!`, 'positive')
-                          Searches.searchesList.splice(0, 0 ,res)
+                          Searches.searchesList.splice(0, 0, res)
                         } else {
                           showToast(`Couldn't add Search ${sku.string} ${size}!`, 'negative')
                         }
@@ -470,6 +486,8 @@ function SizeButton() {
 //     sizeElement.textContent = item
 //   });
 // });
+
+
 
 // Router
 

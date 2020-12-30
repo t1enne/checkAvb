@@ -1,4 +1,7 @@
 import m from 'mithril'
+import io from 'socket.io-client'
+const socket = io('http://localhost:3000')
+
 import {
   Button,
   Icon,
@@ -151,6 +154,12 @@ let filter = {}
 // Creating Sets to create unique values to pass to the filter
 let mySets = {}
 
+socket.on(`remote-input`, (item) => {
+  console.log(item);
+  document.querySelector(`input.request-${item.id}.request-${item.field}`).value = item.value
+  m.redraw()
+})
+
 headers.forEach((field, i) => {
   mySets[`${field}Set`] = new Set()
 });
@@ -233,8 +242,6 @@ function Header(vnode) {
       label: item
     })
   )
-  console.log(mySets);
-
   return {
     view(vnode) {
 
@@ -342,6 +349,7 @@ let Request = {
     vnode.state.request = vnode.attrs.request
     vnode.state.request.nr = JSON.stringify(vnode.attrs.index)
     // vnode.state.reset(vnode, vnode.key)
+    vnode.state.request.model = '0'
   },
   oninit(vnode) {
     // vnode.state.originalRequest = originalRequests[vnode.attrs.request._id]
@@ -365,28 +373,41 @@ let Request = {
 
     //first push the results to res and when done to inputs to avoid redraws
     const res = []
-
     for (let field in vnode.state.request) {
       if (field != '_id' && 'id') {
+        let value = ''
         let fields = Object.keys(vnode.state.request)
         res.push(
-          m(Input, {
-            class: `request-${field} request-${_id}`,
+          m('input', {
+            class: `req-input request-${field} request-${_id}`,
             data: field,
-            value: vnode.state.request[field],
+            id: vnode.state.request._id,
+            // value: value,
             readonly: field === 'nr' ? true : false,
+            oncreate(e) {
+              e.dom.value = vnode.state.request[field]
+              // console.log(value, vnode.state.request[field]);
+            },
+            onupdate(e) {
+              console.log(e);
+            },
             // DIFFING
             oninput: (e) => {
               vnode.state.request[field] = e.srcElement.value.toLowerCase()
               if (vnode.state.request[field] != originalRequests[_id][field]) {
                 //paint yellow the diffs
-                console.log(vnode.state.request, 'diffing ' + field);
+
                 vnode.state.changed = true;
                 e.srcElement.classList.add('diffed')
               } else {
                 vnode.state.changed = false;
                 e.srcElement.classList.remove('diffed')
               }
+              socket.emit('input', {
+                id: vnode.state.request._id,
+                field: field,
+                value: e.srcElement.value
+              })
             },
             onchange: (e) => {
               let field = e.srcElement.getAttribute('data')
@@ -528,6 +549,8 @@ let Richieste = {
 
   },
   view(vnode) {
+
+    console.log('drawing requests');
     vnode.state.filteredRequests = vnode.state.filterRequests(requests, vnode.state.filter)
     // console.log(vnode.state.filter, vnode.state.filteredRequests);
     return m('.requests-component', [

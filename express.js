@@ -1,6 +1,6 @@
 const express = require('express');
-const cookieParser = require('cookie-parser');
 let session = require('express-session');
+const cookieParser = require('cookie-parser');
 const getter = require('./index.js');
 require('dotenv').config();
 const mongoose = require('mongoose');
@@ -8,6 +8,10 @@ const Client = require("./public/models/client");
 const SearchInstance = require("./public/models/search");
 const OrderInstance = require("./public/models/order");
 const Request = require("./public/models/request")
+const socketInit = require('./sockets.js')
+
+const app = express();
+
 
 // MONGOOSE
 let mongoUrl = process.env.MONGOLAB_URI
@@ -22,14 +26,19 @@ db.once('open', () => {
   console.log('connected to DB');
 });
 
-// ALTERNATIVE WAY TO CREATE/SAVE MODEL
-// ClientOrders.create({ name: 'Naz', surname: 'Taov' }, (err, example_instance) => {
-//   if(err) return handleError(err)
-// })
-
 // END OF MONGOOSE
 
-const app = express();
+// SOCKET.IO
+
+const server = require('http').createServer(app);
+
+socketInit(server)
+
+const port = process.env.PORT || 3000;
+
+server.listen(port, () => {
+  console.log(`Listening at http://localhost:${port}`);
+});
 
 app.use(cookieParser());
 app.use(session({
@@ -349,12 +358,6 @@ app.get('/api/tracking/:awb', async (req, res) => {
   let awb = await getter.getDhl(req.params.awb)
   res.json(awb.results)
 })
-
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Listening at http://localhost:${port}`);
-});
-
 
 /*
 <===========>

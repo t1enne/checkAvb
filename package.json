@@ -21,7 +21,9 @@
     "mithril": "^2.0.4",
     "mongoose": "^5.10.11",
     "node-fetch": "^2.6.1",
-    "regenerator-runtime": "^0.13.7"
+    "regenerator-runtime": "^0.13.7",
+    "socket.io": "^3.0.4",
+    "socket.io-client": "^3.0.4"
   },
   "devDependencies": {
     "cssnano": "^4.1.10",

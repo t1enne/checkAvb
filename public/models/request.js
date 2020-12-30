@@ -22,6 +22,8 @@ let RequestSchema = new mongoose.Schema({
   feedback: { type: String, default: ''},
   order: { type: String, default: ''},
   status: {type: String, default: 'richiesto'}
+},{
+    versionKey: false // You should be aware of the outcome after set to false
 })
 
 const Request = mongoose.model('RequestInstance', RequestSchema);
