@@ -2,9 +2,9 @@ const socketio = require('socket.io')
 
 function init(server) {
   const io = socketio(server, {
-    withCredentials: true,
+    credentials: true,
     cors: {
-      origin: "^\(http://localhost:3000/socket.io\)",
+      origin: `^http://localhost:3000/socket.io`,
       methods: ["GET", "POST"]
     }
   })
