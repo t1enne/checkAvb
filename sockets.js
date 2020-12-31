@@ -2,7 +2,6 @@ const socketio = require('socket.io')
 
 function init(server) {
   const io = socketio(server, {
-    credentials: true,
     cors: {
       origin: "*",
       methods: ["GET", "POST"]
