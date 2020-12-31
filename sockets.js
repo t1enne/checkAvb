@@ -4,7 +4,7 @@ function init(server) {
   const io = socketio(server, {
     credentials: true,
     cors: {
-      origin: `^http://localhost:3000/socket.io`,
+      origin: "*",
       methods: ["GET", "POST"]
     }
   })
