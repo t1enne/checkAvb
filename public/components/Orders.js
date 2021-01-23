@@ -3,13 +3,13 @@ import {
   Card,
   Button,
   Icons,
-  // Icon,
+  Icon,
+  Input,
   List,
   ListItem,
   PopoverMenu,
   Tag
 } from 'construct-ui'
-// import { Tabs } from './Tabs'
 import {
   Searches
 } from './Searches'
@@ -21,40 +21,57 @@ function AssignedSearch() {
   return {
     view(vnode) {
       let item = vnode.attrs.search
-      let contentL = m(Button, {
-        iconLeft: Icons.MINUS,
-        intent: 'negative',
-        size: 'xs',
-        class: 'remove-search',
-        onclick: (e) => {
-          //UNASSIGN SEARCH
-          e.preventDefault()
-          e.stopPropagation()
-          console.log(1);
-          m.request({
-            method: 'GET',
-            url: `/api/addToClient/unassigned/${item._id}`
-          }).then(res => {
-            console.log(res);
-            showToast(`Unassigned ${item.model}`, 'warning')
-          })
-        }
-      })
+      // let contentL = m(Button, {
+      //   iconLeft: Icons.MINUS,
+      //   intent: 'negative',
+      //   size: 'xs',
+      //   class: 'remove-search',
+      //   onclick: (e) => {
+      //     //UNASSIGN SEARCH
+      //     e.preventDefault()
+      //     e.stopPropagation()
+      //     console.log(1);
+      //     m.request({
+      //       method: 'GET',
+      //       url: `/api/addToClient/unassigned/${item._id}`
+      //     }).then(res => {
+      //       console.log(res);
+      //       showToast(`Unassigned ${item.model}`, 'warning')
+      //     })
+      //   }
+      // })
 
       return m(ListItem, {
-        label: `${item.model} ${item.color} ${item.size}`,
+        // label: `${item.model} ${item.color} ${item.size}`,
         class: `list-item-${vnode.attrs.index}`,
-        contentLeft: contentL,
-        contentRight: [
-          m(Tag, {
-            size: 'xs',
-            label: item.descr
-          }),
-          m(Tag, {
-          intent: 'warning',
-          size: 'xs',
-          label: `€${item.price}`
-        })]
+        contentLeft: m('.list-content', [
+          m('.left-content.flex.space-b',
+            m('.label', `${item.model} ${item.color} ${item.size}`),
+            m(Tag, {
+              intent: 'warning',
+              size: 'xs',
+              label: `€${item.price}`
+            })
+          ),
+          m('.descr-content',
+            m(Tag, {
+              size: 'xs',
+              label: item.descr
+            })
+
+          )
+        ]),
+        // contentRight: [
+        //   m(Tag, {
+        //     size: 'xs',
+        //     label: item.descr
+        //   }),
+        //   m(Tag, {
+        //     intent: 'warning',
+        //     size: 'xs',
+        //     label: `€${item.price}`
+        //   })
+        // ]
       })
     }
   }
@@ -65,7 +82,10 @@ let Orders = {
   loadOrders: () => {
     m.request({
       method: "GET",
-      url: "/api/listOrders"
+      url: "/api/listOrders",
+      headers: {
+        user: localStorage.user
+      }
     }).then(res => {
       Orders.ordersList = res
     })
@@ -125,9 +145,7 @@ let Orders = {
                 method: "DELETE",
                 url: `/api/deleteOrder/${order._id}`
               }).then(res => {
-                console.log(res)
                 Orders.ordersList.splice(Orders.ordersList.indexOf(res), 1)
-                m.redraw()
               })
             }
           })
@@ -190,7 +208,24 @@ let Orders = {
     // UNASSIGNED SEARCHES MOVED TO EDIT ORDER
 
     return [
-      m('.orders.flex.reverse', Orders.ordersList.map((order, o) => {
+      m(Input, {
+        contentRight: m(Icon, {
+          name: Icons.FILTER
+        }),
+        placeholder: 'Filter Orders',
+        oninput(e) {
+          let val = e.target.value.toLowerCase()
+          let orders = e.target.parentElement.parentElement.querySelectorAll('.client-order')
+
+          orders.forEach(order => {
+            const text = order.textContent.toLowerCase()
+            text.includes(val) ? (order.style.order = '-1', order.style.display = 'block') : (order.style.order = 'unset', order.style.display = 'none')
+          })
+
+
+        },
+      }),
+      m('.orders.flex.column', Orders.ordersList.map((order, o) => {
         return m(Orders.order, {
           order: order,
           o: o

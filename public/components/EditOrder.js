@@ -3,9 +3,9 @@ import {
   Tag,
   Icons,
   List,
-  ListItem,
+  // ListItem,
   Button,
-  Popover,
+  // Popover,
   Select
 } from 'construct-ui'
 import {
@@ -32,7 +32,7 @@ function AssignedSearch() {
       let content = m('.search-popover', [
         m(`img[src=${imgSrc}][style= padding: .5rem; border-radius:10px; display: block;]`, {
           label: 'click',
-          oninit: (e) => {
+          oninit: () => {
             fetch(`api/image/${item.year}/${item.season}/${item.model}`, {
                 headers: {
                   smurf: localStorage.smurf
@@ -62,21 +62,18 @@ function AssignedSearch() {
             m.request({
               method: 'GET',
               url: `/api/addToClient/unassigned/${item._id}`
-            }).then(res => {
+            }).then(() => {
               let removedSearch = vnode.attrs.assignedSearches.splice(vnode.attrs.index, 1)[0]
               Searches.unassignedSearches.push(removedSearch)
               showToast(`Unassigned ${item.model}`, 'warning')
             })
           }
         }),
-        m('.left-content[style=align-items:center;]',
+        m('.left-content[style=text-align:left;]',
           m('.sku-detail.label', `${item.year}${item.season} ${item.model} ${item.color} ${item.size}`),
-          m(Select, {
-            size: 'xs',
-            basic: true,
-            style: 'margin-right:10px;',
-            options: ['N/A', 'NEG1', 'DOS', 'ECOMM', 'HQ']
-          })
+          m(Tag, {
+            label: item.descr,
+          }),
         ),
         m('.right-content[style=overflow:hidden;]',
           // m(Select, {
@@ -85,12 +82,15 @@ function AssignedSearch() {
           //   options: ['NEG1', 'DOS', 'N/A', 'ECOMM', 'HQ']
           // }),
           m(Tag, {
-            label: item.descr,
-          }),
-          m(Tag, {
-            label: item.price,
+            label: `€${item.price}`,
             intent: 'warning'
-          })
+          }),
+          // m(Select, {
+          //   size: 'xs',
+          //   basic: true,
+          //   style: 'margin-right:10px;',
+          //   options: ['N/A', 'NEG1', 'DOS', 'ECOMM', 'HQ']
+          // })
         )
       ])
     }
@@ -172,14 +172,15 @@ function UnassignedSearch() {
             vnode.state.assignOrder(order, searchId, index)
           }
         }),
-        m('.left-content[style=align-items:center;]',
-          m('.sku-detail.label', `${item.year}${item.season} ${item.model} ${item.color} ${item.size}`)),
-        m('.right-content[style=overflow:hidden;]',
+        m('.left-content[style=text-align:left;]',
+          m('.sku-detail.label', `${item.year}${item.season} ${item.model} ${item.color} ${item.size}`),
           m(Tag, {
             label: item.descr,
           }),
+        ),
+        m('.right-content[style=overflow:hidden;]',
           m(Tag, {
-            label: item.price,
+            label: `€${item.price}`,
             intent: 'warning'
           })
         )
@@ -258,7 +259,7 @@ let EditOrder = {
           ])
         ),
 
-        m('.searches.flex', [
+        m('.searches.grid', [
           m('.assigned-searches',
             m('h3', 'Assigned Searches'),
             m(List, {
@@ -284,7 +285,7 @@ let EditOrder = {
               }),
               m(Tag, {
                 intent: 'primary',
-                label: `total: ${vnode.state.total}`
+                label: `total: €${vnode.state.total}`
               })
             ])),
           m('.unassigned-searches',

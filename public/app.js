@@ -49,9 +49,9 @@ import {
   showToast
 } from '/components/Nav';
 
-import {
-  Dhl
-} from '/components/Dhl'
+// import {
+//   Dhl
+// } from '/components/Dhl'
 
 import EditClient from '/components/EditClient'
 
@@ -106,7 +106,7 @@ let Login = {
       placeholder: 'Password',
       type: 'password',
       autocomplete: "current-password",
-      oncreate: (e) => {
+      oncreate: () => {
         // console.log(e);
       },
       oninput: (e) => {
@@ -202,7 +202,10 @@ let SearchForm = {
 
             await m.request({
               method: "GET",
-              url: `/api/avb/${model}/${color}`
+              url: `/api/avb/${model}/${color}`,
+              headers: {
+                smurf: localStorage.smurf
+              }
             }).then(res => {
               console.log(res);
               if (res === 404) {
@@ -236,13 +239,25 @@ function Sku() {
       vnode.state.imgFetched = false
       vnode.state.discountedPrice = ''
       // vnode.state.sku = vnode.attrs.sku
-      vnode.state.getPrice = () => {
-        m.request({
-          method: 'GET',
-          url: `/api/price/${vnode.attrs.sku.year}/${vnode.attrs.sku.season}/${vnode.attrs.sku.model}`
-        }).then(res => {
-          vnode.state.price = res
-        })
+      vnode.state.getPrice = (vnode) => {
+
+        if (!vnode.state.price && !localStorage[`${vnode.attrs.sku.year}${vnode.attrs.sku.season}${vnode.attrs.sku.model}`]) {
+          m.request({
+            method: "GET",
+            url: `/api/price/${vnode.attrs.sku.year}/${vnode.attrs.sku.season}/${vnode.attrs.sku.model}`,
+            headers: {
+              smurf: localStorage.smurf
+            }
+          }).then(res => {
+            if (NOSALE.filter(e => e == vnode.attrs.sku.model + vnode.attrs.sku.color).length > 0 && vnode.attrs.sku.year + vnode.attrs.sku.season === '202') {
+              vnode.dom.querySelector('.basic').textContent = 'BASICO'
+            } else if (vnode.attrs.sku.year + vnode.attrs.sku.season === '202') {
+              vnode.state.salable = true
+            }
+            vnode.state.price = res
+            localStorage[`${vnode.attrs.sku.year}${vnode.attrs.sku.season}${vnode.attrs.sku.model}`] = res
+          })
+        }
       }
     },
     oncreate: () => {
@@ -252,7 +267,6 @@ function Sku() {
       let i = vnode.attrs.i
       let sku = vnode.attrs.sku
       let string = sku.string.split(' ').join('')
-      sku.price = ''
       let discountedPrice = null
       let content = m(`img.sku-image-${i}[src=${vnode.state.imgSrc}]`)
       return m(Card, {
@@ -283,7 +297,11 @@ function Sku() {
                   vnode.state.loading = !vnode.state.loading;
                   // e.preventDefault();
                   // e.stopPropagation();
-                  fetch(`api/image/${sku.year}/${sku.season}/${sku.model}`).then(res => res.text()).then(url => {
+                  fetch(`api/image/${sku.year}/${sku.season}/${sku.model}`, {
+                    headers: {
+                      smurf: localStorage.smurf
+                    }
+                  }).then(res => res.text()).then(url => {
                     vnode.state.imgFetched = true
                     vnode.state.imgSrc = url;
                     vnode.state.loading = !vnode.state.loading;
@@ -305,27 +323,13 @@ function Sku() {
             size: 'xs',
             intent: vnode.state.salable ?
               'negative' : 'warning',
-            oncreate: () => {
-              if (!vnode.state.price) {
-                vnode.state.price = 'fetching'
-                m.request({
-                  method: "GET",
-                  url: `/api/price/${sku.year}/${sku.season}/${sku.model}`
-                }).then(res => {
-                  if (NOSALE.filter(e => e == sku.model + sku.color).length > 0 && sku.year + sku.season === '202') {
-                    vnode.dom.querySelector('.basic').textContent = 'BASICO'
-                    vnode.state.price = res
-                  } else if (sku.year + sku.season === '202') {
-                    vnode.state.salable = true
-                    vnode.state.price = res
-                  } else {
-                    vnode.state.price = res
-                  }
-                })
-              }
+            oncreate(e) {
+              vnode.state.getPrice(vnode)
+              console.log(e);
             },
-            sublabel: `€${vnode.state.price}`,
+            sublabel: `€${vnode.state.price || localStorage[`${sku.year}${sku.season}${sku.model}`]} `,
             label: vnode.state.discountedPrice,
+            loading: vnode.state.price || localStorage[`${sku.year}${sku.season}${sku.model}`] ? false : true,
             onclick() {
               if (vnode.state.salable) {
                 vnode.state.discountedPrice = parseInt(parseInt(vnode.state.price) * 0.7)
@@ -362,7 +366,10 @@ function SizeButton() {
   function getShops(sku, i) {
     m.request({
       method: 'GET',
-      url: `/api/${sku.year}/${sku.season}/${sku.model}/${sku.color}/${sku.sizesForRequests[i]}`
+      url: `/api/${sku.year}/${sku.season}/${sku.model}/${sku.color}/${sku.sizesForRequests[i]}`,
+      headers: {
+        smurf: localStorage.smurf
+      }
     }).then(res => {
       shops = Object.values(res)[0]
       isLoading = !isLoading
@@ -504,7 +511,7 @@ m.route(document.body, '/main', {
   '/orders': ordersSection,
   '/clients': clientsSection,
   '/history': historySection,
-  '/dhlTracking': Dhl,
+  // '/dhlTracking': Dhl,
   '/orders/edit/:id': EditOrder,
   '/clients/edit/:id': EditClient,
   '/richieste': Richieste,

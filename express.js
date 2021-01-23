@@ -44,7 +44,7 @@ app.use(cookieParser());
 app.use(session({
   secret: 'keyboard cat',
   cookie: {
-    maxAge: 1000 * 60 * 5,
+    maxAge: 1000 * 60 * 5 * 100,
     sameSite: 'strict'
   },
   rolling: true,
@@ -96,7 +96,7 @@ app.get(`/api/image/:year/:season/:model/`, async (req, res) => {
   if (!req.session.smurf) {
     req.session.smurf = req.headers.smurf
   }
-  let b64 = await getter.getImage(req.session.smurf, req.params.year, req.params.season, req.params.model);
+  let b64 = await getter.getImage(req.headers.smurf, req.params.year, req.params.season, req.params.model);
   // setTimeout(() => {
   //
   // }, 1000)
@@ -110,7 +110,7 @@ app.get(`/api/image/:year/:season/:model/`, async (req, res) => {
 <===========>
 */
 app.get('/api/avb/:model/:color/', async (req, res) => {
-  const avb = await getter.getAvb(req.session.smurf, req.params.model, req.params.color);
+  const avb = await getter.getAvb(req.headers.smurf, req.params.model, req.params.color);
   res.json(avb)
 });
 
@@ -131,13 +131,13 @@ app.get(`/api/request/:year/:season/:model/:color/`, async (req, res) => {
 
 // GET SHOP DETAILS
 app.get('/api/:year/:season/:model/:color/:size', async (req, res) => {
-  const avb = await getter.getShops(req.session.smurf, req.params.year, req.params.season, req.params.model, req.params.color, req.params.size);
+  const avb = await getter.getShops(req.headers.smurf, req.params.year, req.params.season, req.params.model, req.params.color, req.params.size);
   res.json(avb)
 });
 
 // GET Prices
 app.get(`/api/price/:year/:season/:model/`, async (req, res) => {
-  let price = await getter.getPrice(req.session.smurf, req.params.year, req.params.season, req.params.model);
+  let price = await getter.getPrice(req.headers.smurf, req.params.year, req.params.season, req.params.model);
   res.json(price);
 });
 
@@ -225,9 +225,13 @@ app.post(`/api/createOrder/:client/:name`, async (req, res) => {
 })
 // LIST ORDERS
 app.get(`/api/listOrders`, async (req, res) => {
-  await OrderInstance.find({}, (err, orders) => {
+  await OrderInstance.find({
+    user: req.headers.user
+  }, (err, orders) => {
     if (err) console.error(err);
     res.json(orders)
+  }).sort({
+    dateObj: -1
   })
 })
 
@@ -390,46 +394,46 @@ app.get(`/api/newRequest`, async (req, res) => {
 
 // update request
 
-app.get('/api/updateRequest', async (req, res) => {
-
-  await Request.findOneAndUpdate({
-    id: req.headers.id
-  }, update, {
-    new: true
-  }, (err, request) => {
-    if (err) console.error(err);
-    res.json(request)
-  })
-})
-
-// update requests
-
-app.post('/api/updateRequests', async (req, res) => {
-  // idValues is an array joined with '&'
-  let {
-    id,
-    idfields,
-    idvalues,
-    last
-  } = req.headers
-  let update = {}
-
-  idfields = idfields.split(',')
-  idvalues = idvalues.split('&')
-
-  idfields.forEach((field, i) => {
-    update[field] = idvalues[i]
-  });
-
-  await Request.findOneAndUpdate({
-    _id: id
-  }, update, {
-    new: true
-  }, (err, request) => {
-    if (err) console.error(err);
-    res.json(request)
-  })
-})
+// app.get('/api/updateRequest', async (req, res) => {
+//
+//   await Request.findOneAndUpdate({
+//     id: req.headers.id
+//   }, update, {
+//     new: true
+//   }, (err, request) => {
+//     if (err) console.error(err);
+//     res.json(request)
+//   })
+// })
+//
+// // update requests
+//
+// app.post('/api/updateRequests', async (req, res) => {
+//   // idValues is an array joined with '&'
+//   let {
+//     id,
+//     idfields,
+//     idvalues,
+//     last
+//   } = req.headers
+//   let update = {}
+//
+//   idfields = idfields.split(',')
+//   idvalues = idvalues.split('&')
+//
+//   idfields.forEach((field, i) => {
+//     update[field] = idvalues[i]
+//   });
+//
+//   await Request.findOneAndUpdate({
+//     _id: id
+//   }, update, {
+//     new: true
+//   }, (err, request) => {
+//     if (err) console.error(err);
+//     res.json(request)
+//   })
+// })
 
 // delete request
 

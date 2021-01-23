@@ -1,5 +1,7 @@
 import m from 'mithril'
-import {showToast} from './Nav'
+import {
+  showToast
+} from './Nav'
 
 
 //check if session exists
@@ -10,8 +12,8 @@ let session = null
 let login = {
   async check() {
     console.log('running check');
-    if(session && location.hash === '#!/login') {
-        m.route.set('/main')
+    if (localStorage.smurf && location.hash === '#!/login') {
+      m.route.set('/main')
     } else {
       m.route.set('/login')
     }
@@ -37,15 +39,15 @@ let login = {
     m.request({
       url: `/api/login`,
       headers: {
-        'user': user,
-        'pwd': pwd
+        'user': user.toLowerCase(),
+        'pwd': pwd.toLowerCase()
       }
     }).then(res => {
       if (res.user) {
         session = res
         localStorage.smurf = session.smurf
         localStorage.user = session.user
-        if (remember)  localStorage.pwd = pwd
+        if (remember) localStorage.pwd = pwd
         showToast(`Welcome back ${localStorage.user} !`, 'primary')
       }
       login.check()

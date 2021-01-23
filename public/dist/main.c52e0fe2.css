@@ -336,7 +336,6 @@ input[name=css-tabs] {
 
 ul.client-list {
   display: flex;
-  flex-direction: column-reverse;
 }
 
 ul.client-list .client-card {
@@ -403,10 +402,27 @@ ul.client-list .client-card span {
   border-top: 1px dotted lightgray;
 }
 
+@media screen and (max-width: 800px) {
+  .searches {
+    grid-template-columns: repeat(1, 100%);
+  }
+}
+
+@media screen and (min-width: 700px) {
+  .searches {
+    grid-template-columns: repeat(2, 50%);
+  }
+}
+
 .assigned-searches,
 .unassigned-searches {
-  min-width: 40vw;
-  /* width: 40vw; */
+  width: auto;
+  min-width: 50%;
+}
+
+.assigned-searches .cui-list-item-content-left {
+  width: 100%;
+  padding-left: 0px;
 }
 
 .cui-list-item-content-right {
@@ -618,6 +634,14 @@ svg.get-image path {
 
 .flex {
   display: flex;
+}
+
+.column {
+  flex-direction: column;
+}
+
+.grid {
+  display: grid;
 }
 
 .wrap {

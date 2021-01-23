@@ -3469,7 +3469,7 @@ function setup(env) {
 
 module.exports = setup;
 
-},{"ms":"../node_modules/socket.io-client/node_modules/ms/index.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
+},{"ms":"../node_modules/socket.io-client/node_modules/ms/index.js"}],"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -3855,7 +3855,7 @@ formatters.j = function (v) {
     return '[UnexpectedJSONParseError]: ' + error.message;
   }
 };
-},{"./common":"../node_modules/socket.io-client/node_modules/debug/src/common.js","process":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../node_modules/socket.io-client/build/url.js":[function(require,module,exports) {
+},{"./common":"../node_modules/socket.io-client/node_modules/debug/src/common.js","process":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../node_modules/socket.io-client/build/url.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5262,7 +5262,7 @@ formatters.j = function (v) {
     return '[UnexpectedJSONParseError]: ' + error.message;
   }
 };
-},{"./common":"../node_modules/engine.io-client/node_modules/debug/src/common.js","process":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../node_modules/engine.io-client/lib/transports/polling.js":[function(require,module,exports) {
+},{"./common":"../node_modules/engine.io-client/node_modules/debug/src/common.js","process":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../node_modules/engine.io-client/lib/transports/polling.js":[function(require,module,exports) {
 const Transport = require("../transport");
 const parseqs = require("parseqs");
 const parser = require("engine.io-parser");
@@ -6046,7 +6046,7 @@ module.exports = {
   defaultBinaryType: "arraybuffer"
 };
 
-},{"../globalThis":"../node_modules/engine.io-client/lib/globalThis.browser.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/base64-js/index.js":[function(require,module,exports) {
+},{"../globalThis":"../node_modules/engine.io-client/lib/globalThis.browser.js"}],"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/base64-js/index.js":[function(require,module,exports) {
 'use strict'
 
 exports.byteLength = byteLength
@@ -6174,9 +6174,7 @@ function fromByteArray (uint8) {
 
   // go through the array every three bytes, we'll deal with trailing stuff later
   for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
-    parts.push(encodeChunk(
-      uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)
-    ))
+    parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)))
   }
 
   // pad the end with zeros, but make sure to not forget the extra bytes
@@ -6200,7 +6198,8 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/ieee754/index.js":[function(require,module,exports) {
+},{}],"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/ieee754/index.js":[function(require,module,exports) {
+/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = (nBytes * 8) - mLen - 1
@@ -6286,14 +6285,14 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/isarray/index.js":[function(require,module,exports) {
+},{}],"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/isarray/index.js":[function(require,module,exports) {
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/buffer/index.js":[function(require,module,exports) {
+},{}],"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/buffer/index.js":[function(require,module,exports) {
 
 var global = arguments[3];
 /*!
@@ -8086,7 +8085,7 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-},{"base64-js":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/base64-js/index.js","ieee754":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/ieee754/index.js","isarray":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/isarray/index.js","buffer":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/buffer/index.js"}],"../node_modules/engine.io-client/lib/transports/websocket.js":[function(require,module,exports) {
+},{"base64-js":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/base64-js/index.js","ieee754":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/ieee754/index.js","isarray":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/isarray/index.js","buffer":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/buffer/index.js"}],"../node_modules/engine.io-client/lib/transports/websocket.js":[function(require,module,exports) {
 var Buffer = require("buffer").Buffer;
 const Transport = require("../transport");
 const parser = require("engine.io-parser");
@@ -8352,7 +8351,7 @@ class WS extends Transport {
 
 module.exports = WS;
 
-},{"../transport":"../node_modules/engine.io-client/lib/transport.js","engine.io-parser":"../node_modules/engine.io-parser/lib/index.js","parseqs":"../node_modules/parseqs/index.js","yeast":"../node_modules/yeast/index.js","../util":"../node_modules/engine.io-client/lib/util.js","./websocket-constructor":"../node_modules/engine.io-client/lib/transports/websocket-constructor.browser.js","debug":"../node_modules/engine.io-client/node_modules/debug/src/browser.js","buffer":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/buffer/index.js"}],"../node_modules/engine.io-client/lib/transports/index.js":[function(require,module,exports) {
+},{"../transport":"../node_modules/engine.io-client/lib/transport.js","engine.io-parser":"../node_modules/engine.io-parser/lib/index.js","parseqs":"../node_modules/parseqs/index.js","yeast":"../node_modules/yeast/index.js","../util":"../node_modules/engine.io-client/lib/util.js","./websocket-constructor":"../node_modules/engine.io-client/lib/transports/websocket-constructor.browser.js","debug":"../node_modules/engine.io-client/node_modules/debug/src/browser.js","buffer":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/buffer/index.js"}],"../node_modules/engine.io-client/lib/transports/index.js":[function(require,module,exports) {
 const XMLHttpRequest = require("xmlhttprequest-ssl");
 const XHR = require("./polling-xhr");
 const JSONP = require("./polling-jsonp");
@@ -9860,7 +9859,7 @@ formatters.j = function (v) {
     return '[UnexpectedJSONParseError]: ' + error.message;
   }
 };
-},{"./common":"../node_modules/socket.io-parser/node_modules/debug/src/common.js","process":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../node_modules/socket.io-parser/dist/index.js":[function(require,module,exports) {
+},{"./common":"../node_modules/socket.io-parser/node_modules/debug/src/common.js","process":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../node_modules/socket.io-parser/dist/index.js":[function(require,module,exports) {
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -18817,14 +18816,14 @@ function () {
 }();
 
 exports.List = List;
-},{"tslib":"../node_modules/tslib/tslib.es6.js","mithril":"../node_modules/mithril/index.js","classnames":"../node_modules/classnames/index.js","../../_shared":"../node_modules/construct-ui/lib/esm/_shared/index.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/util/support/isBufferBrowser.js":[function(require,module,exports) {
+},{"tslib":"../node_modules/tslib/tslib.es6.js","mithril":"../node_modules/mithril/index.js","classnames":"../node_modules/classnames/index.js","../../_shared":"../node_modules/construct-ui/lib/esm/_shared/index.js"}],"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/util/support/isBufferBrowser.js":[function(require,module,exports) {
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/util/node_modules/inherits/inherits_browser.js":[function(require,module,exports) {
+},{}],"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/util/node_modules/inherits/inherits_browser.js":[function(require,module,exports) {
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -18849,7 +18848,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/util/util.js":[function(require,module,exports) {
+},{}],"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/util/util.js":[function(require,module,exports) {
 var process = require("process");
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -19570,7 +19569,7 @@ function callbackify(original) {
 }
 
 exports.callbackify = callbackify;
-},{"./support/isBuffer":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/util/support/isBufferBrowser.js","inherits":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/util/node_modules/inherits/inherits_browser.js","process":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../node_modules/construct-ui/lib/esm/components/list/ListItem.js":[function(require,module,exports) {
+},{"./support/isBuffer":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/util/support/isBufferBrowser.js","inherits":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/util/node_modules/inherits/inherits_browser.js","process":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../node_modules/construct-ui/lib/esm/components/list/ListItem.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19635,7 +19634,7 @@ function () {
 }();
 
 exports.ListItem = ListItem;
-},{"tslib":"../node_modules/tslib/tslib.es6.js","mithril":"../node_modules/mithril/index.js","classnames":"../node_modules/classnames/index.js","../../_shared":"../node_modules/construct-ui/lib/esm/_shared/index.js","util":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/util/util.js"}],"../node_modules/construct-ui/lib/esm/components/list/index.js":[function(require,module,exports) {
+},{"tslib":"../node_modules/tslib/tslib.es6.js","mithril":"../node_modules/mithril/index.js","classnames":"../node_modules/classnames/index.js","../../_shared":"../node_modules/construct-ui/lib/esm/_shared/index.js","util":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/util/util.js"}],"../node_modules/construct-ui/lib/esm/components/list/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23451,7 +23450,7 @@ Object.keys(_utils).forEach(function (key) {
     }
   });
 });
-},{"./_shared":"../node_modules/construct-ui/lib/esm/_shared/index.js","./components":"../node_modules/construct-ui/lib/esm/components/index.js","./utils":"../node_modules/construct-ui/lib/esm/utils/index.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+},{"./_shared":"../node_modules/construct-ui/lib/esm/_shared/index.js","./components":"../node_modules/construct-ui/lib/esm/components/index.js","./utils":"../node_modules/construct-ui/lib/esm/utils/index.js"}],"../../../../../../usr/lib/node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
 var bundleURL = null;
 
 function getBundleURLCached() {
@@ -23483,7 +23482,7 @@ function getBaseURL(url) {
 
 exports.getBundleURL = getBundleURLCached;
 exports.getBaseURL = getBaseURL;
-},{}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
+},{}],"../../../../../../usr/lib/node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
 var bundle = require('./bundle-url');
 
 function updateLink(link) {
@@ -23518,12 +23517,12 @@ function reloadCSS() {
 }
 
 module.exports = reloadCSS;
-},{"./bundle-url":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"../node_modules/construct-ui/lib/index.css":[function(require,module,exports) {
+},{"./bundle-url":"../../../../../../usr/lib/node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"../node_modules/construct-ui/lib/index.css":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
 
 module.hot.dispose(reloadCSS);
 module.hot.accept(reloadCSS);
-},{"_css_loader":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"logo.svg":[function(require,module,exports) {
+},{"_css_loader":"../../../../../../usr/lib/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"logo.svg":[function(require,module,exports) {
 module.exports = "/logo.86ce68ea.svg";
 },{}],"components/Nav.js":[function(require,module,exports) {
 "use strict";
@@ -23735,7 +23734,7 @@ var login = {
             case 0:
               console.log('running check');
 
-              if (session && location.hash === '#!/login') {
+              if (localStorage.smurf && location.hash === '#!/login') {
                 _mithril.default.route.set('/main');
               } else {
                 _mithril.default.route.set('/login');
@@ -23798,8 +23797,8 @@ var login = {
               _mithril.default.request({
                 url: "/api/login",
                 headers: {
-                  'user': user,
-                  'pwd': pwd
+                  'user': user.toLowerCase(),
+                  'pwd': pwd.toLowerCase()
                 }
               }).then(function (res) {
                 if (res.user) {
@@ -23925,43 +23924,51 @@ var _Nav = require("./Nav");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// import { Tabs } from './Tabs'
 function AssignedSearch() {
   return {
     view: function view(vnode) {
-      var item = vnode.attrs.search;
-      var contentL = (0, _mithril.default)(_constructUi.Button, {
-        iconLeft: _constructUi.Icons.MINUS,
-        intent: 'negative',
-        size: 'xs',
-        class: 'remove-search',
-        onclick: function onclick(e) {
-          //UNASSIGN SEARCH
-          e.preventDefault();
-          e.stopPropagation();
-          console.log(1);
+      var item = vnode.attrs.search; // let contentL = m(Button, {
+      //   iconLeft: Icons.MINUS,
+      //   intent: 'negative',
+      //   size: 'xs',
+      //   class: 'remove-search',
+      //   onclick: (e) => {
+      //     //UNASSIGN SEARCH
+      //     e.preventDefault()
+      //     e.stopPropagation()
+      //     console.log(1);
+      //     m.request({
+      //       method: 'GET',
+      //       url: `/api/addToClient/unassigned/${item._id}`
+      //     }).then(res => {
+      //       console.log(res);
+      //       showToast(`Unassigned ${item.model}`, 'warning')
+      //     })
+      //   }
+      // })
 
-          _mithril.default.request({
-            method: 'GET',
-            url: "/api/addToClient/unassigned/".concat(item._id)
-          }).then(function (res) {
-            console.log(res);
-            (0, _Nav.showToast)("Unassigned ".concat(item.model), 'warning');
-          });
-        }
-      });
       return (0, _mithril.default)(_constructUi.ListItem, {
-        label: "".concat(item.model, " ").concat(item.color, " ").concat(item.size),
+        // label: `${item.model} ${item.color} ${item.size}`,
         class: "list-item-".concat(vnode.attrs.index),
-        contentLeft: contentL,
-        contentRight: [(0, _mithril.default)(_constructUi.Tag, {
-          size: 'xs',
-          label: item.descr
-        }), (0, _mithril.default)(_constructUi.Tag, {
+        contentLeft: (0, _mithril.default)('.list-content', [(0, _mithril.default)('.left-content.flex.space-b', (0, _mithril.default)('.label', "".concat(item.model, " ").concat(item.color, " ").concat(item.size)), (0, _mithril.default)(_constructUi.Tag, {
           intent: 'warning',
           size: 'xs',
           label: "\u20AC".concat(item.price)
-        })]
+        })), (0, _mithril.default)('.descr-content', (0, _mithril.default)(_constructUi.Tag, {
+          size: 'xs',
+          label: item.descr
+        }))]) // contentRight: [
+        //   m(Tag, {
+        //     size: 'xs',
+        //     label: item.descr
+        //   }),
+        //   m(Tag, {
+        //     intent: 'warning',
+        //     size: 'xs',
+        //     label: `€${item.price}`
+        //   })
+        // ]
+
       });
     }
   };
@@ -23972,7 +23979,10 @@ var Orders = {
   loadOrders: function loadOrders() {
     _mithril.default.request({
       method: "GET",
-      url: "/api/listOrders"
+      url: "/api/listOrders",
+      headers: {
+        user: localStorage.user
+      }
     }).then(function (res) {
       Orders.ordersList = res;
     });
@@ -24033,10 +24043,7 @@ var Orders = {
               method: "DELETE",
               url: "/api/deleteOrder/".concat(order._id)
             }).then(function (res) {
-              console.log(res);
               Orders.ordersList.splice(Orders.ordersList.indexOf(res), 1);
-
-              _mithril.default.redraw();
             });
           }
         })],
@@ -24087,7 +24094,20 @@ var Orders = {
   },
   view: function view() {
     // UNASSIGNED SEARCHES MOVED TO EDIT ORDER
-    return [(0, _mithril.default)('.orders.flex.reverse', Orders.ordersList.map(function (order, o) {
+    return [(0, _mithril.default)(_constructUi.Input, {
+      contentRight: (0, _mithril.default)(_constructUi.Icon, {
+        name: _constructUi.Icons.FILTER
+      }),
+      placeholder: 'Filter Orders',
+      oninput: function oninput(e) {
+        var val = e.target.value.toLowerCase();
+        var orders = e.target.parentElement.parentElement.querySelectorAll('.client-order');
+        orders.forEach(function (order) {
+          var text = order.textContent.toLowerCase();
+          text.includes(val) ? (order.style.order = '-1', order.style.display = 'block') : (order.style.order = 'unset', order.style.display = 'none');
+        });
+      }
+    }), (0, _mithril.default)('.orders.flex.column', Orders.ordersList.map(function (order, o) {
       return (0, _mithril.default)(Orders.order, {
         order: order,
         o: o
@@ -24126,8 +24146,21 @@ var Clients = {
       Clients.loadClients();
     }
   },
-  view: function view(vnode) {
-    return Clients.clientsList.map(function (client, i) {
+  view: function view() {
+    return (0, _mithril.default)('.clients-section', (0, _mithril.default)(_constructUi.Input, {
+      contentRight: (0, _mithril.default)(_constructUi.Icon, {
+        name: _constructUi.Icons.FILTER
+      }),
+      placeholder: 'Filter Clients',
+      oninput: function oninput(e) {
+        var val = e.target.value.toLowerCase();
+        var clients = e.target.parentElement.parentElement.querySelectorAll('.client-card');
+        clients.forEach(function (client) {
+          var text = client.textContent.toLowerCase();
+          text.includes(val) ? (client.style.order = '-1', client.style.display = 'block') : (client.style.order = 'unset', client.style.display = 'none');
+        });
+      }
+    }), (0, _mithril.default)('ul.client-list.flex.column', Clients.clientsList.map(function (client) {
       return [(0, _mithril.default)(_constructUi.Card, {
         class: 'client-card',
         url: client._id,
@@ -24148,7 +24181,7 @@ var Clients = {
         }
       }), (0, _mithril.default)("h1#client-name", client.name + ' ' + client.surname), (0, _mithril.default)(_constructUi.Button, {
         class: 'mail-copy-button',
-        label: "mail: ".concat(client.mail),
+        label: "mail: ".concat(client.mail || ''),
         iconLeft: _constructUi.Icons.COPY,
         basic: true,
         onclick: function onclick(e) {
@@ -24165,7 +24198,7 @@ var Clients = {
           navigator.clipboard.writeText(client.phone);
         }
       }))];
-    });
+    })));
   }
 };
 exports.Clients = Clients;
@@ -24418,7 +24451,10 @@ var ordersSection = {
 
                 _mithril.default.request({
                   method: "POST",
-                  url: "/api/createOrder/".concat(item._id, "/").concat(item.name, "&").concat(item.surname)
+                  url: "/api/createOrder/".concat(item._id, "/").concat(item.name, "&").concat(item.surname),
+                  headers: {
+                    user: localStorage.user
+                  }
                 }).then(function (res) {
                   console.log(res);
 
@@ -24475,7 +24511,7 @@ var clientsSection = {
         return onclick;
       }()
     }), (0, _mithril.default)(".client-content", [(0, _mithril.default)(".new-client.row", [(0, _mithril.default)(_constructUi.Button, {
-      onclick: function onclick(e) {
+      onclick: function onclick() {
         document.querySelector('.new-client.row').classList.toggle('reveal-inputs');
       },
       label: "New Client",
@@ -24557,13 +24593,13 @@ var clientsSection = {
 
         return onclick;
       }()
-    })])]), (0, _mithril.default)("ul.client-list", (0, _mithril.default)(_Clients.Clients))]))];
+    })])]), (0, _mithril.default)(_Clients.Clients)]))];
   }
 };
 var historySection = {
   historyList: [],
   view: function view() {
-    return [(0, _mithril.default)(_Nav.Nav), (0, _mithril.default)('.container.searches', (0, _mithril.default)("h1", "A History of your Searches"), (0, _mithril.default)(_constructUi.Button, {
+    return [(0, _mithril.default)(_Nav.Nav), (0, _mithril.default)('.container.history', (0, _mithril.default)("h1", "A History of your Searches"), (0, _mithril.default)(_constructUi.Button, {
       basic: true,
       iconLeft: _constructUi.Icons.TRASH,
       compact: true,
@@ -24629,117 +24665,7 @@ function s(query, cb) {
 exports.ordersSection = ordersSection;
 exports.clientsSection = clientsSection;
 exports.historySection = historySection;
-},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Nav":"components/Nav.js","./Orders":"components/Orders.js","./Clients":"components/Clients.js","./Searches":"components/Searches.js"}],"components/Dhl.js":[function(require,module,exports) {
-"use strict";
-
-var _mithril = _interopRequireDefault(require("mithril"));
-
-var _constructUi = require("construct-ui");
-
-var _Nav = require("./Nav");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
-function getDhl(awb) {
-  _mithril.default.request({
-    method: 'GET',
-    url: "/api/tracking/".concat(awb)
-  }).then(function (res) {
-    console.log(res[0]);
-    return res[0];
-  });
-}
-
-function Results() {
-  return {
-    view: function view(vnode) {
-      var res = vnode.attrs.res;
-      var delivered = res.delivery.status === 'delivered' ? 'positive' : 'warning';
-      return [(0, _mithril.default)(_constructUi.Tag, {
-        label: 'destination: ' + res.destination.value || null
-      }), (0, _mithril.default)(_constructUi.Tag, {
-        label: res.delivery.status || null,
-        intent: delivered
-      }), (0, _mithril.default)(_constructUi.Tag, {
-        label: 'pieces: ' + res.pieces.value || null
-      }), (0, _mithril.default)(_constructUi.Tag, {
-        label: 'updated: ' + res.checkpoints[0].date
-      }), (0, _mithril.default)(_constructUi.List, {
-        fluid: true,
-        interactive: true
-      }, res.checkpoints.map(function (item) {
-        return (0, _mithril.default)(_constructUi.ListItem, {
-          label: item.description
-        });
-      }))];
-    }
-  };
-}
-
-var Dhl = {
-  tracking: '',
-  view: function view(vnode) {
-    return [(0, _mithril.default)(_Nav.Nav), (0, _mithril.default)('.container', (0, _mithril.default)(_constructUi.Card, {
-      fluid: true
-    }, (0, _mithril.default)(_constructUi.Input, {
-      oninput: function oninput(e) {
-        e.preventDefault(); // console.log(e);
-
-        vnode.state.tracking = e.srcElement.value;
-      },
-      contentLeft: (0, _mithril.default)(_constructUi.Icon, {
-        name: _constructUi.Icons.BOX
-      }),
-      placeholder: 'dhl tracking'
-    }), (0, _mithril.default)(_constructUi.Button, {
-      label: 'Search',
-      iconLeft: _constructUi.Icons.SEARCH,
-      onclick: function () {
-        var _onclick = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(e) {
-          var awb;
-          return regeneratorRuntime.wrap(function _callee$(_context) {
-            while (1) {
-              switch (_context.prev = _context.next) {
-                case 0:
-                  e.preventDefault();
-                  awb = vnode.state.tracking.split(' ').join('');
-
-                  _mithril.default.request({
-                    method: 'GET',
-                    url: "/api/tracking/".concat(awb)
-                  }).then(function (res) {
-                    vnode.state.results = res[0];
-
-                    _mithril.default.render(document.querySelector('.dhl-results'), (0, _mithril.default)(Results, {
-                      res: vnode.state.results
-                    }));
-                  }); // vnode.state.results = await getDhl(vnode.state.tracking)
-                  // console.log(vnode.state);
-
-
-                case 3:
-                case "end":
-                  return _context.stop();
-              }
-            }
-          }, _callee);
-        }));
-
-        function onclick(_x) {
-          return _onclick.apply(this, arguments);
-        }
-
-        return onclick;
-      }()
-    }), (0, _mithril.default)('.dhl-results')))];
-  }
-};
-exports.Dhl = Dhl;
-},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Nav":"components/Nav.js"}],"components/EditClient.js":[function(require,module,exports) {
+},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Nav":"components/Nav.js","./Orders":"components/Orders.js","./Clients":"components/Clients.js","./Searches":"components/Searches.js"}],"components/EditClient.js":[function(require,module,exports) {
 "use strict";
 
 var _mithril = _interopRequireDefault(require("mithril"));
@@ -25500,7 +25426,7 @@ function AssignedSearch() {
       var item = vnode.attrs.search;
       var content = (0, _mithril.default)('.search-popover', [(0, _mithril.default)("img[src=".concat(imgSrc, "][style= padding: .5rem; border-radius:10px; display: block;]"), {
         label: 'click',
-        oninit: function oninit(e) {
+        oninit: function oninit() {
           fetch("api/image/".concat(item.year, "/").concat(item.season, "/").concat(item.model), {
             headers: {
               smurf: localStorage.smurf
@@ -25529,7 +25455,7 @@ function AssignedSearch() {
           _mithril.default.request({
             method: 'GET',
             url: "/api/addToClient/unassigned/".concat(item._id)
-          }).then(function (res) {
+          }).then(function () {
             var removedSearch = vnode.attrs.assignedSearches.splice(vnode.attrs.index, 1)[0];
 
             _Searches.Searches.unassignedSearches.push(removedSearch);
@@ -25537,22 +25463,23 @@ function AssignedSearch() {
             (0, _Nav.showToast)("Unassigned ".concat(item.model), 'warning');
           });
         }
-      }), (0, _mithril.default)('.left-content[style=align-items:center;]', (0, _mithril.default)('.sku-detail.label', "".concat(item.year).concat(item.season, " ").concat(item.model, " ").concat(item.color, " ").concat(item.size)), (0, _mithril.default)(_constructUi.Select, {
-        size: 'xs',
-        basic: true,
-        style: 'margin-right:10px;',
-        options: ['N/A', 'NEG1', 'DOS', 'ECOMM', 'HQ']
+      }), (0, _mithril.default)('.left-content[style=text-align:left;]', (0, _mithril.default)('.sku-detail.label', "".concat(item.year).concat(item.season, " ").concat(item.model, " ").concat(item.color, " ").concat(item.size)), (0, _mithril.default)(_constructUi.Tag, {
+        label: item.descr
       })), (0, _mithril.default)('.right-content[style=overflow:hidden;]', // m(Select, {
       //   size: 'xs',
       //   fluid: true,
       //   options: ['NEG1', 'DOS', 'N/A', 'ECOMM', 'HQ']
       // }),
       (0, _mithril.default)(_constructUi.Tag, {
-        label: item.descr
-      }), (0, _mithril.default)(_constructUi.Tag, {
-        label: item.price,
+        label: "\u20AC".concat(item.price),
         intent: 'warning'
-      }))]);
+      }) // m(Select, {
+      //   size: 'xs',
+      //   basic: true,
+      //   style: 'margin-right:10px;',
+      //   options: ['N/A', 'NEG1', 'DOS', 'ECOMM', 'HQ']
+      // })
+      )]);
     }
   };
 }
@@ -25631,10 +25558,10 @@ function UnassignedSearch() {
           var searchId = item._id;
           vnode.state.assignOrder(order, searchId, index);
         }
-      }), (0, _mithril.default)('.left-content[style=align-items:center;]', (0, _mithril.default)('.sku-detail.label', "".concat(item.year).concat(item.season, " ").concat(item.model, " ").concat(item.color, " ").concat(item.size))), (0, _mithril.default)('.right-content[style=overflow:hidden;]', (0, _mithril.default)(_constructUi.Tag, {
+      }), (0, _mithril.default)('.left-content[style=text-align:left;]', (0, _mithril.default)('.sku-detail.label', "".concat(item.year).concat(item.season, " ").concat(item.model, " ").concat(item.color, " ").concat(item.size)), (0, _mithril.default)(_constructUi.Tag, {
         label: item.descr
-      }), (0, _mithril.default)(_constructUi.Tag, {
-        label: item.price,
+      })), (0, _mithril.default)('.right-content[style=overflow:hidden;]', (0, _mithril.default)(_constructUi.Tag, {
+        label: "\u20AC".concat(item.price),
         intent: 'warning'
       }))]);
     }
@@ -25737,7 +25664,7 @@ var EditOrder = {
           _Searches.Searches.loadSearches();
         });
       }
-    })])), (0, _mithril.default)('.searches.flex', [(0, _mithril.default)('.assigned-searches', (0, _mithril.default)('h3', 'Assigned Searches'), (0, _mithril.default)(_constructUi.List, {
+    })])), (0, _mithril.default)('.searches.grid', [(0, _mithril.default)('.assigned-searches', (0, _mithril.default)('h3', 'Assigned Searches'), (0, _mithril.default)(_constructUi.List, {
       size: 'xs',
       interactive: false // style: `max-width: ${vnode.state.maxWidth};`
 
@@ -25758,7 +25685,7 @@ var EditOrder = {
       label: "pcs: ".concat(vnode.state.pieces)
     }), (0, _mithril.default)(_constructUi.Tag, {
       intent: 'primary',
-      label: "total: ".concat(vnode.state.total)
+      label: "total: \u20AC".concat(vnode.state.total)
     })])), (0, _mithril.default)('.unassigned-searches', (0, _mithril.default)('h3', 'Unassigned Searches'), (0, _mithril.default)(_constructUi.List, {
       size: 'xs',
       interactive: false,
@@ -25792,8 +25719,6 @@ var _logo = _interopRequireDefault(require("./logo.svg"));
 var _login = require("/components/login");
 
 var _Nav = require("/components/Nav");
-
-var _Dhl = require("/components/Dhl");
 
 var _EditClient = _interopRequireDefault(require("/components/EditClient"));
 
@@ -25861,7 +25786,7 @@ var Login = {
       placeholder: 'Password',
       type: 'password',
       autocomplete: "current-password",
-      oncreate: function oncreate(e) {// console.log(e);
+      oncreate: function oncreate() {// console.log(e);
       },
       oninput: function oninput(e) {
         vnode.state.pwd = e.srcElement.value;
@@ -25967,7 +25892,10 @@ var SearchForm = {
                   _context2.next = 7;
                   return _mithril.default.request({
                     method: "GET",
-                    url: "/api/avb/".concat(model, "/").concat(color)
+                    url: "/api/avb/".concat(model, "/").concat(color),
+                    headers: {
+                      smurf: localStorage.smurf
+                    }
                   }).then(function (res) {
                     console.log(res);
 
@@ -26016,13 +25944,27 @@ function Sku() {
       vnode.state.imgFetched = false;
       vnode.state.discountedPrice = ''; // vnode.state.sku = vnode.attrs.sku
 
-      vnode.state.getPrice = function () {
-        _mithril.default.request({
-          method: 'GET',
-          url: "/api/price/".concat(vnode.attrs.sku.year, "/").concat(vnode.attrs.sku.season, "/").concat(vnode.attrs.sku.model)
-        }).then(function (res) {
-          vnode.state.price = res;
-        });
+      vnode.state.getPrice = function (vnode) {
+        if (!vnode.state.price && !localStorage["".concat(vnode.attrs.sku.year).concat(vnode.attrs.sku.season).concat(vnode.attrs.sku.model)]) {
+          _mithril.default.request({
+            method: "GET",
+            url: "/api/price/".concat(vnode.attrs.sku.year, "/").concat(vnode.attrs.sku.season, "/").concat(vnode.attrs.sku.model),
+            headers: {
+              smurf: localStorage.smurf
+            }
+          }).then(function (res) {
+            if (_noSaleAI.NOSALE.filter(function (e) {
+              return e == vnode.attrs.sku.model + vnode.attrs.sku.color;
+            }).length > 0 && vnode.attrs.sku.year + vnode.attrs.sku.season === '202') {
+              vnode.dom.querySelector('.basic').textContent = 'BASICO';
+            } else if (vnode.attrs.sku.year + vnode.attrs.sku.season === '202') {
+              vnode.state.salable = true;
+            }
+
+            vnode.state.price = res;
+            localStorage["".concat(vnode.attrs.sku.year).concat(vnode.attrs.sku.season).concat(vnode.attrs.sku.model)] = res;
+          });
+        }
       };
     },
     oncreate: function oncreate() {// vnode.state.imgSrc = ''
@@ -26031,7 +25973,6 @@ function Sku() {
       var i = vnode.attrs.i;
       var sku = vnode.attrs.sku;
       var string = sku.string.split(' ').join('');
-      sku.price = '';
       var discountedPrice = null;
       var content = (0, _mithril.default)("img.sku-image-".concat(i, "[src=").concat(vnode.state.imgSrc, "]"));
       return (0, _mithril.default)(_constructUi.Card, {
@@ -26059,7 +26000,11 @@ function Sku() {
               vnode.state.loading = !vnode.state.loading; // e.preventDefault();
               // e.stopPropagation();
 
-              fetch("api/image/".concat(sku.year, "/").concat(sku.season, "/").concat(sku.model)).then(function (res) {
+              fetch("api/image/".concat(sku.year, "/").concat(sku.season, "/").concat(sku.model), {
+                headers: {
+                  smurf: localStorage.smurf
+                }
+              }).then(function (res) {
                 return res.text();
               }).then(function (url) {
                 vnode.state.imgFetched = true;
@@ -26080,30 +26025,13 @@ function Sku() {
         class: 'price-' + string,
         size: 'xs',
         intent: vnode.state.salable ? 'negative' : 'warning',
-        oncreate: function oncreate() {
-          if (!vnode.state.price) {
-            vnode.state.price = 'fetching';
-
-            _mithril.default.request({
-              method: "GET",
-              url: "/api/price/".concat(sku.year, "/").concat(sku.season, "/").concat(sku.model)
-            }).then(function (res) {
-              if (_noSaleAI.NOSALE.filter(function (e) {
-                return e == sku.model + sku.color;
-              }).length > 0 && sku.year + sku.season === '202') {
-                vnode.dom.querySelector('.basic').textContent = 'BASICO';
-                vnode.state.price = res;
-              } else if (sku.year + sku.season === '202') {
-                vnode.state.salable = true;
-                vnode.state.price = res;
-              } else {
-                vnode.state.price = res;
-              }
-            });
-          }
+        oncreate: function oncreate(e) {
+          vnode.state.getPrice(vnode);
+          console.log(e);
         },
-        sublabel: "\u20AC".concat(vnode.state.price),
+        sublabel: "\u20AC".concat(vnode.state.price || localStorage["".concat(sku.year).concat(sku.season).concat(sku.model)], " "),
         label: vnode.state.discountedPrice,
+        loading: vnode.state.price || localStorage["".concat(sku.year).concat(sku.season).concat(sku.model)] ? false : true,
         onclick: function onclick() {
           if (vnode.state.salable) {
             vnode.state.discountedPrice = parseInt(parseInt(vnode.state.price) * 0.7);
@@ -26133,7 +26061,10 @@ function SizeButton() {
   function getShops(sku, i) {
     _mithril.default.request({
       method: 'GET',
-      url: "/api/".concat(sku.year, "/").concat(sku.season, "/").concat(sku.model, "/").concat(sku.color, "/").concat(sku.sizesForRequests[i])
+      url: "/api/".concat(sku.year, "/").concat(sku.season, "/").concat(sku.model, "/").concat(sku.color, "/").concat(sku.sizesForRequests[i]),
+      headers: {
+        smurf: localStorage.smurf
+      }
     }).then(function (res) {
       shops = Object.values(res)[0];
       isLoading = !isLoading;
@@ -26285,12 +26216,12 @@ _mithril.default.route(document.body, '/main', {
   '/orders': ordersSection,
   '/clients': clientsSection,
   '/history': historySection,
-  '/dhlTracking': _Dhl.Dhl,
+  // '/dhlTracking': Dhl,
   '/orders/edit/:id': _EditOrder.default,
   '/clients/edit/:id': _EditClient.default,
   '/richieste': _Richieste.Richieste
 });
-},{"regenerator-runtime/runtime":"../node_modules/regenerator-runtime/runtime.js","mithril":"../node_modules/mithril/index.js","socket.io-client":"../node_modules/socket.io-client/build/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../node_modules/construct-ui/lib/index.css":"../node_modules/construct-ui/lib/index.css","./logo.svg":"logo.svg","/components/login":"components/login.js","/components/Tabs":"components/Tabs.js","/components/Nav":"components/Nav.js","/components/Dhl":"components/Dhl.js","/components/EditClient":"components/EditClient.js","/components/Searches":"components/Searches.js","/components/Richieste":"components/Richieste.js","/components/EditOrder":"components/EditOrder.js","./noSaleAI20":"noSaleAI20.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"regenerator-runtime/runtime":"../node_modules/regenerator-runtime/runtime.js","mithril":"../node_modules/mithril/index.js","socket.io-client":"../node_modules/socket.io-client/build/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../node_modules/construct-ui/lib/index.css":"../node_modules/construct-ui/lib/index.css","./logo.svg":"logo.svg","/components/login":"components/login.js","/components/Tabs":"components/Tabs.js","/components/Nav":"components/Nav.js","/components/EditClient":"components/EditClient.js","/components/Searches":"components/Searches.js","/components/Richieste":"components/Richieste.js","/components/EditOrder":"components/EditOrder.js","./noSaleAI20":"noSaleAI20.js"}],"../../../../../../usr/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -26318,7 +26249,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "13090" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "33139" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -26494,5 +26425,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","app.js"], null)
+},{}]},{},["../../../../../../usr/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","app.js"], null)
 //# sourceMappingURL=/app.c328ef1a.js.map

@@ -255,7 +255,10 @@ let ordersSection = {
                         console.log(item)
                         m.request({
                           method: "POST",
-                          url: `/api/createOrder/${item._id}/${item.name}&${item.surname}`
+                          url: `/api/createOrder/${item._id}/${item.name}&${item.surname}`,
+                          headers: {
+                            user: localStorage.user
+                          }
                         }).then(res => {
                           console.log(res);
                           Orders.ordersList.push(res)
@@ -301,7 +304,7 @@ let clientsSection = {
         m(".client-content", [
           m(".new-client.row", [
             m(Button, {
-              onclick: (e) => {
+              onclick: () => {
                 document.querySelector('.new-client.row').classList.toggle('reveal-inputs')
               },
               label: "New Client",
@@ -370,7 +373,7 @@ let clientsSection = {
               })
             ])
           ]),
-          m("ul.client-list", m(Clients))
+          m(Clients)
         ])
       )
     ]
@@ -381,7 +384,7 @@ let historySection = {
   historyList: [],
   view: () => {
     return [m(Nav),
-      m('.container.searches',
+      m('.container.history',
         m("h1", "A History of your Searches"),
         m(Button, {
           basic: true,
