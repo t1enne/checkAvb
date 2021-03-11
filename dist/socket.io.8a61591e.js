@@ -117,7 +117,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
+})({"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -326,7 +326,7 @@ process.chdir = function (dir) {
 process.umask = function () {
   return 0;
 };
-},{}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/base64-js/index.js":[function(require,module,exports) {
+},{}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/base64-js/index.js":[function(require,module,exports) {
 'use strict'
 
 exports.byteLength = byteLength
@@ -454,9 +454,7 @@ function fromByteArray (uint8) {
 
   // go through the array every three bytes, we'll deal with trailing stuff later
   for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
-    parts.push(encodeChunk(
-      uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)
-    ))
+    parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)))
   }
 
   // pad the end with zeros, but make sure to not forget the extra bytes
@@ -480,7 +478,8 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/ieee754/index.js":[function(require,module,exports) {
+},{}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/ieee754/index.js":[function(require,module,exports) {
+/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = (nBytes * 8) - mLen - 1
@@ -566,14 +565,14 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/isarray/index.js":[function(require,module,exports) {
+},{}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/isarray/index.js":[function(require,module,exports) {
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/buffer/index.js":[function(require,module,exports) {
+},{}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/buffer/index.js":[function(require,module,exports) {
 
 var global = arguments[3];
 /*!
@@ -2366,7 +2365,7 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-},{"base64-js":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/base64-js/index.js","ieee754":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/ieee754/index.js","isarray":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/isarray/index.js","buffer":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/buffer/index.js"}],"../node_modules/socket.io-client/dist/socket.io.js":[function(require,module,exports) {
+},{"base64-js":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/base64-js/index.js","ieee754":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/ieee754/index.js","isarray":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/isarray/index.js","buffer":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/buffer/index.js"}],"../node_modules/socket.io-client/dist/socket.io.js":[function(require,module,exports) {
 var define;
 var global = arguments[3];
 var process = require("process");
@@ -2987,7 +2986,9 @@ function _typeof2(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "funct
         /*! debug */
         "./node_modules/debug/src/browser.js")("socket.io-client:manager");
 
-        var Manager = /*#__PURE__*/function (_Emitter) {
+        var Manager =
+        /*#__PURE__*/
+        function (_Emitter) {
           _inherits(Manager, _Emitter);
 
           var _super = _createSuper(Manager);
@@ -3770,7 +3771,9 @@ function _typeof2(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "funct
           removeListener: 1
         });
 
-        var Socket = /*#__PURE__*/function (_Emitter) {
+        var Socket =
+        /*#__PURE__*/
+        function (_Emitter) {
           _inherits(Socket, _Emitter);
 
           var _super = _createSuper(Socket);
@@ -5003,9 +5006,9 @@ function _typeof2(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "funct
 
             try {
               r = exports.storage.getItem('debug');
-            } catch (error) {// Swallow
-              // XXX (@Qix-) should we be logging these?
-            } // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
+            } catch (error) {} // Swallow
+            // XXX (@Qix-) should we be logging these?
+            // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
 
 
             if (!r && typeof process !== 'undefined' && 'env' in process) {
@@ -5605,7 +5608,9 @@ function _typeof2(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "funct
         /*! parseqs */
         "./node_modules/parseqs/index.js");
 
-        var Socket = /*#__PURE__*/function (_Emitter) {
+        var Socket =
+        /*#__PURE__*/
+        function (_Emitter) {
           _inherits(Socket, _Emitter);
 
           var _super = _createSuper(Socket);
@@ -6387,7 +6392,9 @@ function _typeof2(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "funct
         /*! component-emitter */
         "./node_modules/component-emitter/index.js");
 
-        var Transport = /*#__PURE__*/function (_Emitter) {
+        var Transport =
+        /*#__PURE__*/
+        function (_Emitter) {
           _inherits(Transport, _Emitter);
 
           var _super = _createSuper(Transport);
@@ -6779,7 +6786,9 @@ function _typeof2(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "funct
 
         function empty() {}
 
-        var JSONPPolling = /*#__PURE__*/function (_Polling) {
+        var JSONPPolling =
+        /*#__PURE__*/
+        function (_Polling) {
           _inherits(JSONPPolling, _Polling);
 
           var _super = _createSuper(JSONPPolling);
@@ -7176,7 +7185,9 @@ function _typeof2(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "funct
           return null != xhr.responseType;
         }();
 
-        var XHR = /*#__PURE__*/function (_Polling) {
+        var XHR =
+        /*#__PURE__*/
+        function (_Polling) {
           _inherits(XHR, _Polling);
 
           var _super = _createSuper(XHR);
@@ -7281,7 +7292,9 @@ function _typeof2(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "funct
           return XHR;
         }(Polling);
 
-        var Request = /*#__PURE__*/function (_Emitter) {
+        var Request =
+        /*#__PURE__*/
+        function (_Emitter) {
           _inherits(Request, _Emitter);
 
           var _super2 = _createSuper(Request);
@@ -7689,7 +7702,9 @@ function _typeof2(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "funct
         /*! debug */
         "./node_modules/debug/src/browser.js")("engine.io-client:polling");
 
-        var Polling = /*#__PURE__*/function (_Transport) {
+        var Polling =
+        /*#__PURE__*/
+        function (_Transport) {
           _inherits(Polling, _Transport);
 
           var _super = _createSuper(Polling);
@@ -8099,7 +8114,9 @@ function _typeof2(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "funct
 
         var isReactNative = typeof navigator !== "undefined" && typeof navigator.product === "string" && navigator.product.toLowerCase() === "reactnative";
 
-        var WS = /*#__PURE__*/function (_Transport) {
+        var WS =
+        /*#__PURE__*/
+        function (_Transport) {
           _inherits(WS, _Transport);
 
           var _super = _createSuper(WS);
@@ -9582,7 +9599,9 @@ function _typeof2(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "funct
          */
 
 
-        var Encoder = /*#__PURE__*/function () {
+        var Encoder =
+        /*#__PURE__*/
+        function () {
           function Encoder() {
             _classCallCheck(this, Encoder);
           }
@@ -9669,7 +9688,9 @@ function _typeof2(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "funct
          * @return {Object} decoder
          */
 
-        var Decoder = /*#__PURE__*/function (_Emitter) {
+        var Decoder =
+        /*#__PURE__*/
+        function (_Emitter) {
           _inherits(Decoder, _Emitter);
 
           var _super = _createSuper(Decoder);
@@ -9864,7 +9885,9 @@ function _typeof2(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "funct
          */
 
 
-        var BinaryReconstructor = /*#__PURE__*/function () {
+        var BinaryReconstructor =
+        /*#__PURE__*/
+        function () {
           function BinaryReconstructor(packet) {
             _classCallCheck(this, BinaryReconstructor);
 
@@ -10091,7 +10114,7 @@ function _typeof2(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "funct
     })
   );
 });
-},{"process":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/process/browser.js","buffer":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/buffer/index.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"process":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/process/browser.js","buffer":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/buffer/index.js"}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -10119,7 +10142,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "6866" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "41771" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -10150,9 +10173,8 @@ if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
         assetsToAccept.forEach(function (v) {
           hmrAcceptRun(v[0], v[1]);
         });
-      } else if (location.reload) {
-        // `location` global exists in a web worker context but lacks `.reload()` function.
-        location.reload();
+      } else {
+        window.location.reload();
       }
     }
 
@@ -10295,5 +10317,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","../node_modules/socket.io-client/dist/socket.io.js"], null)
+},{}]},{},["../../../../.npm/_npx/32004/lib/node_modules/parcel/src/builtins/hmr-runtime.js","../node_modules/socket.io-client/dist/socket.io.js"], null)
 //# sourceMappingURL=/socket.io.8a61591e.js.map

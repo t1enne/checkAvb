@@ -21,7 +21,7 @@ async function getCookie(user, pwd) {
       method: 'POST',
       mode: 'cors',
     }).then(res => res.headers.raw()['set-cookie'][0].split(';')[0])
-    if(cookie != undefined){
+    if (cookie != undefined) {
       console.log(cookie);
       return {
         cookie
@@ -52,7 +52,18 @@ async function getPrice(cookie, year, season, model) {
 
     let $ = cheerio.load(html);
 
-    const cc = $(`#tab6 > table a`)
+    const cc = Array.from($(`#tab6 > table tr`))
+    if (cc.length) {
+      cc.forEach(tr => {
+        let desc = tr.textContent.trim()
+
+        const clickAtt = tr.querySelector('a').getAttribute('onclick')
+        let url = `https://websmart.brunellocucinelli.it${clickAtt.match('/.*jpg')[0]}`
+
+        console.log(desc, url)
+      })
+    }
+
     // console.log(cc);
 
     const buttonUrl = $('.actions > a').attr('href');
@@ -68,7 +79,7 @@ async function getPrice(cookie, year, season, model) {
       .then((res) => res.text())
       .then((priceHtml) => {
         $ = cheerio.load(priceHtml);
-        const p = $('.mainlist:nth-child(1) tr:contains("SOLOMEO") > td:nth-child(2)').text();
+        const p = $('#listtable tr:contains("SOLOMEO") > td:nth-child(2)').text();
         return p.split('.').join('');
       });
     return price;
@@ -105,6 +116,29 @@ async function getImage(cookie, year, season, model) {
         })
         .then((res) => res.buffer());
     }
+
+    const b64 = Buffer.from(buffer).toString('base64');
+    return `data:image/jpeg;base64,${b64}`;
+  } catch (e) {
+    console.log(e.message);
+  }
+}
+
+
+async function getColors(cookie, url) {
+  try {
+    const headers = {
+      Cookie: cookie,
+    };
+
+    let buffer = await fetch(url, {
+        credentials: 'include',
+        headers,
+        referrer: 'https://websmart.brunellocucinelli.it/bcweb/WRTICMO10R.pgm',
+        method: 'GET',
+        mode: 'cors',
+      })
+      .then((res) => res.buffer());
 
     const b64 = Buffer.from(buffer).toString('base64');
     return `data:image/jpeg;base64,${b64}`;
@@ -230,7 +264,7 @@ async function availabilityRequest(cookie, model, color) {
       mode: 'cors',
     }).then((res) => res.text());
 
-    if( html.search('nonvalid') != -1 ) return 401
+    if (html.search('nonvalid') != -1) return 401
 
     // LOGGIN OUT RESULTS
     const $ = cheerio.load(html);
@@ -352,3 +386,4 @@ module.exports.getCookie = getCookie;
 module.exports.getImage = getImage;
 module.exports.getReceivables = getReceivables;
 module.exports.getPrice = getPrice;
+module.exports.getColors = getColors;

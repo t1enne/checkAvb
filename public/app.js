@@ -323,9 +323,9 @@ function Sku() {
             size: 'xs',
             intent: vnode.state.salable ?
               'negative' : 'warning',
-            oncreate(e) {
+            oncreate() {
               vnode.state.getPrice(vnode)
-              console.log(e);
+              // console.log(e);
             },
             sublabel: `€${vnode.state.price || localStorage[`${sku.year}${sku.season}${sku.model}`]} `,
             label: vnode.state.discountedPrice,

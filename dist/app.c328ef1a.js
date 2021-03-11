@@ -3469,7 +3469,7 @@ function setup(env) {
 
 module.exports = setup;
 
-},{"ms":"../node_modules/socket.io-client/node_modules/ms/index.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
+},{"ms":"../node_modules/socket.io-client/node_modules/ms/index.js"}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -3807,9 +3807,9 @@ function load() {
 
   try {
     r = exports.storage.getItem('debug');
-  } catch (error) {// Swallow
-    // XXX (@Qix-) should we be logging these?
-  } // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
+  } catch (error) {} // Swallow
+  // XXX (@Qix-) should we be logging these?
+  // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
 
 
   if (!r && typeof process !== 'undefined' && 'env' in process) {
@@ -3855,7 +3855,7 @@ formatters.j = function (v) {
     return '[UnexpectedJSONParseError]: ' + error.message;
   }
 };
-},{"./common":"../node_modules/socket.io-client/node_modules/debug/src/common.js","process":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../node_modules/socket.io-client/build/url.js":[function(require,module,exports) {
+},{"./common":"../node_modules/socket.io-client/node_modules/debug/src/common.js","process":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/process/browser.js"}],"../node_modules/socket.io-client/build/url.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5214,9 +5214,9 @@ function load() {
 
   try {
     r = exports.storage.getItem('debug');
-  } catch (error) {// Swallow
-    // XXX (@Qix-) should we be logging these?
-  } // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
+  } catch (error) {} // Swallow
+  // XXX (@Qix-) should we be logging these?
+  // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
 
 
   if (!r && typeof process !== 'undefined' && 'env' in process) {
@@ -5262,7 +5262,7 @@ formatters.j = function (v) {
     return '[UnexpectedJSONParseError]: ' + error.message;
   }
 };
-},{"./common":"../node_modules/engine.io-client/node_modules/debug/src/common.js","process":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../node_modules/engine.io-client/lib/transports/polling.js":[function(require,module,exports) {
+},{"./common":"../node_modules/engine.io-client/node_modules/debug/src/common.js","process":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/process/browser.js"}],"../node_modules/engine.io-client/lib/transports/polling.js":[function(require,module,exports) {
 const Transport = require("../transport");
 const parseqs = require("parseqs");
 const parser = require("engine.io-parser");
@@ -6046,7 +6046,7 @@ module.exports = {
   defaultBinaryType: "arraybuffer"
 };
 
-},{"../globalThis":"../node_modules/engine.io-client/lib/globalThis.browser.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/base64-js/index.js":[function(require,module,exports) {
+},{"../globalThis":"../node_modules/engine.io-client/lib/globalThis.browser.js"}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/base64-js/index.js":[function(require,module,exports) {
 'use strict'
 
 exports.byteLength = byteLength
@@ -6174,9 +6174,7 @@ function fromByteArray (uint8) {
 
   // go through the array every three bytes, we'll deal with trailing stuff later
   for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
-    parts.push(encodeChunk(
-      uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)
-    ))
+    parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)))
   }
 
   // pad the end with zeros, but make sure to not forget the extra bytes
@@ -6200,7 +6198,8 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/ieee754/index.js":[function(require,module,exports) {
+},{}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/ieee754/index.js":[function(require,module,exports) {
+/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = (nBytes * 8) - mLen - 1
@@ -6286,14 +6285,14 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/isarray/index.js":[function(require,module,exports) {
+},{}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/isarray/index.js":[function(require,module,exports) {
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/buffer/index.js":[function(require,module,exports) {
+},{}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/buffer/index.js":[function(require,module,exports) {
 
 var global = arguments[3];
 /*!
@@ -8086,7 +8085,7 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-},{"base64-js":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/base64-js/index.js","ieee754":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/ieee754/index.js","isarray":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/isarray/index.js","buffer":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/buffer/index.js"}],"../node_modules/engine.io-client/lib/transports/websocket.js":[function(require,module,exports) {
+},{"base64-js":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/base64-js/index.js","ieee754":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/ieee754/index.js","isarray":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/isarray/index.js","buffer":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/buffer/index.js"}],"../node_modules/engine.io-client/lib/transports/websocket.js":[function(require,module,exports) {
 var Buffer = require("buffer").Buffer;
 const Transport = require("../transport");
 const parser = require("engine.io-parser");
@@ -8352,7 +8351,7 @@ class WS extends Transport {
 
 module.exports = WS;
 
-},{"../transport":"../node_modules/engine.io-client/lib/transport.js","engine.io-parser":"../node_modules/engine.io-parser/lib/index.js","parseqs":"../node_modules/parseqs/index.js","yeast":"../node_modules/yeast/index.js","../util":"../node_modules/engine.io-client/lib/util.js","./websocket-constructor":"../node_modules/engine.io-client/lib/transports/websocket-constructor.browser.js","debug":"../node_modules/engine.io-client/node_modules/debug/src/browser.js","buffer":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/buffer/index.js"}],"../node_modules/engine.io-client/lib/transports/index.js":[function(require,module,exports) {
+},{"../transport":"../node_modules/engine.io-client/lib/transport.js","engine.io-parser":"../node_modules/engine.io-parser/lib/index.js","parseqs":"../node_modules/parseqs/index.js","yeast":"../node_modules/yeast/index.js","../util":"../node_modules/engine.io-client/lib/util.js","./websocket-constructor":"../node_modules/engine.io-client/lib/transports/websocket-constructor.browser.js","debug":"../node_modules/engine.io-client/node_modules/debug/src/browser.js","buffer":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/buffer/index.js"}],"../node_modules/engine.io-client/lib/transports/index.js":[function(require,module,exports) {
 const XMLHttpRequest = require("xmlhttprequest-ssl");
 const XHR = require("./polling-xhr");
 const JSONP = require("./polling-jsonp");
@@ -9812,9 +9811,9 @@ function load() {
 
   try {
     r = exports.storage.getItem('debug');
-  } catch (error) {// Swallow
-    // XXX (@Qix-) should we be logging these?
-  } // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
+  } catch (error) {} // Swallow
+  // XXX (@Qix-) should we be logging these?
+  // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
 
 
   if (!r && typeof process !== 'undefined' && 'env' in process) {
@@ -9860,7 +9859,7 @@ formatters.j = function (v) {
     return '[UnexpectedJSONParseError]: ' + error.message;
   }
 };
-},{"./common":"../node_modules/socket.io-parser/node_modules/debug/src/common.js","process":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../node_modules/socket.io-parser/dist/index.js":[function(require,module,exports) {
+},{"./common":"../node_modules/socket.io-parser/node_modules/debug/src/common.js","process":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/process/browser.js"}],"../node_modules/socket.io-parser/dist/index.js":[function(require,module,exports) {
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -9879,7 +9878,7 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
@@ -9925,21 +9924,23 @@ var PacketType;
  */
 
 
-var Encoder = /*#__PURE__*/function () {
+var Encoder =
+/*#__PURE__*/
+function () {
   function Encoder() {
     _classCallCheck(this, Encoder);
   }
 
   _createClass(Encoder, [{
     key: "encode",
-
+    value:
     /**
      * Encode a packet as a single string if non-binary, or as a
      * buffer sequence, depending on packet type.
      *
      * @param {Object} obj - packet object
      */
-    value: function encode(obj) {
+    function encode(obj) {
       debug("encoding packet %j", obj);
 
       if (obj.type === PacketType.EVENT || obj.type === PacketType.ACK) {
@@ -10012,7 +10013,9 @@ exports.Encoder = Encoder;
  * @return {Object} decoder
  */
 
-var Decoder = /*#__PURE__*/function (_Emitter) {
+var Decoder =
+/*#__PURE__*/
+function (_Emitter) {
   _inherits(Decoder, _Emitter);
 
   var _super = _createSuper(Decoder);
@@ -10152,11 +10155,11 @@ var Decoder = /*#__PURE__*/function (_Emitter) {
     }
   }, {
     key: "destroy",
-
+    value:
     /**
      * Deallocates a parser's resources
      */
-    value: function destroy() {
+    function destroy() {
       if (this.reconstructor) {
         this.reconstructor.finishedReconstruction();
       }
@@ -10207,7 +10210,9 @@ function tryParse(str) {
  */
 
 
-var BinaryReconstructor = /*#__PURE__*/function () {
+var BinaryReconstructor =
+/*#__PURE__*/
+function () {
   function BinaryReconstructor(packet) {
     _classCallCheck(this, BinaryReconstructor);
 
@@ -10327,7 +10332,7 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
@@ -10361,7 +10366,9 @@ var RESERVED_EVENTS = Object.freeze({
   removeListener: 1
 });
 
-var Socket = /*#__PURE__*/function (_Emitter) {
+var Socket =
+/*#__PURE__*/
+function (_Emitter) {
   _inherits(Socket, _Emitter);
 
   var _super = _createSuper(Socket);
@@ -10418,13 +10425,18 @@ var Socket = /*#__PURE__*/function (_Emitter) {
      */
 
   }, {
-    key: "connect",
-
+    key: "active",
+    get: function get() {
+      return !!this.subs;
+    }
     /**
      * "Opens" the socket.
      *
      * @public
      */
+
+  }, {
+    key: "connect",
     value: function connect() {
       if (this.connected) return this;
       this.subEvents();
@@ -10472,12 +10484,12 @@ var Socket = /*#__PURE__*/function (_Emitter) {
   }, {
     key: "emit",
     value: function emit(ev) {
-      if (RESERVED_EVENTS.hasOwnProperty(ev)) {
-        throw new Error('"' + ev + '" is a reserved event name');
-      }
-
       for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
         args[_key2 - 1] = arguments[_key2];
+      }
+
+      if (RESERVED_EVENTS.hasOwnProperty(ev)) {
+        throw new Error('"' + ev + '" is a reserved event name');
       }
 
       args.unshift(ev);
@@ -10679,14 +10691,13 @@ var Socket = /*#__PURE__*/function (_Emitter) {
       var self = this;
       var sent = false;
       return function () {
-        // prevent double callbacks
-        if (sent) return;
-        sent = true;
-
         for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
           args[_key3] = arguments[_key3];
         }
 
+        // prevent double callbacks
+        if (sent) return;
+        sent = true;
         debug("sending ack %j", args);
         self.packet({
           type: socket_io_parser_1.PacketType.ACK,
@@ -10850,8 +10861,11 @@ var Socket = /*#__PURE__*/function (_Emitter) {
      */
 
   }, {
-    key: "onAny",
-
+    key: "volatile",
+    get: function get() {
+      this.flags.volatile = true;
+      return this;
+    }
     /**
      * Adds a listener that will be fired when any event is emitted. The event name is passed as the first argument to the
      * callback.
@@ -10859,6 +10873,9 @@ var Socket = /*#__PURE__*/function (_Emitter) {
      * @param listener
      * @public
      */
+
+  }, {
+    key: "onAny",
     value: function onAny(listener) {
       this._anyListeners = this._anyListeners || [];
 
@@ -10923,17 +10940,6 @@ var Socket = /*#__PURE__*/function (_Emitter) {
     key: "listenersAny",
     value: function listenersAny() {
       return this._anyListeners || [];
-    }
-  }, {
-    key: "active",
-    get: function get() {
-      return !!this.subs;
-    }
-  }, {
-    key: "volatile",
-    get: function get() {
-      this.flags.volatile = true;
-      return this;
     }
   }]);
 
@@ -11053,7 +11059,7 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
@@ -11078,7 +11084,9 @@ var Backoff = require("backo2");
 
 var debug = require("debug")("socket.io-client:manager");
 
-var Manager = /*#__PURE__*/function (_Emitter) {
+var Manager =
+/*#__PURE__*/
+function (_Emitter) {
   _inherits(Manager, _Emitter);
 
   var _super = _createSuper(Manager);
@@ -18817,14 +18825,14 @@ function () {
 }();
 
 exports.List = List;
-},{"tslib":"../node_modules/tslib/tslib.es6.js","mithril":"../node_modules/mithril/index.js","classnames":"../node_modules/classnames/index.js","../../_shared":"../node_modules/construct-ui/lib/esm/_shared/index.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/util/support/isBufferBrowser.js":[function(require,module,exports) {
+},{"tslib":"../node_modules/tslib/tslib.es6.js","mithril":"../node_modules/mithril/index.js","classnames":"../node_modules/classnames/index.js","../../_shared":"../node_modules/construct-ui/lib/esm/_shared/index.js"}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/util/support/isBufferBrowser.js":[function(require,module,exports) {
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/util/node_modules/inherits/inherits_browser.js":[function(require,module,exports) {
+},{}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/util/node_modules/inherits/inherits_browser.js":[function(require,module,exports) {
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -18849,7 +18857,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/util/util.js":[function(require,module,exports) {
+},{}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/util/util.js":[function(require,module,exports) {
 var process = require("process");
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -19570,7 +19578,7 @@ function callbackify(original) {
 }
 
 exports.callbackify = callbackify;
-},{"./support/isBuffer":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/util/support/isBufferBrowser.js","inherits":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/util/node_modules/inherits/inherits_browser.js","process":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../node_modules/construct-ui/lib/esm/components/list/ListItem.js":[function(require,module,exports) {
+},{"./support/isBuffer":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/util/support/isBufferBrowser.js","inherits":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/util/node_modules/inherits/inherits_browser.js","process":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/process/browser.js"}],"../node_modules/construct-ui/lib/esm/components/list/ListItem.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19635,7 +19643,7 @@ function () {
 }();
 
 exports.ListItem = ListItem;
-},{"tslib":"../node_modules/tslib/tslib.es6.js","mithril":"../node_modules/mithril/index.js","classnames":"../node_modules/classnames/index.js","../../_shared":"../node_modules/construct-ui/lib/esm/_shared/index.js","util":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/util/util.js"}],"../node_modules/construct-ui/lib/esm/components/list/index.js":[function(require,module,exports) {
+},{"tslib":"../node_modules/tslib/tslib.es6.js","mithril":"../node_modules/mithril/index.js","classnames":"../node_modules/classnames/index.js","../../_shared":"../node_modules/construct-ui/lib/esm/_shared/index.js","util":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/util/util.js"}],"../node_modules/construct-ui/lib/esm/components/list/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -23451,7 +23459,7 @@ Object.keys(_utils).forEach(function (key) {
     }
   });
 });
-},{"./_shared":"../node_modules/construct-ui/lib/esm/_shared/index.js","./components":"../node_modules/construct-ui/lib/esm/components/index.js","./utils":"../node_modules/construct-ui/lib/esm/utils/index.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+},{"./_shared":"../node_modules/construct-ui/lib/esm/_shared/index.js","./components":"../node_modules/construct-ui/lib/esm/components/index.js","./utils":"../node_modules/construct-ui/lib/esm/utils/index.js"}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/src/builtins/bundle-url.js":[function(require,module,exports) {
 var bundleURL = null;
 
 function getBundleURLCached() {
@@ -23483,7 +23491,7 @@ function getBaseURL(url) {
 
 exports.getBundleURL = getBundleURLCached;
 exports.getBaseURL = getBaseURL;
-},{}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
+},{}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/src/builtins/css-loader.js":[function(require,module,exports) {
 var bundle = require('./bundle-url');
 
 function updateLink(link) {
@@ -23518,12 +23526,12 @@ function reloadCSS() {
 }
 
 module.exports = reloadCSS;
-},{"./bundle-url":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"../node_modules/construct-ui/lib/index.css":[function(require,module,exports) {
+},{"./bundle-url":"../../../../.npm/_npx/32004/lib/node_modules/parcel/src/builtins/bundle-url.js"}],"../node_modules/construct-ui/lib/index.css":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
 
 module.hot.dispose(reloadCSS);
 module.hot.accept(reloadCSS);
-},{"_css_loader":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"logo.svg":[function(require,module,exports) {
+},{"_css_loader":"../../../../.npm/_npx/32004/lib/node_modules/parcel/src/builtins/css-loader.js"}],"logo.svg":[function(require,module,exports) {
 module.exports = "/logo.86ce68ea.svg";
 },{}],"components/Nav.js":[function(require,module,exports) {
 "use strict";
@@ -23727,15 +23735,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //check if session exists
 var session = null;
 var login = {
-  check: function check() {
-    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+  check: function () {
+    var _check = _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee() {
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
               console.log('running check');
 
-              if (session && location.hash === '#!/login') {
+              if (localStorage.smurf && location.hash === '#!/login') {
                 _mithril.default.route.set('/main');
               } else {
                 _mithril.default.route.set('/login');
@@ -23747,10 +23757,18 @@ var login = {
           }
         }
       }, _callee);
-    }))();
-  },
-  setDev: function setDev() {
-    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+    }));
+
+    function check() {
+      return _check.apply(this, arguments);
+    }
+
+    return check;
+  }(),
+  setDev: function () {
+    var _setDev = _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee2() {
       return regeneratorRuntime.wrap(function _callee2$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
@@ -23787,10 +23805,18 @@ var login = {
           }
         }
       }, _callee2);
-    }))();
-  },
-  authenticate: function authenticate(remember, user, pwd) {
-    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+    }));
+
+    function setDev() {
+      return _setDev.apply(this, arguments);
+    }
+
+    return setDev;
+  }(),
+  authenticate: function () {
+    var _authenticate = _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee3(remember, user, pwd) {
       return regeneratorRuntime.wrap(function _callee3$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
@@ -23798,8 +23824,8 @@ var login = {
               _mithril.default.request({
                 url: "/api/login",
                 headers: {
-                  'user': user,
-                  'pwd': pwd
+                  'user': user.toLowerCase(),
+                  'pwd': pwd.toLowerCase()
                 }
               }).then(function (res) {
                 if (res.user) {
@@ -23819,8 +23845,14 @@ var login = {
           }
         }
       }, _callee3);
-    }))();
-  }
+    }));
+
+    function authenticate(_x, _x2, _x3) {
+      return _authenticate.apply(this, arguments);
+    }
+
+    return authenticate;
+  }()
 };
 exports.login = login;
 },{"mithril":"../node_modules/mithril/index.js","./Nav":"components/Nav.js"}],"components/Searches.js":[function(require,module,exports) {
@@ -23841,7 +23873,9 @@ var Searches = {
   unassignedSearches: [],
   assignedSearches: {},
   loadSearches: function () {
-    var _loadSearches = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+    var _loadSearches = _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee() {
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -23925,43 +23959,51 @@ var _Nav = require("./Nav");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// import { Tabs } from './Tabs'
 function AssignedSearch() {
   return {
     view: function view(vnode) {
-      var item = vnode.attrs.search;
-      var contentL = (0, _mithril.default)(_constructUi.Button, {
-        iconLeft: _constructUi.Icons.MINUS,
-        intent: 'negative',
-        size: 'xs',
-        class: 'remove-search',
-        onclick: function onclick(e) {
-          //UNASSIGN SEARCH
-          e.preventDefault();
-          e.stopPropagation();
-          console.log(1);
+      var item = vnode.attrs.search; // let contentL = m(Button, {
+      //   iconLeft: Icons.MINUS,
+      //   intent: 'negative',
+      //   size: 'xs',
+      //   class: 'remove-search',
+      //   onclick: (e) => {
+      //     //UNASSIGN SEARCH
+      //     e.preventDefault()
+      //     e.stopPropagation()
+      //     console.log(1);
+      //     m.request({
+      //       method: 'GET',
+      //       url: `/api/addToClient/unassigned/${item._id}`
+      //     }).then(res => {
+      //       console.log(res);
+      //       showToast(`Unassigned ${item.model}`, 'warning')
+      //     })
+      //   }
+      // })
 
-          _mithril.default.request({
-            method: 'GET',
-            url: "/api/addToClient/unassigned/".concat(item._id)
-          }).then(function (res) {
-            console.log(res);
-            (0, _Nav.showToast)("Unassigned ".concat(item.model), 'warning');
-          });
-        }
-      });
       return (0, _mithril.default)(_constructUi.ListItem, {
-        label: "".concat(item.model, " ").concat(item.color, " ").concat(item.size),
+        // label: `${item.model} ${item.color} ${item.size}`,
         class: "list-item-".concat(vnode.attrs.index),
-        contentLeft: contentL,
-        contentRight: [(0, _mithril.default)(_constructUi.Tag, {
-          size: 'xs',
-          label: item.descr
-        }), (0, _mithril.default)(_constructUi.Tag, {
+        contentLeft: (0, _mithril.default)('.list-content', [(0, _mithril.default)('.left-content.flex.space-b', (0, _mithril.default)('.label', "".concat(item.model, " ").concat(item.color, " ").concat(item.size)), (0, _mithril.default)(_constructUi.Tag, {
           intent: 'warning',
           size: 'xs',
           label: "\u20AC".concat(item.price)
-        })]
+        })), (0, _mithril.default)('.descr-content', (0, _mithril.default)(_constructUi.Tag, {
+          size: 'xs',
+          label: item.descr
+        }))]) // contentRight: [
+        //   m(Tag, {
+        //     size: 'xs',
+        //     label: item.descr
+        //   }),
+        //   m(Tag, {
+        //     intent: 'warning',
+        //     size: 'xs',
+        //     label: `€${item.price}`
+        //   })
+        // ]
+
       });
     }
   };
@@ -23972,7 +24014,10 @@ var Orders = {
   loadOrders: function loadOrders() {
     _mithril.default.request({
       method: "GET",
-      url: "/api/listOrders"
+      url: "/api/listOrders",
+      headers: {
+        user: localStorage.user
+      }
     }).then(function (res) {
       Orders.ordersList = res;
     });
@@ -24033,10 +24078,7 @@ var Orders = {
               method: "DELETE",
               url: "/api/deleteOrder/".concat(order._id)
             }).then(function (res) {
-              console.log(res);
               Orders.ordersList.splice(Orders.ordersList.indexOf(res), 1);
-
-              _mithril.default.redraw();
             });
           }
         })],
@@ -24087,7 +24129,20 @@ var Orders = {
   },
   view: function view() {
     // UNASSIGNED SEARCHES MOVED TO EDIT ORDER
-    return [(0, _mithril.default)('.orders.flex.reverse', Orders.ordersList.map(function (order, o) {
+    return [(0, _mithril.default)(_constructUi.Input, {
+      contentRight: (0, _mithril.default)(_constructUi.Icon, {
+        name: _constructUi.Icons.FILTER
+      }),
+      placeholder: 'Filter Orders',
+      oninput: function oninput(e) {
+        var val = e.target.value.toLowerCase();
+        var orders = e.target.parentElement.parentElement.querySelectorAll('.client-order');
+        orders.forEach(function (order) {
+          var text = order.textContent.toLowerCase();
+          text.includes(val) ? (order.style.order = '-1', order.style.display = 'block') : (order.style.order = 'unset', order.style.display = 'none');
+        });
+      }
+    }), (0, _mithril.default)('.orders.flex.column', Orders.ordersList.map(function (order, o) {
       return (0, _mithril.default)(Orders.order, {
         order: order,
         o: o
@@ -24126,8 +24181,21 @@ var Clients = {
       Clients.loadClients();
     }
   },
-  view: function view(vnode) {
-    return Clients.clientsList.map(function (client, i) {
+  view: function view() {
+    return (0, _mithril.default)('.clients-section', (0, _mithril.default)(_constructUi.Input, {
+      contentRight: (0, _mithril.default)(_constructUi.Icon, {
+        name: _constructUi.Icons.FILTER
+      }),
+      placeholder: 'Filter Clients',
+      oninput: function oninput(e) {
+        var val = e.target.value.toLowerCase();
+        var clients = e.target.parentElement.parentElement.querySelectorAll('.client-card');
+        clients.forEach(function (client) {
+          var text = client.textContent.toLowerCase();
+          text.includes(val) ? (client.style.order = '-1', client.style.display = 'block') : (client.style.order = 'unset', client.style.display = 'none');
+        });
+      }
+    }), (0, _mithril.default)('ul.client-list.flex.column', Clients.clientsList.map(function (client) {
       return [(0, _mithril.default)(_constructUi.Card, {
         class: 'client-card',
         url: client._id,
@@ -24148,7 +24216,7 @@ var Clients = {
         }
       }), (0, _mithril.default)("h1#client-name", client.name + ' ' + client.surname), (0, _mithril.default)(_constructUi.Button, {
         class: 'mail-copy-button',
-        label: "mail: ".concat(client.mail),
+        label: "mail: ".concat(client.mail || ''),
         iconLeft: _constructUi.Icons.COPY,
         basic: true,
         onclick: function onclick(e) {
@@ -24165,7 +24233,7 @@ var Clients = {
           navigator.clipboard.writeText(client.phone);
         }
       }))];
-    });
+    })));
   }
 };
 exports.Clients = Clients;
@@ -24364,7 +24432,9 @@ var ordersSection = {
       style: 'float: right;',
       // loading: vnode.tag.loading,
       onclick: function () {
-        var _onclick = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+        var _onclick = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee() {
           return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
@@ -24418,7 +24488,10 @@ var ordersSection = {
 
                 _mithril.default.request({
                   method: "POST",
-                  url: "/api/createOrder/".concat(item._id, "/").concat(item.name, "&").concat(item.surname)
+                  url: "/api/createOrder/".concat(item._id, "/").concat(item.name, "&").concat(item.surname),
+                  headers: {
+                    user: localStorage.user
+                  }
                 }).then(function (res) {
                   console.log(res);
 
@@ -24447,7 +24520,9 @@ var clientsSection = {
       style: 'float: right;',
       loading: vnode.state.loading,
       onclick: function () {
-        var _onclick2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+        var _onclick2 = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee2() {
           return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
               switch (_context2.prev = _context2.next) {
@@ -24475,7 +24550,7 @@ var clientsSection = {
         return onclick;
       }()
     }), (0, _mithril.default)(".client-content", [(0, _mithril.default)(".new-client.row", [(0, _mithril.default)(_constructUi.Button, {
-      onclick: function onclick(e) {
+      onclick: function onclick() {
         document.querySelector('.new-client.row').classList.toggle('reveal-inputs');
       },
       label: "New Client",
@@ -24516,7 +24591,9 @@ var clientsSection = {
       label: "Add Client",
       // CREATE NEW CLIENT
       onclick: function () {
-        var _onclick3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+        var _onclick3 = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee3() {
           var name, surname, mail, phone;
           return regeneratorRuntime.wrap(function _callee3$(_context3) {
             while (1) {
@@ -24557,13 +24634,13 @@ var clientsSection = {
 
         return onclick;
       }()
-    })])]), (0, _mithril.default)("ul.client-list", (0, _mithril.default)(_Clients.Clients))]))];
+    })])]), (0, _mithril.default)(_Clients.Clients)]))];
   }
 };
 var historySection = {
   historyList: [],
   view: function view() {
-    return [(0, _mithril.default)(_Nav.Nav), (0, _mithril.default)('.container.searches', (0, _mithril.default)("h1", "A History of your Searches"), (0, _mithril.default)(_constructUi.Button, {
+    return [(0, _mithril.default)(_Nav.Nav), (0, _mithril.default)('.container.history', (0, _mithril.default)("h1", "A History of your Searches"), (0, _mithril.default)(_constructUi.Button, {
       basic: true,
       iconLeft: _constructUi.Icons.TRASH,
       compact: true,
@@ -24582,7 +24659,9 @@ var historySection = {
       style: 'float: right;',
       // loading: vnode.tag.loading,
       onclick: function () {
-        var _onclick4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
+        var _onclick4 = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee4() {
           return regeneratorRuntime.wrap(function _callee4$(_context4) {
             while (1) {
               switch (_context4.prev = _context4.next) {
@@ -24629,117 +24708,7 @@ function s(query, cb) {
 exports.ordersSection = ordersSection;
 exports.clientsSection = clientsSection;
 exports.historySection = historySection;
-},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Nav":"components/Nav.js","./Orders":"components/Orders.js","./Clients":"components/Clients.js","./Searches":"components/Searches.js"}],"components/Dhl.js":[function(require,module,exports) {
-"use strict";
-
-var _mithril = _interopRequireDefault(require("mithril"));
-
-var _constructUi = require("construct-ui");
-
-var _Nav = require("./Nav");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
-function getDhl(awb) {
-  _mithril.default.request({
-    method: 'GET',
-    url: "/api/tracking/".concat(awb)
-  }).then(function (res) {
-    console.log(res[0]);
-    return res[0];
-  });
-}
-
-function Results() {
-  return {
-    view: function view(vnode) {
-      var res = vnode.attrs.res;
-      var delivered = res.delivery.status === 'delivered' ? 'positive' : 'warning';
-      return [(0, _mithril.default)(_constructUi.Tag, {
-        label: 'destination: ' + res.destination.value || null
-      }), (0, _mithril.default)(_constructUi.Tag, {
-        label: res.delivery.status || null,
-        intent: delivered
-      }), (0, _mithril.default)(_constructUi.Tag, {
-        label: 'pieces: ' + res.pieces.value || null
-      }), (0, _mithril.default)(_constructUi.Tag, {
-        label: 'updated: ' + res.checkpoints[0].date
-      }), (0, _mithril.default)(_constructUi.List, {
-        fluid: true,
-        interactive: true
-      }, res.checkpoints.map(function (item) {
-        return (0, _mithril.default)(_constructUi.ListItem, {
-          label: item.description
-        });
-      }))];
-    }
-  };
-}
-
-var Dhl = {
-  tracking: '',
-  view: function view(vnode) {
-    return [(0, _mithril.default)(_Nav.Nav), (0, _mithril.default)('.container', (0, _mithril.default)(_constructUi.Card, {
-      fluid: true
-    }, (0, _mithril.default)(_constructUi.Input, {
-      oninput: function oninput(e) {
-        e.preventDefault(); // console.log(e);
-
-        vnode.state.tracking = e.srcElement.value;
-      },
-      contentLeft: (0, _mithril.default)(_constructUi.Icon, {
-        name: _constructUi.Icons.BOX
-      }),
-      placeholder: 'dhl tracking'
-    }), (0, _mithril.default)(_constructUi.Button, {
-      label: 'Search',
-      iconLeft: _constructUi.Icons.SEARCH,
-      onclick: function () {
-        var _onclick = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(e) {
-          var awb;
-          return regeneratorRuntime.wrap(function _callee$(_context) {
-            while (1) {
-              switch (_context.prev = _context.next) {
-                case 0:
-                  e.preventDefault();
-                  awb = vnode.state.tracking.split(' ').join('');
-
-                  _mithril.default.request({
-                    method: 'GET',
-                    url: "/api/tracking/".concat(awb)
-                  }).then(function (res) {
-                    vnode.state.results = res[0];
-
-                    _mithril.default.render(document.querySelector('.dhl-results'), (0, _mithril.default)(Results, {
-                      res: vnode.state.results
-                    }));
-                  }); // vnode.state.results = await getDhl(vnode.state.tracking)
-                  // console.log(vnode.state);
-
-
-                case 3:
-                case "end":
-                  return _context.stop();
-              }
-            }
-          }, _callee);
-        }));
-
-        function onclick(_x) {
-          return _onclick.apply(this, arguments);
-        }
-
-        return onclick;
-      }()
-    }), (0, _mithril.default)('.dhl-results')))];
-  }
-};
-exports.Dhl = Dhl;
-},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Nav":"components/Nav.js"}],"components/EditClient.js":[function(require,module,exports) {
+},{"mithril":"../node_modules/mithril/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","./Nav":"components/Nav.js","./Orders":"components/Orders.js","./Clients":"components/Clients.js","./Searches":"components/Searches.js"}],"components/EditClient.js":[function(require,module,exports) {
 "use strict";
 
 var _mithril = _interopRequireDefault(require("mithril"));
@@ -24853,8 +24822,10 @@ var EditClient = {
       return vnode.state.client = res[0];
     });
   },
-  oninit: function oninit(vnode) {
-    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+  oninit: function () {
+    var _oninit = _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee(vnode) {
       var client;
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
@@ -24886,8 +24857,14 @@ var EditClient = {
           }
         }
       }, _callee);
-    }))();
-  },
+    }));
+
+    function oninit(_x) {
+      return _oninit.apply(this, arguments);
+    }
+
+    return oninit;
+  }(),
   view: function view(vnode) {
     if (vnode.state.client) {
       return [(0, _mithril.default)(_Nav.Nav), (0, _mithril.default)('.client-edit-wrapper', (0, _mithril.default)(_constructUi.Card, {
@@ -25036,6 +25013,12 @@ var headers = ["actions", "nr", "day", "season", "line", "model", "color", "size
 var filter = {}; // Creating Sets to create unique values to pass to the filter
 
 var mySets = {};
+socket.on("remote-input", function (item) {
+  console.log(item);
+  document.querySelector("input.request-".concat(item.id, ".request-").concat(item.field)).value = item.value;
+
+  _mithril.default.redraw();
+});
 headers.forEach(function (field, i) {
   mySets["".concat(field, "Set")] = new Set();
 });
@@ -25142,8 +25125,7 @@ function Header(vnode) {
           label: 'Select All',
           onchange: function onchange(e) {// state.onCheckAll(e)
           }
-        }) // filterCheckboxes
-        ]),
+        })]),
         trigger: (0, _mithril.default)(_constructUi.Button, {
           label: header,
           fluid: true,
@@ -25152,7 +25134,7 @@ function Header(vnode) {
           disabled: header === 'actions' ? true : false // iconLeft: Icons.FILTER
 
         })
-      }), (0, _mithril.default)('input', {
+      }), (0, _mithril.default)(_constructUi.Input, {
         placeholder: header,
         class: "header-".concat(header),
         disabled: header === 'actions' ? true : false,
@@ -25227,6 +25209,8 @@ var Request = {
   onupdate: function onupdate(vnode) {
     vnode.state.request = vnode.attrs.request;
     vnode.state.request.nr = JSON.stringify(vnode.attrs.index); // vnode.state.reset(vnode, vnode.key)
+
+    vnode.state.request.model = '0';
   },
   oninit: function oninit(vnode) {
     // vnode.state.originalRequest = originalRequests[vnode.attrs.request._id]
@@ -25251,19 +25235,26 @@ var Request = {
 
     var _loop = function _loop(field) {
       if (field != '_id' && 'id') {
+        var value = '';
         var fields = Object.keys(vnode.state.request);
         res.push((0, _mithril.default)('input', {
-          class: "request-".concat(field, " request-").concat(_id),
+          class: "req-input request-".concat(field, " request-").concat(_id),
           data: field,
-          value: vnode.state.request[field],
+          id: vnode.state.request._id,
+          // value: value,
           readonly: field === 'nr' ? true : false,
+          oncreate: function oncreate(e) {
+            e.dom.value = vnode.state.request[field]; // console.log(value, vnode.state.request[field]);
+          },
+          onupdate: function onupdate(e) {
+            console.log(e);
+          },
           // DIFFING
           oninput: function oninput(e) {
             vnode.state.request[field] = e.srcElement.value.toLowerCase();
 
             if (vnode.state.request[field] != originalRequests[_id][field]) {
               //paint yellow the diffs
-              console.log(vnode.state.request, 'diffing ' + field);
               vnode.state.changed = true;
               e.srcElement.classList.add('diffed');
             } else {
@@ -25272,7 +25263,8 @@ var Request = {
             }
 
             socket.emit('input', {
-              element: e.target.parentElement.classList,
+              id: vnode.state.request._id,
+              field: field,
               value: e.srcElement.value
             });
           },
@@ -25344,8 +25336,10 @@ var Richieste = {
   requests: [],
   updated: false,
   filteredRequests: [],
-  getRequests: function getRequests() {
-    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+  getRequests: function () {
+    var _getRequests = _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee() {
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -25369,8 +25363,14 @@ var Richieste = {
           }
         }
       }, _callee);
-    }))();
-  },
+    }));
+
+    function getRequests() {
+      return _getRequests.apply(this, arguments);
+    }
+
+    return getRequests;
+  }(),
   getDate: function getDate() {
     var d = new Date();
     var day = d.getDate();
@@ -25421,8 +25421,10 @@ var Richieste = {
     });
     return res;
   },
-  oninit: function oninit(vnode) {
-    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+  oninit: function () {
+    var _oninit = _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee2(vnode) {
       return regeneratorRuntime.wrap(function _callee2$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
@@ -25442,9 +25444,16 @@ var Richieste = {
           }
         }
       }, _callee2);
-    }))();
-  },
+    }));
+
+    function oninit(_x) {
+      return _oninit.apply(this, arguments);
+    }
+
+    return oninit;
+  }(),
   view: function view(vnode) {
+    console.log('drawing requests');
     vnode.state.filteredRequests = vnode.state.filterRequests(requests, vnode.state.filter); // console.log(vnode.state.filter, vnode.state.filteredRequests);
 
     return (0, _mithril.default)('.requests-component', [(0, _mithril.default)(_Nav.Nav), (0, _mithril.default)(".requests-wrapper.container", [(0, _mithril.default)("h1", "Richieste Solomeo"), (0, _mithril.default)(MenuComponent), (0, _mithril.default)('.table', [(0, _mithril.default)(Headers, {
@@ -25483,7 +25492,7 @@ function AssignedSearch() {
       var item = vnode.attrs.search;
       var content = (0, _mithril.default)('.search-popover', [(0, _mithril.default)("img[src=".concat(imgSrc, "][style= padding: .5rem; border-radius:10px; display: block;]"), {
         label: 'click',
-        oninit: function oninit(e) {
+        oninit: function oninit() {
           fetch("api/image/".concat(item.year, "/").concat(item.season, "/").concat(item.model), {
             headers: {
               smurf: localStorage.smurf
@@ -25512,7 +25521,7 @@ function AssignedSearch() {
           _mithril.default.request({
             method: 'GET',
             url: "/api/addToClient/unassigned/".concat(item._id)
-          }).then(function (res) {
+          }).then(function () {
             var removedSearch = vnode.attrs.assignedSearches.splice(vnode.attrs.index, 1)[0];
 
             _Searches.Searches.unassignedSearches.push(removedSearch);
@@ -25520,22 +25529,23 @@ function AssignedSearch() {
             (0, _Nav.showToast)("Unassigned ".concat(item.model), 'warning');
           });
         }
-      }), (0, _mithril.default)('.left-content[style=align-items:center;]', (0, _mithril.default)('.sku-detail.label', "".concat(item.year).concat(item.season, " ").concat(item.model, " ").concat(item.color, " ").concat(item.size)), (0, _mithril.default)(_constructUi.Select, {
-        size: 'xs',
-        basic: true,
-        style: 'margin-right:10px;',
-        options: ['N/A', 'NEG1', 'DOS', 'ECOMM', 'HQ']
+      }), (0, _mithril.default)('.left-content[style=text-align:left;]', (0, _mithril.default)('.sku-detail.label', "".concat(item.year).concat(item.season, " ").concat(item.model, " ").concat(item.color, " ").concat(item.size)), (0, _mithril.default)(_constructUi.Tag, {
+        label: item.descr
       })), (0, _mithril.default)('.right-content[style=overflow:hidden;]', // m(Select, {
       //   size: 'xs',
       //   fluid: true,
       //   options: ['NEG1', 'DOS', 'N/A', 'ECOMM', 'HQ']
       // }),
       (0, _mithril.default)(_constructUi.Tag, {
-        label: item.descr
-      }), (0, _mithril.default)(_constructUi.Tag, {
-        label: item.price,
+        label: "\u20AC".concat(item.price),
         intent: 'warning'
-      }))]);
+      }) // m(Select, {
+      //   size: 'xs',
+      //   basic: true,
+      //   style: 'margin-right:10px;',
+      //   options: ['N/A', 'NEG1', 'DOS', 'ECOMM', 'HQ']
+      // })
+      )]);
     }
   };
 }
@@ -25614,10 +25624,10 @@ function UnassignedSearch() {
           var searchId = item._id;
           vnode.state.assignOrder(order, searchId, index);
         }
-      }), (0, _mithril.default)('.left-content[style=align-items:center;]', (0, _mithril.default)('.sku-detail.label', "".concat(item.year).concat(item.season, " ").concat(item.model, " ").concat(item.color, " ").concat(item.size))), (0, _mithril.default)('.right-content[style=overflow:hidden;]', (0, _mithril.default)(_constructUi.Tag, {
+      }), (0, _mithril.default)('.left-content[style=text-align:left;]', (0, _mithril.default)('.sku-detail.label', "".concat(item.year).concat(item.season, " ").concat(item.model, " ").concat(item.color, " ").concat(item.size)), (0, _mithril.default)(_constructUi.Tag, {
         label: item.descr
-      }), (0, _mithril.default)(_constructUi.Tag, {
-        label: item.price,
+      })), (0, _mithril.default)('.right-content[style=overflow:hidden;]', (0, _mithril.default)(_constructUi.Tag, {
+        label: "\u20AC".concat(item.price),
         intent: 'warning'
       }))]);
     }
@@ -25654,7 +25664,9 @@ var EditOrder = {
     });
   },
   oninit: function () {
-    var _oninit = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(vnode) {
+    var _oninit = _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee(vnode) {
       var order;
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
@@ -25720,7 +25732,7 @@ var EditOrder = {
           _Searches.Searches.loadSearches();
         });
       }
-    })])), (0, _mithril.default)('.searches.flex', [(0, _mithril.default)('.assigned-searches', (0, _mithril.default)('h3', 'Assigned Searches'), (0, _mithril.default)(_constructUi.List, {
+    })])), (0, _mithril.default)('.searches.grid', [(0, _mithril.default)('.assigned-searches', (0, _mithril.default)('h3', 'Assigned Searches'), (0, _mithril.default)(_constructUi.List, {
       size: 'xs',
       interactive: false // style: `max-width: ${vnode.state.maxWidth};`
 
@@ -25741,7 +25753,7 @@ var EditOrder = {
       label: "pcs: ".concat(vnode.state.pieces)
     }), (0, _mithril.default)(_constructUi.Tag, {
       intent: 'primary',
-      label: "total: ".concat(vnode.state.total)
+      label: "total: \u20AC".concat(vnode.state.total)
     })])), (0, _mithril.default)('.unassigned-searches', (0, _mithril.default)('h3', 'Unassigned Searches'), (0, _mithril.default)(_constructUi.List, {
       size: 'xs',
       interactive: false,
@@ -25775,8 +25787,6 @@ var _logo = _interopRequireDefault(require("./logo.svg"));
 var _login = require("/components/login");
 
 var _Nav = require("/components/Nav");
-
-var _Dhl = require("/components/Dhl");
 
 var _EditClient = _interopRequireDefault(require("/components/EditClient"));
 
@@ -25844,7 +25854,7 @@ var Login = {
       placeholder: 'Password',
       type: 'password',
       autocomplete: "current-password",
-      oncreate: function oncreate(e) {// console.log(e);
+      oncreate: function oncreate() {// console.log(e);
       },
       oninput: function oninput(e) {
         vnode.state.pwd = e.srcElement.value;
@@ -25855,7 +25865,9 @@ var Login = {
       type: 'submit',
       intent: 'primary',
       onclick: function () {
-        var _onclick = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(e) {
+        var _onclick = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee(e) {
           return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
@@ -25935,7 +25947,9 @@ var SearchForm = {
       type: 'submit',
       loading: vnode.state.loading,
       onclick: function () {
-        var _onclick2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(e) {
+        var _onclick2 = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee2(e) {
           var model, color;
           return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
@@ -25950,7 +25964,10 @@ var SearchForm = {
                   _context2.next = 7;
                   return _mithril.default.request({
                     method: "GET",
-                    url: "/api/avb/".concat(model, "/").concat(color)
+                    url: "/api/avb/".concat(model, "/").concat(color),
+                    headers: {
+                      smurf: localStorage.smurf
+                    }
                   }).then(function (res) {
                     console.log(res);
 
@@ -25999,13 +26016,27 @@ function Sku() {
       vnode.state.imgFetched = false;
       vnode.state.discountedPrice = ''; // vnode.state.sku = vnode.attrs.sku
 
-      vnode.state.getPrice = function () {
-        _mithril.default.request({
-          method: 'GET',
-          url: "/api/price/".concat(vnode.attrs.sku.year, "/").concat(vnode.attrs.sku.season, "/").concat(vnode.attrs.sku.model)
-        }).then(function (res) {
-          vnode.state.price = res;
-        });
+      vnode.state.getPrice = function (vnode) {
+        if (!vnode.state.price && !localStorage["".concat(vnode.attrs.sku.year).concat(vnode.attrs.sku.season).concat(vnode.attrs.sku.model)]) {
+          _mithril.default.request({
+            method: "GET",
+            url: "/api/price/".concat(vnode.attrs.sku.year, "/").concat(vnode.attrs.sku.season, "/").concat(vnode.attrs.sku.model),
+            headers: {
+              smurf: localStorage.smurf
+            }
+          }).then(function (res) {
+            if (_noSaleAI.NOSALE.filter(function (e) {
+              return e == vnode.attrs.sku.model + vnode.attrs.sku.color;
+            }).length > 0 && vnode.attrs.sku.year + vnode.attrs.sku.season === '202') {
+              vnode.dom.querySelector('.basic').textContent = 'BASICO';
+            } else if (vnode.attrs.sku.year + vnode.attrs.sku.season === '202') {
+              vnode.state.salable = true;
+            }
+
+            vnode.state.price = res;
+            localStorage["".concat(vnode.attrs.sku.year).concat(vnode.attrs.sku.season).concat(vnode.attrs.sku.model)] = res;
+          });
+        }
       };
     },
     oncreate: function oncreate() {// vnode.state.imgSrc = ''
@@ -26014,7 +26045,6 @@ function Sku() {
       var i = vnode.attrs.i;
       var sku = vnode.attrs.sku;
       var string = sku.string.split(' ').join('');
-      sku.price = '';
       var discountedPrice = null;
       var content = (0, _mithril.default)("img.sku-image-".concat(i, "[src=").concat(vnode.state.imgSrc, "]"));
       return (0, _mithril.default)(_constructUi.Card, {
@@ -26042,7 +26072,11 @@ function Sku() {
               vnode.state.loading = !vnode.state.loading; // e.preventDefault();
               // e.stopPropagation();
 
-              fetch("api/image/".concat(sku.year, "/").concat(sku.season, "/").concat(sku.model)).then(function (res) {
+              fetch("api/image/".concat(sku.year, "/").concat(sku.season, "/").concat(sku.model), {
+                headers: {
+                  smurf: localStorage.smurf
+                }
+              }).then(function (res) {
                 return res.text();
               }).then(function (url) {
                 vnode.state.imgFetched = true;
@@ -26064,29 +26098,11 @@ function Sku() {
         size: 'xs',
         intent: vnode.state.salable ? 'negative' : 'warning',
         oncreate: function oncreate() {
-          if (!vnode.state.price) {
-            vnode.state.price = 'fetching';
-
-            _mithril.default.request({
-              method: "GET",
-              url: "/api/price/".concat(sku.year, "/").concat(sku.season, "/").concat(sku.model)
-            }).then(function (res) {
-              if (_noSaleAI.NOSALE.filter(function (e) {
-                return e == sku.model + sku.color;
-              }).length > 0 && sku.year + sku.season === '202') {
-                vnode.dom.querySelector('.basic').textContent = 'BASICO';
-                vnode.state.price = res;
-              } else if (sku.year + sku.season === '202') {
-                vnode.state.salable = true;
-                vnode.state.price = res;
-              } else {
-                vnode.state.price = res;
-              }
-            });
-          }
+          vnode.state.getPrice(vnode); // console.log(e);
         },
-        sublabel: "\u20AC".concat(vnode.state.price),
+        sublabel: "\u20AC".concat(vnode.state.price || localStorage["".concat(sku.year).concat(sku.season).concat(sku.model)], " "),
         label: vnode.state.discountedPrice,
+        loading: vnode.state.price || localStorage["".concat(sku.year).concat(sku.season).concat(sku.model)] ? false : true,
         onclick: function onclick() {
           if (vnode.state.salable) {
             vnode.state.discountedPrice = parseInt(parseInt(vnode.state.price) * 0.7);
@@ -26116,7 +26132,10 @@ function SizeButton() {
   function getShops(sku, i) {
     _mithril.default.request({
       method: 'GET',
-      url: "/api/".concat(sku.year, "/").concat(sku.season, "/").concat(sku.model, "/").concat(sku.color, "/").concat(sku.sizesForRequests[i])
+      url: "/api/".concat(sku.year, "/").concat(sku.season, "/").concat(sku.model, "/").concat(sku.color, "/").concat(sku.sizesForRequests[i]),
+      headers: {
+        smurf: localStorage.smurf
+      }
     }).then(function (res) {
       shops = Object.values(res)[0];
       isLoading = !isLoading;
@@ -26142,7 +26161,9 @@ function SizeButton() {
         size: 'xs',
         requestSize: sizeForReq,
         onclick: function () {
-          var _onclick3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+          var _onclick3 = _asyncToGenerator(
+          /*#__PURE__*/
+          regeneratorRuntime.mark(function _callee3() {
             var string;
             return regeneratorRuntime.wrap(function _callee3$(_context3) {
               while (1) {
@@ -26268,12 +26289,12 @@ _mithril.default.route(document.body, '/main', {
   '/orders': ordersSection,
   '/clients': clientsSection,
   '/history': historySection,
-  '/dhlTracking': _Dhl.Dhl,
+  // '/dhlTracking': Dhl,
   '/orders/edit/:id': _EditOrder.default,
   '/clients/edit/:id': _EditClient.default,
   '/richieste': _Richieste.Richieste
 });
-},{"regenerator-runtime/runtime":"../node_modules/regenerator-runtime/runtime.js","mithril":"../node_modules/mithril/index.js","socket.io-client":"../node_modules/socket.io-client/build/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../node_modules/construct-ui/lib/index.css":"../node_modules/construct-ui/lib/index.css","./logo.svg":"logo.svg","/components/login":"components/login.js","/components/Tabs":"components/Tabs.js","/components/Nav":"components/Nav.js","/components/Dhl":"components/Dhl.js","/components/EditClient":"components/EditClient.js","/components/Searches":"components/Searches.js","/components/Richieste":"components/Richieste.js","/components/EditOrder":"components/EditOrder.js","./noSaleAI20":"noSaleAI20.js"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"regenerator-runtime/runtime":"../node_modules/regenerator-runtime/runtime.js","mithril":"../node_modules/mithril/index.js","socket.io-client":"../node_modules/socket.io-client/build/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../node_modules/construct-ui/lib/index.css":"../node_modules/construct-ui/lib/index.css","./logo.svg":"logo.svg","/components/login":"components/login.js","/components/Tabs":"components/Tabs.js","/components/Nav":"components/Nav.js","/components/EditClient":"components/EditClient.js","/components/Searches":"components/Searches.js","/components/Richieste":"components/Richieste.js","/components/EditOrder":"components/EditOrder.js","./noSaleAI20":"noSaleAI20.js"}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -26301,7 +26322,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "6866" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "41771" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -26332,9 +26353,8 @@ if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
         assetsToAccept.forEach(function (v) {
           hmrAcceptRun(v[0], v[1]);
         });
-      } else if (location.reload) {
-        // `location` global exists in a web worker context but lacks `.reload()` function.
-        location.reload();
+      } else {
+        window.location.reload();
       }
     }
 
@@ -26477,5 +26497,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","app.js"], null)
+},{}]},{},["../../../../.npm/_npx/32004/lib/node_modules/parcel/src/builtins/hmr-runtime.js","app.js"], null)
 //# sourceMappingURL=/app.c328ef1a.js.map
