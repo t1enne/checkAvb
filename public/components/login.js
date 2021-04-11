@@ -14,7 +14,7 @@ let login = {
     console.log('running check');
     if (localStorage.smurf && location.hash === '#!/login') {
       m.route.set('/main')
-    } else {
+    } else if (!localStorage.pwd) {
       m.route.set('/login')
     }
   },
@@ -51,6 +51,7 @@ let login = {
         showToast(`Welcome back ${localStorage.user} !`, 'primary')
       }
       login.check()
+        return res.user ? true : false
     })
   }
 }

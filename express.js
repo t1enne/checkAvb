@@ -52,7 +52,8 @@ app.use(session({
   saveUninitialized: true
 }));
 
-app.use(express.static('public/dist'));
+app.use(express.static('dist'));
+
 
 //CHECK IF LOGGED
 app.get('/logged', (req, res) => {

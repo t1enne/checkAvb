@@ -117,7 +117,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/process/browser.js":[function(require,module,exports) {
+})({"../node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -326,7 +326,7 @@ process.chdir = function (dir) {
 process.umask = function () {
   return 0;
 };
-},{}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/base64-js/index.js":[function(require,module,exports) {
+},{}],"../node_modules/base64-js/index.js":[function(require,module,exports) {
 'use strict'
 
 exports.byteLength = byteLength
@@ -478,7 +478,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/ieee754/index.js":[function(require,module,exports) {
+},{}],"../node_modules/ieee754/index.js":[function(require,module,exports) {
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -565,14 +565,14 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/isarray/index.js":[function(require,module,exports) {
+},{}],"../node_modules/isarray/index.js":[function(require,module,exports) {
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/buffer/index.js":[function(require,module,exports) {
+},{}],"../node_modules/buffer/index.js":[function(require,module,exports) {
 
 var global = arguments[3];
 /*!
@@ -2365,7 +2365,7 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-},{"base64-js":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/base64-js/index.js","ieee754":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/ieee754/index.js","isarray":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/isarray/index.js","buffer":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/buffer/index.js"}],"../node_modules/socket.io-client/dist/socket.io.js":[function(require,module,exports) {
+},{"base64-js":"../node_modules/base64-js/index.js","ieee754":"../node_modules/ieee754/index.js","isarray":"../node_modules/isarray/index.js","buffer":"../node_modules/buffer/index.js"}],"../node_modules/socket.io-client/dist/socket.io.js":[function(require,module,exports) {
 var define;
 var global = arguments[3];
 var process = require("process");
@@ -5006,9 +5006,9 @@ function _typeof2(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "funct
 
             try {
               r = exports.storage.getItem('debug');
-            } catch (error) {} // Swallow
-            // XXX (@Qix-) should we be logging these?
-            // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
+            } catch (error) {// Swallow
+              // XXX (@Qix-) should we be logging these?
+            } // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
 
 
             if (!r && typeof process !== 'undefined' && 'env' in process) {
@@ -10114,7 +10114,7 @@ function _typeof2(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "funct
     })
   );
 });
-},{"process":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/process/browser.js","buffer":"../../../../.npm/_npx/32004/lib/node_modules/parcel/node_modules/buffer/index.js"}],"../../../../.npm/_npx/32004/lib/node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"process":"../node_modules/process/browser.js","buffer":"../node_modules/buffer/index.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -10142,7 +10142,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "41771" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "39101" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -10317,5 +10317,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../../../../.npm/_npx/32004/lib/node_modules/parcel/src/builtins/hmr-runtime.js","../node_modules/socket.io-client/dist/socket.io.js"], null)
+},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","../node_modules/socket.io-client/dist/socket.io.js"], null)
 //# sourceMappingURL=/socket.io.8a61591e.js.map

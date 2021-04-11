@@ -1,7 +1,7 @@
 {
   "name": "checkAvailability",
   "version": "1.0.0",
-  "description": "",
+  "description": "checks availability of models",
   "main": "index.js",
   "scripts": {
     "dev": "parcel public/index.html",
@@ -19,7 +19,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "mithril": "^2.0.4",
-    "mongoose": "^5.10.11",
+    "mongoose": "^5.12.3",
     "node-fetch": "^2.6.1",
     "regenerator-runtime": "^0.13.7",
     "socket.io": "^3.0.4",
@@ -31,6 +31,6 @@
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
     "nodemon": "^2.0.7",
-    "parcel-bundler": "^1.12.3"
+    "parcel-bundler": "1.12.3"
   }
 }
