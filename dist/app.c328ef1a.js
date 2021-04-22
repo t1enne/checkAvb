@@ -3037,7 +3037,7 @@ function queryKey(uri, query) {
     return data;
 }
 
-},{}],"../node_modules/socket.io-client/node_modules/ms/index.js":[function(require,module,exports) {
+},{}],"../node_modules/ms/index.js":[function(require,module,exports) {
 /**
  * Helpers.
  */
@@ -3063,7 +3063,7 @@ var y = d * 365.25;
  * @api public
  */
 
-module.exports = function (val, options) {
+module.exports = function(val, options) {
   options = options || {};
   var type = typeof val;
   if (type === 'string' && val.length > 0) {
@@ -3201,275 +3201,282 @@ function plural(ms, msAbs, n, name) {
   return Math.round(ms / n) + ' ' + name + (isPlural ? 's' : '');
 }
 
-},{}],"../node_modules/socket.io-client/node_modules/debug/src/common.js":[function(require,module,exports) {
+},{}],"../node_modules/debug/src/common.js":[function(require,module,exports) {
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 /**
  * This is the common logic for both the Node.js and web browser
  * implementations of `debug()`.
  */
-
 function setup(env) {
-	createDebug.debug = createDebug;
-	createDebug.default = createDebug;
-	createDebug.coerce = coerce;
-	createDebug.disable = disable;
-	createDebug.enable = enable;
-	createDebug.enabled = enabled;
-	createDebug.humanize = require('ms');
+  createDebug.debug = createDebug;
+  createDebug.default = createDebug;
+  createDebug.coerce = coerce;
+  createDebug.disable = disable;
+  createDebug.enable = enable;
+  createDebug.enabled = enabled;
+  createDebug.humanize = require('ms');
+  createDebug.destroy = destroy;
+  Object.keys(env).forEach(function (key) {
+    createDebug[key] = env[key];
+  });
+  /**
+  * The currently active debug mode names, and names to skip.
+  */
 
-	Object.keys(env).forEach(key => {
-		createDebug[key] = env[key];
-	});
+  createDebug.names = [];
+  createDebug.skips = [];
+  /**
+  * Map of special "%n" handling functions, for the debug "format" argument.
+  *
+  * Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
+  */
 
-	/**
-	* Active `debug` instances.
-	*/
-	createDebug.instances = [];
+  createDebug.formatters = {};
+  /**
+  * Selects a color for a debug namespace
+  * @param {String} namespace The namespace string for the for the debug instance to be colored
+  * @return {Number|String} An ANSI color code for the given namespace
+  * @api private
+  */
 
-	/**
-	* The currently active debug mode names, and names to skip.
-	*/
+  function selectColor(namespace) {
+    var hash = 0;
 
-	createDebug.names = [];
-	createDebug.skips = [];
+    for (var i = 0; i < namespace.length; i++) {
+      hash = (hash << 5) - hash + namespace.charCodeAt(i);
+      hash |= 0; // Convert to 32bit integer
+    }
 
-	/**
-	* Map of special "%n" handling functions, for the debug "format" argument.
-	*
-	* Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
-	*/
-	createDebug.formatters = {};
+    return createDebug.colors[Math.abs(hash) % createDebug.colors.length];
+  }
 
-	/**
-	* Selects a color for a debug namespace
-	* @param {String} namespace The namespace string for the for the debug instance to be colored
-	* @return {Number|String} An ANSI color code for the given namespace
-	* @api private
-	*/
-	function selectColor(namespace) {
-		let hash = 0;
+  createDebug.selectColor = selectColor;
+  /**
+  * Create a debugger with the given `namespace`.
+  *
+  * @param {String} namespace
+  * @return {Function}
+  * @api public
+  */
 
-		for (let i = 0; i < namespace.length; i++) {
-			hash = ((hash << 5) - hash) + namespace.charCodeAt(i);
-			hash |= 0; // Convert to 32bit integer
-		}
+  function createDebug(namespace) {
+    var prevTime;
+    var enableOverride = null;
 
-		return createDebug.colors[Math.abs(hash) % createDebug.colors.length];
-	}
-	createDebug.selectColor = selectColor;
+    function debug() {
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
 
-	/**
-	* Create a debugger with the given `namespace`.
-	*
-	* @param {String} namespace
-	* @return {Function}
-	* @api public
-	*/
-	function createDebug(namespace) {
-		let prevTime;
+      // Disabled?
+      if (!debug.enabled) {
+        return;
+      }
 
-		function debug(...args) {
-			// Disabled?
-			if (!debug.enabled) {
-				return;
-			}
+      var self = debug; // Set `diff` timestamp
 
-			const self = debug;
+      var curr = Number(new Date());
+      var ms = curr - (prevTime || curr);
+      self.diff = ms;
+      self.prev = prevTime;
+      self.curr = curr;
+      prevTime = curr;
+      args[0] = createDebug.coerce(args[0]);
 
-			// Set `diff` timestamp
-			const curr = Number(new Date());
-			const ms = curr - (prevTime || curr);
-			self.diff = ms;
-			self.prev = prevTime;
-			self.curr = curr;
-			prevTime = curr;
+      if (typeof args[0] !== 'string') {
+        // Anything else let's inspect with %O
+        args.unshift('%O');
+      } // Apply any `formatters` transformations
 
-			args[0] = createDebug.coerce(args[0]);
 
-			if (typeof args[0] !== 'string') {
-				// Anything else let's inspect with %O
-				args.unshift('%O');
-			}
+      var index = 0;
+      args[0] = args[0].replace(/%([a-zA-Z%])/g, function (match, format) {
+        // If we encounter an escaped % then don't increase the array index
+        if (match === '%%') {
+          return '%';
+        }
 
-			// Apply any `formatters` transformations
-			let index = 0;
-			args[0] = args[0].replace(/%([a-zA-Z%])/g, (match, format) => {
-				// If we encounter an escaped % then don't increase the array index
-				if (match === '%%') {
-					return match;
-				}
-				index++;
-				const formatter = createDebug.formatters[format];
-				if (typeof formatter === 'function') {
-					const val = args[index];
-					match = formatter.call(self, val);
+        index++;
+        var formatter = createDebug.formatters[format];
 
-					// Now we need to remove `args[index]` since it's inlined in the `format`
-					args.splice(index, 1);
-					index--;
-				}
-				return match;
-			});
+        if (typeof formatter === 'function') {
+          var val = args[index];
+          match = formatter.call(self, val); // Now we need to remove `args[index]` since it's inlined in the `format`
 
-			// Apply env-specific formatting (colors, etc.)
-			createDebug.formatArgs.call(self, args);
+          args.splice(index, 1);
+          index--;
+        }
 
-			const logFn = self.log || createDebug.log;
-			logFn.apply(self, args);
-		}
+        return match;
+      }); // Apply env-specific formatting (colors, etc.)
 
-		debug.namespace = namespace;
-		debug.enabled = createDebug.enabled(namespace);
-		debug.useColors = createDebug.useColors();
-		debug.color = selectColor(namespace);
-		debug.destroy = destroy;
-		debug.extend = extend;
-		// Debug.formatArgs = formatArgs;
-		// debug.rawLog = rawLog;
+      createDebug.formatArgs.call(self, args);
+      var logFn = self.log || createDebug.log;
+      logFn.apply(self, args);
+    }
 
-		// env-specific initialization logic for debug instances
-		if (typeof createDebug.init === 'function') {
-			createDebug.init(debug);
-		}
+    debug.namespace = namespace;
+    debug.useColors = createDebug.useColors();
+    debug.color = createDebug.selectColor(namespace);
+    debug.extend = extend;
+    debug.destroy = createDebug.destroy; // XXX Temporary. Will be removed in the next major release.
 
-		createDebug.instances.push(debug);
+    Object.defineProperty(debug, 'enabled', {
+      enumerable: true,
+      configurable: false,
+      get: function () {
+        return enableOverride === null ? createDebug.enabled(namespace) : enableOverride;
+      },
+      set: function (v) {
+        enableOverride = v;
+      }
+    }); // Env-specific initialization logic for debug instances
 
-		return debug;
-	}
+    if (typeof createDebug.init === 'function') {
+      createDebug.init(debug);
+    }
 
-	function destroy() {
-		const index = createDebug.instances.indexOf(this);
-		if (index !== -1) {
-			createDebug.instances.splice(index, 1);
-			return true;
-		}
-		return false;
-	}
+    return debug;
+  }
 
-	function extend(namespace, delimiter) {
-		const newDebug = createDebug(this.namespace + (typeof delimiter === 'undefined' ? ':' : delimiter) + namespace);
-		newDebug.log = this.log;
-		return newDebug;
-	}
+  function extend(namespace, delimiter) {
+    var newDebug = createDebug(this.namespace + (typeof delimiter === 'undefined' ? ':' : delimiter) + namespace);
+    newDebug.log = this.log;
+    return newDebug;
+  }
+  /**
+  * Enables a debug mode by namespaces. This can include modes
+  * separated by a colon and wildcards.
+  *
+  * @param {String} namespaces
+  * @api public
+  */
 
-	/**
-	* Enables a debug mode by namespaces. This can include modes
-	* separated by a colon and wildcards.
-	*
-	* @param {String} namespaces
-	* @api public
-	*/
-	function enable(namespaces) {
-		createDebug.save(namespaces);
 
-		createDebug.names = [];
-		createDebug.skips = [];
+  function enable(namespaces) {
+    createDebug.save(namespaces);
+    createDebug.names = [];
+    createDebug.skips = [];
+    var i;
+    var split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
+    var len = split.length;
 
-		let i;
-		const split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
-		const len = split.length;
+    for (i = 0; i < len; i++) {
+      if (!split[i]) {
+        // ignore empty strings
+        continue;
+      }
 
-		for (i = 0; i < len; i++) {
-			if (!split[i]) {
-				// ignore empty strings
-				continue;
-			}
+      namespaces = split[i].replace(/\*/g, '.*?');
 
-			namespaces = split[i].replace(/\*/g, '.*?');
+      if (namespaces[0] === '-') {
+        createDebug.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
+      } else {
+        createDebug.names.push(new RegExp('^' + namespaces + '$'));
+      }
+    }
+  }
+  /**
+  * Disable debug output.
+  *
+  * @return {String} namespaces
+  * @api public
+  */
 
-			if (namespaces[0] === '-') {
-				createDebug.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
-			} else {
-				createDebug.names.push(new RegExp('^' + namespaces + '$'));
-			}
-		}
 
-		for (i = 0; i < createDebug.instances.length; i++) {
-			const instance = createDebug.instances[i];
-			instance.enabled = createDebug.enabled(instance.namespace);
-		}
-	}
+  function disable() {
+    var namespaces = [].concat(_toConsumableArray(createDebug.names.map(toNamespace)), _toConsumableArray(createDebug.skips.map(toNamespace).map(function (namespace) {
+      return '-' + namespace;
+    }))).join(',');
+    createDebug.enable('');
+    return namespaces;
+  }
+  /**
+  * Returns true if the given mode name is enabled, false otherwise.
+  *
+  * @param {String} name
+  * @return {Boolean}
+  * @api public
+  */
 
-	/**
-	* Disable debug output.
-	*
-	* @return {String} namespaces
-	* @api public
-	*/
-	function disable() {
-		const namespaces = [
-			...createDebug.names.map(toNamespace),
-			...createDebug.skips.map(toNamespace).map(namespace => '-' + namespace)
-		].join(',');
-		createDebug.enable('');
-		return namespaces;
-	}
 
-	/**
-	* Returns true if the given mode name is enabled, false otherwise.
-	*
-	* @param {String} name
-	* @return {Boolean}
-	* @api public
-	*/
-	function enabled(name) {
-		if (name[name.length - 1] === '*') {
-			return true;
-		}
+  function enabled(name) {
+    if (name[name.length - 1] === '*') {
+      return true;
+    }
 
-		let i;
-		let len;
+    var i;
+    var len;
 
-		for (i = 0, len = createDebug.skips.length; i < len; i++) {
-			if (createDebug.skips[i].test(name)) {
-				return false;
-			}
-		}
+    for (i = 0, len = createDebug.skips.length; i < len; i++) {
+      if (createDebug.skips[i].test(name)) {
+        return false;
+      }
+    }
 
-		for (i = 0, len = createDebug.names.length; i < len; i++) {
-			if (createDebug.names[i].test(name)) {
-				return true;
-			}
-		}
+    for (i = 0, len = createDebug.names.length; i < len; i++) {
+      if (createDebug.names[i].test(name)) {
+        return true;
+      }
+    }
 
-		return false;
-	}
+    return false;
+  }
+  /**
+  * Convert regexp to namespace
+  *
+  * @param {RegExp} regxep
+  * @return {String} namespace
+  * @api private
+  */
 
-	/**
-	* Convert regexp to namespace
-	*
-	* @param {RegExp} regxep
-	* @return {String} namespace
-	* @api private
-	*/
-	function toNamespace(regexp) {
-		return regexp.toString()
-			.substring(2, regexp.toString().length - 2)
-			.replace(/\.\*\?$/, '*');
-	}
 
-	/**
-	* Coerce `val`.
-	*
-	* @param {Mixed} val
-	* @return {Mixed}
-	* @api private
-	*/
-	function coerce(val) {
-		if (val instanceof Error) {
-			return val.stack || val.message;
-		}
-		return val;
-	}
+  function toNamespace(regexp) {
+    return regexp.toString().substring(2, regexp.toString().length - 2).replace(/\.\*\?$/, '*');
+  }
+  /**
+  * Coerce `val`.
+  *
+  * @param {Mixed} val
+  * @return {Mixed}
+  * @api private
+  */
 
-	createDebug.enable(createDebug.load());
 
-	return createDebug;
+  function coerce(val) {
+    if (val instanceof Error) {
+      return val.stack || val.message;
+    }
+
+    return val;
+  }
+  /**
+  * XXX DO NOT USE. This is a temporary stub function.
+  * XXX It WILL be removed in the next major release.
+  */
+
+
+  function destroy() {
+    console.warn('Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.');
+  }
+
+  createDebug.enable(createDebug.load());
+  return createDebug;
 }
 
 module.exports = setup;
-
-},{"ms":"../node_modules/socket.io-client/node_modules/ms/index.js"}],"../node_modules/process/browser.js":[function(require,module,exports) {
+},{"ms":"../node_modules/ms/index.js"}],"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -3678,22 +3685,32 @@ process.chdir = function (dir) {
 process.umask = function () {
   return 0;
 };
-},{}],"../node_modules/socket.io-client/node_modules/debug/src/browser.js":[function(require,module,exports) {
+},{}],"../node_modules/debug/src/browser.js":[function(require,module,exports) {
 var process = require("process");
 /* eslint-env browser */
 
 /**
  * This is the web browser implementation of `debug()`.
  */
-exports.log = log;
 exports.formatArgs = formatArgs;
 exports.save = save;
 exports.load = load;
 exports.useColors = useColors;
 exports.storage = localstorage();
+
+exports.destroy = function () {
+  var warned = false;
+  return function () {
+    if (!warned) {
+      warned = true;
+      console.warn('Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.');
+    }
+  };
+}();
 /**
  * Colors.
  */
+
 
 exports.colors = ['#0000CC', '#0000FF', '#0033CC', '#0033FF', '#0066CC', '#0066FF', '#0099CC', '#0099FF', '#00CC00', '#00CC33', '#00CC66', '#00CC99', '#00CCCC', '#00CCFF', '#3300CC', '#3300FF', '#3333CC', '#3333FF', '#3366CC', '#3366FF', '#3399CC', '#3399FF', '#33CC00', '#33CC33', '#33CC66', '#33CC99', '#33CCCC', '#33CCFF', '#6600CC', '#6600FF', '#6633CC', '#6633FF', '#66CC00', '#66CC33', '#9900CC', '#9900FF', '#9933CC', '#9933FF', '#99CC00', '#99CC33', '#CC0000', '#CC0033', '#CC0066', '#CC0099', '#CC00CC', '#CC00FF', '#CC3300', '#CC3333', '#CC3366', '#CC3399', '#CC33CC', '#CC33FF', '#CC6600', '#CC6633', '#CC9900', '#CC9933', '#CCCC00', '#CCCC33', '#FF0000', '#FF0033', '#FF0066', '#FF0099', '#FF00CC', '#FF00FF', '#FF3300', '#FF3333', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#FF6600', '#FF6633', '#FF9900', '#FF9933', '#FFCC00', '#FFCC33'];
 /**
@@ -3740,14 +3757,14 @@ function formatArgs(args) {
     return;
   }
 
-  const c = 'color: ' + this.color;
+  var c = 'color: ' + this.color;
   args.splice(1, 0, c, 'color: inherit'); // The final "%c" is somewhat tricky, because there could be other
   // arguments passed either before or after the %c, so we need to
   // figure out the correct index to insert the CSS into
 
-  let index = 0;
-  let lastC = 0;
-  args[0].replace(/%[a-zA-Z%]/g, match => {
+  var index = 0;
+  var lastC = 0;
+  args[0].replace(/%[a-zA-Z%]/g, function (match) {
     if (match === '%%') {
       return;
     }
@@ -3763,18 +3780,16 @@ function formatArgs(args) {
   args.splice(lastC, 0, c);
 }
 /**
- * Invokes `console.log()` when available.
- * No-op when `console.log` is not a "function".
+ * Invokes `console.debug()` when available.
+ * No-op when `console.debug` is not a "function".
+ * If `console.debug` is not available, falls back
+ * to `console.log`.
  *
  * @api public
  */
 
 
-function log(...args) {
-  // This hackery is required for IE8/9, where
-  // the `console.log` function doesn't have 'apply'
-  return typeof console === 'object' && console.log && console.log(...args);
-}
+exports.log = console.debug || console.log || function () {};
 /**
  * Save `namespaces`.
  *
@@ -3803,13 +3818,13 @@ function save(namespaces) {
 
 
 function load() {
-  let r;
+  var r;
 
   try {
     r = exports.storage.getItem('debug');
-  } catch (error) {} // Swallow
-  // XXX (@Qix-) should we be logging these?
-  // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
+  } catch (error) {// Swallow
+    // XXX (@Qix-) should we be logging these?
+  } // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
 
 
   if (!r && typeof process !== 'undefined' && 'env' in process) {
@@ -3841,8 +3856,8 @@ function localstorage() {
 }
 
 module.exports = require('./common')(exports);
-const {
-  formatters
+var {
+  formatters: formatters
 } = module.exports;
 /**
  * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
@@ -3855,7 +3870,7 @@ formatters.j = function (v) {
     return '[UnexpectedJSONParseError]: ' + error.message;
   }
 };
-},{"./common":"../node_modules/socket.io-client/node_modules/debug/src/common.js","process":"../node_modules/process/browser.js"}],"../node_modules/socket.io-client/build/url.js":[function(require,module,exports) {
+},{"./common":"../node_modules/debug/src/common.js","process":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../node_modules/socket.io-client/build/url.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3870,13 +3885,16 @@ var debug = require("debug")("socket.io-client:url");
  * URL parser.
  *
  * @param uri - url
+ * @param path - the request path of the connection
  * @param loc - An object meant to mimic window.location.
  *        Defaults to window.location.
  * @public
  */
 
 
-function url(uri, loc) {
+function url(uri) {
+  var path = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+  var loc = arguments.length > 2 ? arguments[2] : undefined;
   var obj = uri; // default to window.location
 
   loc = loc || typeof location !== "undefined" && location;
@@ -3919,14 +3937,14 @@ function url(uri, loc) {
   var ipv6 = obj.host.indexOf(":") !== -1;
   var host = ipv6 ? "[" + obj.host + "]" : obj.host; // define unique id
 
-  obj.id = obj.protocol + "://" + host + ":" + obj.port; // define href
+  obj.id = obj.protocol + "://" + host + ":" + obj.port + path; // define href
 
   obj.href = obj.protocol + "://" + host + (loc && loc.port === obj.port ? "" : ":" + obj.port);
   return obj;
 }
 
 exports.url = url;
-},{"parseuri":"../node_modules/parseuri/index.js","debug":"../node_modules/socket.io-client/node_modules/debug/src/browser.js"}],"../node_modules/has-cors/index.js":[function(require,module,exports) {
+},{"parseuri":"../node_modules/parseuri/index.js","debug":"../node_modules/debug/src/browser.js"}],"../node_modules/has-cors/index.js":[function(require,module,exports) {
 
 /**
  * Module exports.
@@ -4428,6 +4446,7 @@ Emitter.prototype.hasListeners = function(event){
 },{}],"../node_modules/engine.io-client/lib/transport.js":[function(require,module,exports) {
 const parser = require("engine.io-parser");
 const Emitter = require("component-emitter");
+const debug = require("debug")("engine.io-client:transport");
 
 class Transport extends Emitter {
   /**
@@ -4498,7 +4517,8 @@ class Transport extends Emitter {
     if ("open" === this.readyState) {
       this.write(packets);
     } else {
-      throw new Error("Transport not open");
+      // this might happen if the transport was silently closed in the beforeunload event handler
+      debug("transport is not open, discarding packets");
     }
   }
 
@@ -4544,7 +4564,7 @@ class Transport extends Emitter {
 
 module.exports = Transport;
 
-},{"engine.io-parser":"../node_modules/engine.io-parser/lib/index.js","component-emitter":"../node_modules/component-emitter/index.js"}],"../node_modules/parseqs/index.js":[function(require,module,exports) {
+},{"engine.io-parser":"../node_modules/engine.io-parser/lib/index.js","component-emitter":"../node_modules/component-emitter/index.js","debug":"../node_modules/debug/src/browser.js"}],"../node_modules/parseqs/index.js":[function(require,module,exports) {
 /**
  * Compiles a querystring
  * Returns string representation of the object
@@ -4653,616 +4673,7 @@ yeast.encode = encode;
 yeast.decode = decode;
 module.exports = yeast;
 
-},{}],"../node_modules/engine.io-client/node_modules/ms/index.js":[function(require,module,exports) {
-/**
- * Helpers.
- */
-
-var s = 1000;
-var m = s * 60;
-var h = m * 60;
-var d = h * 24;
-var w = d * 7;
-var y = d * 365.25;
-
-/**
- * Parse or format the given `val`.
- *
- * Options:
- *
- *  - `long` verbose formatting [false]
- *
- * @param {String|Number} val
- * @param {Object} [options]
- * @throws {Error} throw an error if val is not a non-empty string or a number
- * @return {String|Number}
- * @api public
- */
-
-module.exports = function (val, options) {
-  options = options || {};
-  var type = typeof val;
-  if (type === 'string' && val.length > 0) {
-    return parse(val);
-  } else if (type === 'number' && isFinite(val)) {
-    return options.long ? fmtLong(val) : fmtShort(val);
-  }
-  throw new Error(
-    'val is not a non-empty string or a valid number. val=' +
-      JSON.stringify(val)
-  );
-};
-
-/**
- * Parse the given `str` and return milliseconds.
- *
- * @param {String} str
- * @return {Number}
- * @api private
- */
-
-function parse(str) {
-  str = String(str);
-  if (str.length > 100) {
-    return;
-  }
-  var match = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
-    str
-  );
-  if (!match) {
-    return;
-  }
-  var n = parseFloat(match[1]);
-  var type = (match[2] || 'ms').toLowerCase();
-  switch (type) {
-    case 'years':
-    case 'year':
-    case 'yrs':
-    case 'yr':
-    case 'y':
-      return n * y;
-    case 'weeks':
-    case 'week':
-    case 'w':
-      return n * w;
-    case 'days':
-    case 'day':
-    case 'd':
-      return n * d;
-    case 'hours':
-    case 'hour':
-    case 'hrs':
-    case 'hr':
-    case 'h':
-      return n * h;
-    case 'minutes':
-    case 'minute':
-    case 'mins':
-    case 'min':
-    case 'm':
-      return n * m;
-    case 'seconds':
-    case 'second':
-    case 'secs':
-    case 'sec':
-    case 's':
-      return n * s;
-    case 'milliseconds':
-    case 'millisecond':
-    case 'msecs':
-    case 'msec':
-    case 'ms':
-      return n;
-    default:
-      return undefined;
-  }
-}
-
-/**
- * Short format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function fmtShort(ms) {
-  var msAbs = Math.abs(ms);
-  if (msAbs >= d) {
-    return Math.round(ms / d) + 'd';
-  }
-  if (msAbs >= h) {
-    return Math.round(ms / h) + 'h';
-  }
-  if (msAbs >= m) {
-    return Math.round(ms / m) + 'm';
-  }
-  if (msAbs >= s) {
-    return Math.round(ms / s) + 's';
-  }
-  return ms + 'ms';
-}
-
-/**
- * Long format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function fmtLong(ms) {
-  var msAbs = Math.abs(ms);
-  if (msAbs >= d) {
-    return plural(ms, msAbs, d, 'day');
-  }
-  if (msAbs >= h) {
-    return plural(ms, msAbs, h, 'hour');
-  }
-  if (msAbs >= m) {
-    return plural(ms, msAbs, m, 'minute');
-  }
-  if (msAbs >= s) {
-    return plural(ms, msAbs, s, 'second');
-  }
-  return ms + ' ms';
-}
-
-/**
- * Pluralization helper.
- */
-
-function plural(ms, msAbs, n, name) {
-  var isPlural = msAbs >= n * 1.5;
-  return Math.round(ms / n) + ' ' + name + (isPlural ? 's' : '');
-}
-
-},{}],"../node_modules/engine.io-client/node_modules/debug/src/common.js":[function(require,module,exports) {
-
-/**
- * This is the common logic for both the Node.js and web browser
- * implementations of `debug()`.
- */
-
-function setup(env) {
-	createDebug.debug = createDebug;
-	createDebug.default = createDebug;
-	createDebug.coerce = coerce;
-	createDebug.disable = disable;
-	createDebug.enable = enable;
-	createDebug.enabled = enabled;
-	createDebug.humanize = require('ms');
-
-	Object.keys(env).forEach(key => {
-		createDebug[key] = env[key];
-	});
-
-	/**
-	* Active `debug` instances.
-	*/
-	createDebug.instances = [];
-
-	/**
-	* The currently active debug mode names, and names to skip.
-	*/
-
-	createDebug.names = [];
-	createDebug.skips = [];
-
-	/**
-	* Map of special "%n" handling functions, for the debug "format" argument.
-	*
-	* Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
-	*/
-	createDebug.formatters = {};
-
-	/**
-	* Selects a color for a debug namespace
-	* @param {String} namespace The namespace string for the for the debug instance to be colored
-	* @return {Number|String} An ANSI color code for the given namespace
-	* @api private
-	*/
-	function selectColor(namespace) {
-		let hash = 0;
-
-		for (let i = 0; i < namespace.length; i++) {
-			hash = ((hash << 5) - hash) + namespace.charCodeAt(i);
-			hash |= 0; // Convert to 32bit integer
-		}
-
-		return createDebug.colors[Math.abs(hash) % createDebug.colors.length];
-	}
-	createDebug.selectColor = selectColor;
-
-	/**
-	* Create a debugger with the given `namespace`.
-	*
-	* @param {String} namespace
-	* @return {Function}
-	* @api public
-	*/
-	function createDebug(namespace) {
-		let prevTime;
-
-		function debug(...args) {
-			// Disabled?
-			if (!debug.enabled) {
-				return;
-			}
-
-			const self = debug;
-
-			// Set `diff` timestamp
-			const curr = Number(new Date());
-			const ms = curr - (prevTime || curr);
-			self.diff = ms;
-			self.prev = prevTime;
-			self.curr = curr;
-			prevTime = curr;
-
-			args[0] = createDebug.coerce(args[0]);
-
-			if (typeof args[0] !== 'string') {
-				// Anything else let's inspect with %O
-				args.unshift('%O');
-			}
-
-			// Apply any `formatters` transformations
-			let index = 0;
-			args[0] = args[0].replace(/%([a-zA-Z%])/g, (match, format) => {
-				// If we encounter an escaped % then don't increase the array index
-				if (match === '%%') {
-					return match;
-				}
-				index++;
-				const formatter = createDebug.formatters[format];
-				if (typeof formatter === 'function') {
-					const val = args[index];
-					match = formatter.call(self, val);
-
-					// Now we need to remove `args[index]` since it's inlined in the `format`
-					args.splice(index, 1);
-					index--;
-				}
-				return match;
-			});
-
-			// Apply env-specific formatting (colors, etc.)
-			createDebug.formatArgs.call(self, args);
-
-			const logFn = self.log || createDebug.log;
-			logFn.apply(self, args);
-		}
-
-		debug.namespace = namespace;
-		debug.enabled = createDebug.enabled(namespace);
-		debug.useColors = createDebug.useColors();
-		debug.color = selectColor(namespace);
-		debug.destroy = destroy;
-		debug.extend = extend;
-		// Debug.formatArgs = formatArgs;
-		// debug.rawLog = rawLog;
-
-		// env-specific initialization logic for debug instances
-		if (typeof createDebug.init === 'function') {
-			createDebug.init(debug);
-		}
-
-		createDebug.instances.push(debug);
-
-		return debug;
-	}
-
-	function destroy() {
-		const index = createDebug.instances.indexOf(this);
-		if (index !== -1) {
-			createDebug.instances.splice(index, 1);
-			return true;
-		}
-		return false;
-	}
-
-	function extend(namespace, delimiter) {
-		const newDebug = createDebug(this.namespace + (typeof delimiter === 'undefined' ? ':' : delimiter) + namespace);
-		newDebug.log = this.log;
-		return newDebug;
-	}
-
-	/**
-	* Enables a debug mode by namespaces. This can include modes
-	* separated by a colon and wildcards.
-	*
-	* @param {String} namespaces
-	* @api public
-	*/
-	function enable(namespaces) {
-		createDebug.save(namespaces);
-
-		createDebug.names = [];
-		createDebug.skips = [];
-
-		let i;
-		const split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
-		const len = split.length;
-
-		for (i = 0; i < len; i++) {
-			if (!split[i]) {
-				// ignore empty strings
-				continue;
-			}
-
-			namespaces = split[i].replace(/\*/g, '.*?');
-
-			if (namespaces[0] === '-') {
-				createDebug.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
-			} else {
-				createDebug.names.push(new RegExp('^' + namespaces + '$'));
-			}
-		}
-
-		for (i = 0; i < createDebug.instances.length; i++) {
-			const instance = createDebug.instances[i];
-			instance.enabled = createDebug.enabled(instance.namespace);
-		}
-	}
-
-	/**
-	* Disable debug output.
-	*
-	* @return {String} namespaces
-	* @api public
-	*/
-	function disable() {
-		const namespaces = [
-			...createDebug.names.map(toNamespace),
-			...createDebug.skips.map(toNamespace).map(namespace => '-' + namespace)
-		].join(',');
-		createDebug.enable('');
-		return namespaces;
-	}
-
-	/**
-	* Returns true if the given mode name is enabled, false otherwise.
-	*
-	* @param {String} name
-	* @return {Boolean}
-	* @api public
-	*/
-	function enabled(name) {
-		if (name[name.length - 1] === '*') {
-			return true;
-		}
-
-		let i;
-		let len;
-
-		for (i = 0, len = createDebug.skips.length; i < len; i++) {
-			if (createDebug.skips[i].test(name)) {
-				return false;
-			}
-		}
-
-		for (i = 0, len = createDebug.names.length; i < len; i++) {
-			if (createDebug.names[i].test(name)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	* Convert regexp to namespace
-	*
-	* @param {RegExp} regxep
-	* @return {String} namespace
-	* @api private
-	*/
-	function toNamespace(regexp) {
-		return regexp.toString()
-			.substring(2, regexp.toString().length - 2)
-			.replace(/\.\*\?$/, '*');
-	}
-
-	/**
-	* Coerce `val`.
-	*
-	* @param {Mixed} val
-	* @return {Mixed}
-	* @api private
-	*/
-	function coerce(val) {
-		if (val instanceof Error) {
-			return val.stack || val.message;
-		}
-		return val;
-	}
-
-	createDebug.enable(createDebug.load());
-
-	return createDebug;
-}
-
-module.exports = setup;
-
-},{"ms":"../node_modules/engine.io-client/node_modules/ms/index.js"}],"../node_modules/engine.io-client/node_modules/debug/src/browser.js":[function(require,module,exports) {
-var process = require("process");
-/* eslint-env browser */
-
-/**
- * This is the web browser implementation of `debug()`.
- */
-exports.log = log;
-exports.formatArgs = formatArgs;
-exports.save = save;
-exports.load = load;
-exports.useColors = useColors;
-exports.storage = localstorage();
-/**
- * Colors.
- */
-
-exports.colors = ['#0000CC', '#0000FF', '#0033CC', '#0033FF', '#0066CC', '#0066FF', '#0099CC', '#0099FF', '#00CC00', '#00CC33', '#00CC66', '#00CC99', '#00CCCC', '#00CCFF', '#3300CC', '#3300FF', '#3333CC', '#3333FF', '#3366CC', '#3366FF', '#3399CC', '#3399FF', '#33CC00', '#33CC33', '#33CC66', '#33CC99', '#33CCCC', '#33CCFF', '#6600CC', '#6600FF', '#6633CC', '#6633FF', '#66CC00', '#66CC33', '#9900CC', '#9900FF', '#9933CC', '#9933FF', '#99CC00', '#99CC33', '#CC0000', '#CC0033', '#CC0066', '#CC0099', '#CC00CC', '#CC00FF', '#CC3300', '#CC3333', '#CC3366', '#CC3399', '#CC33CC', '#CC33FF', '#CC6600', '#CC6633', '#CC9900', '#CC9933', '#CCCC00', '#CCCC33', '#FF0000', '#FF0033', '#FF0066', '#FF0099', '#FF00CC', '#FF00FF', '#FF3300', '#FF3333', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#FF6600', '#FF6633', '#FF9900', '#FF9933', '#FFCC00', '#FFCC33'];
-/**
- * Currently only WebKit-based Web Inspectors, Firefox >= v31,
- * and the Firebug extension (any Firefox version) are known
- * to support "%c" CSS customizations.
- *
- * TODO: add a `localStorage` variable to explicitly enable/disable colors
- */
-// eslint-disable-next-line complexity
-
-function useColors() {
-  // NB: In an Electron preload script, document will be defined but not fully
-  // initialized. Since we know we're in Chrome, we'll just detect this case
-  // explicitly
-  if (typeof window !== 'undefined' && window.process && (window.process.type === 'renderer' || window.process.__nwjs)) {
-    return true;
-  } // Internet Explorer and Edge do not support colors.
-
-
-  if (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) {
-    return false;
-  } // Is webkit? http://stackoverflow.com/a/16459606/376773
-  // document is undefined in react-native: https://github.com/facebook/react-native/pull/1632
-
-
-  return typeof document !== 'undefined' && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance || // Is firebug? http://stackoverflow.com/a/398120/376773
-  typeof window !== 'undefined' && window.console && (window.console.firebug || window.console.exception && window.console.table) || // Is firefox >= v31?
-  // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
-  typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31 || // Double check webkit in userAgent just in case we are in a worker
-  typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/);
-}
-/**
- * Colorize log arguments if enabled.
- *
- * @api public
- */
-
-
-function formatArgs(args) {
-  args[0] = (this.useColors ? '%c' : '') + this.namespace + (this.useColors ? ' %c' : ' ') + args[0] + (this.useColors ? '%c ' : ' ') + '+' + module.exports.humanize(this.diff);
-
-  if (!this.useColors) {
-    return;
-  }
-
-  const c = 'color: ' + this.color;
-  args.splice(1, 0, c, 'color: inherit'); // The final "%c" is somewhat tricky, because there could be other
-  // arguments passed either before or after the %c, so we need to
-  // figure out the correct index to insert the CSS into
-
-  let index = 0;
-  let lastC = 0;
-  args[0].replace(/%[a-zA-Z%]/g, match => {
-    if (match === '%%') {
-      return;
-    }
-
-    index++;
-
-    if (match === '%c') {
-      // We only are interested in the *last* %c
-      // (the user may have provided their own)
-      lastC = index;
-    }
-  });
-  args.splice(lastC, 0, c);
-}
-/**
- * Invokes `console.log()` when available.
- * No-op when `console.log` is not a "function".
- *
- * @api public
- */
-
-
-function log(...args) {
-  // This hackery is required for IE8/9, where
-  // the `console.log` function doesn't have 'apply'
-  return typeof console === 'object' && console.log && console.log(...args);
-}
-/**
- * Save `namespaces`.
- *
- * @param {String} namespaces
- * @api private
- */
-
-
-function save(namespaces) {
-  try {
-    if (namespaces) {
-      exports.storage.setItem('debug', namespaces);
-    } else {
-      exports.storage.removeItem('debug');
-    }
-  } catch (error) {// Swallow
-    // XXX (@Qix-) should we be logging these?
-  }
-}
-/**
- * Load `namespaces`.
- *
- * @return {String} returns the previously persisted debug modes
- * @api private
- */
-
-
-function load() {
-  let r;
-
-  try {
-    r = exports.storage.getItem('debug');
-  } catch (error) {} // Swallow
-  // XXX (@Qix-) should we be logging these?
-  // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
-
-
-  if (!r && typeof process !== 'undefined' && 'env' in process) {
-    r = undefined;
-  }
-
-  return r;
-}
-/**
- * Localstorage attempts to return the localstorage.
- *
- * This is necessary because safari throws
- * when a user disables cookies/localstorage
- * and you attempt to access it.
- *
- * @return {LocalStorage}
- * @api private
- */
-
-
-function localstorage() {
-  try {
-    // TVMLKit (Apple TV JS Runtime) does not have a window object, just localStorage in the global context
-    // The Browser also has localStorage in the global context.
-    return localStorage;
-  } catch (error) {// Swallow
-    // XXX (@Qix-) should we be logging these?
-  }
-}
-
-module.exports = require('./common')(exports);
-const {
-  formatters
-} = module.exports;
-/**
- * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
- */
-
-formatters.j = function (v) {
-  try {
-    return JSON.stringify(v);
-  } catch (error) {
-    return '[UnexpectedJSONParseError]: ' + error.message;
-  }
-};
-},{"./common":"../node_modules/engine.io-client/node_modules/debug/src/common.js","process":"../node_modules/process/browser.js"}],"../node_modules/engine.io-client/lib/transports/polling.js":[function(require,module,exports) {
+},{}],"../node_modules/engine.io-client/lib/transports/polling.js":[function(require,module,exports) {
 const Transport = require("../transport");
 const parseqs = require("parseqs");
 const parser = require("engine.io-parser");
@@ -5474,10 +4885,12 @@ class Polling extends Transport {
 
 module.exports = Polling;
 
-},{"../transport":"../node_modules/engine.io-client/lib/transport.js","parseqs":"../node_modules/parseqs/index.js","engine.io-parser":"../node_modules/engine.io-parser/lib/index.js","yeast":"../node_modules/yeast/index.js","debug":"../node_modules/engine.io-client/node_modules/debug/src/browser.js"}],"../node_modules/engine.io-client/lib/util.js":[function(require,module,exports) {
+},{"../transport":"../node_modules/engine.io-client/lib/transport.js","parseqs":"../node_modules/parseqs/index.js","engine.io-parser":"../node_modules/engine.io-parser/lib/index.js","yeast":"../node_modules/yeast/index.js","debug":"../node_modules/debug/src/browser.js"}],"../node_modules/engine.io-client/lib/util.js":[function(require,module,exports) {
 module.exports.pick = (obj, ...attr) => {
   return attr.reduce((acc, k) => {
-    acc[k] = obj[k];
+    if (obj.hasOwnProperty(k)) {
+      acc[k] = obj[k];
+    }
     return acc;
   }, {});
 };
@@ -5820,7 +5233,7 @@ function unloadHandler() {
 module.exports = XHR;
 module.exports.Request = Request;
 
-},{"xmlhttprequest-ssl":"../node_modules/engine.io-client/lib/xmlhttprequest.js","./polling":"../node_modules/engine.io-client/lib/transports/polling.js","component-emitter":"../node_modules/component-emitter/index.js","../util":"../node_modules/engine.io-client/lib/util.js","../globalThis":"../node_modules/engine.io-client/lib/globalThis.browser.js","debug":"../node_modules/engine.io-client/node_modules/debug/src/browser.js"}],"../node_modules/engine.io-client/lib/transports/polling-jsonp.js":[function(require,module,exports) {
+},{"xmlhttprequest-ssl":"../node_modules/engine.io-client/lib/xmlhttprequest.js","./polling":"../node_modules/engine.io-client/lib/transports/polling.js","component-emitter":"../node_modules/component-emitter/index.js","../util":"../node_modules/engine.io-client/lib/util.js","../globalThis":"../node_modules/engine.io-client/lib/globalThis.browser.js","debug":"../node_modules/debug/src/browser.js"}],"../node_modules/engine.io-client/lib/transports/polling-jsonp.js":[function(require,module,exports) {
 const Polling = require("./polling");
 const globalThis = require("../globalThis");
 
@@ -5832,12 +5245,6 @@ const rEscapedNewline = /\\n/g;
  */
 
 let callbacks;
-
-/**
- * Noop.
- */
-
-function empty() {}
 
 class JSONPPolling extends Polling {
   /**
@@ -5869,17 +5276,6 @@ class JSONPPolling extends Polling {
 
     // append to query string
     this.query.j = this.index;
-
-    // prevent spurious errors from being emitted when the window is unloaded
-    if (typeof addEventListener === "function") {
-      addEventListener(
-        "beforeunload",
-        function() {
-          if (self.script) self.script.onerror = empty;
-        },
-        false
-      );
-    }
   }
 
   /**
@@ -5896,6 +5292,8 @@ class JSONPPolling extends Polling {
    */
   doClose() {
     if (this.script) {
+      // prevent spurious errors from being emitted when the window is unloaded
+      this.script.onerror = () => {};
       this.script.parentNode.removeChild(this.script);
       this.script = null;
     }
@@ -6046,7 +5444,7 @@ module.exports = {
   defaultBinaryType: "arraybuffer"
 };
 
-},{"../globalThis":"../node_modules/engine.io-client/lib/globalThis.browser.js"}],"../node_modules/base64-js/index.js":[function(require,module,exports) {
+},{"../globalThis":"../node_modules/engine.io-client/lib/globalThis.browser.js"}],"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/base64-js/index.js":[function(require,module,exports) {
 'use strict'
 
 exports.byteLength = byteLength
@@ -6198,7 +5596,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],"../node_modules/ieee754/index.js":[function(require,module,exports) {
+},{}],"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/ieee754/index.js":[function(require,module,exports) {
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -6285,14 +5683,14 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],"../node_modules/isarray/index.js":[function(require,module,exports) {
+},{}],"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/isarray/index.js":[function(require,module,exports) {
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],"../node_modules/buffer/index.js":[function(require,module,exports) {
+},{}],"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/buffer/index.js":[function(require,module,exports) {
 
 var global = arguments[3];
 /*!
@@ -8085,7 +7483,7 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-},{"base64-js":"../node_modules/base64-js/index.js","ieee754":"../node_modules/ieee754/index.js","isarray":"../node_modules/isarray/index.js","buffer":"../node_modules/buffer/index.js"}],"../node_modules/engine.io-client/lib/transports/websocket.js":[function(require,module,exports) {
+},{"base64-js":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/base64-js/index.js","ieee754":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/ieee754/index.js","isarray":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/isarray/index.js","buffer":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/buffer/index.js"}],"../node_modules/engine.io-client/lib/transports/websocket.js":[function(require,module,exports) {
 var Buffer = require("buffer").Buffer;
 const Transport = require("../transport");
 const parser = require("engine.io-parser");
@@ -8156,7 +7554,12 @@ class WS extends Transport {
           "ca",
           "ciphers",
           "rejectUnauthorized",
-          "localAddress"
+          "localAddress",
+          "protocolVersion",
+          "origin",
+          "maxPayload",
+          "family",
+          "checkServerIdentity"
         );
 
     if (this.opts.extraHeaders) {
@@ -8285,6 +7688,7 @@ class WS extends Transport {
   doClose() {
     if (typeof this.ws !== "undefined") {
       this.ws.close();
+      this.ws = null;
     }
   }
 
@@ -8351,7 +7755,7 @@ class WS extends Transport {
 
 module.exports = WS;
 
-},{"../transport":"../node_modules/engine.io-client/lib/transport.js","engine.io-parser":"../node_modules/engine.io-parser/lib/index.js","parseqs":"../node_modules/parseqs/index.js","yeast":"../node_modules/yeast/index.js","../util":"../node_modules/engine.io-client/lib/util.js","./websocket-constructor":"../node_modules/engine.io-client/lib/transports/websocket-constructor.browser.js","debug":"../node_modules/engine.io-client/node_modules/debug/src/browser.js","buffer":"../node_modules/buffer/index.js"}],"../node_modules/engine.io-client/lib/transports/index.js":[function(require,module,exports) {
+},{"../transport":"../node_modules/engine.io-client/lib/transport.js","engine.io-parser":"../node_modules/engine.io-parser/lib/index.js","parseqs":"../node_modules/parseqs/index.js","yeast":"../node_modules/yeast/index.js","../util":"../node_modules/engine.io-client/lib/util.js","./websocket-constructor":"../node_modules/engine.io-client/lib/transports/websocket-constructor.browser.js","debug":"../node_modules/debug/src/browser.js","buffer":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/buffer/index.js"}],"../node_modules/engine.io-client/lib/transports/index.js":[function(require,module,exports) {
 const XMLHttpRequest = require("xmlhttprequest-ssl");
 const XHR = require("./polling-xhr");
 const JSONP = require("./polling-jsonp");
@@ -8490,6 +7894,20 @@ class Socket extends Emitter {
 
     // set on heartbeat
     this.pingTimeoutTimer = null;
+
+    if (typeof addEventListener === "function") {
+      addEventListener(
+        "beforeunload",
+        () => {
+          if (this.transport) {
+            // silently close the transport
+            this.transport.removeAllListeners();
+            this.transport.close();
+          }
+        },
+        false
+      );
+    }
 
     this.open();
   }
@@ -9066,7 +8484,7 @@ function clone(obj) {
 
 module.exports = Socket;
 
-},{"./transports/index":"../node_modules/engine.io-client/lib/transports/index.js","component-emitter":"../node_modules/component-emitter/index.js","debug":"../node_modules/engine.io-client/node_modules/debug/src/browser.js","engine.io-parser":"../node_modules/engine.io-parser/lib/index.js","parseuri":"../node_modules/parseuri/index.js","parseqs":"../node_modules/parseqs/index.js"}],"../node_modules/engine.io-client/lib/index.js":[function(require,module,exports) {
+},{"./transports/index":"../node_modules/engine.io-client/lib/transports/index.js","component-emitter":"../node_modules/component-emitter/index.js","debug":"../node_modules/debug/src/browser.js","engine.io-parser":"../node_modules/engine.io-parser/lib/index.js","parseuri":"../node_modules/parseuri/index.js","parseqs":"../node_modules/parseqs/index.js"}],"../node_modules/engine.io-client/lib/index.js":[function(require,module,exports) {
 const Socket = require("./socket");
 
 module.exports = (uri, opts) => new Socket(uri, opts);
@@ -9250,616 +8668,7 @@ function _reconstructPacket(data, buffers) {
 
   return data;
 }
-},{"./is-binary":"../node_modules/socket.io-parser/dist/is-binary.js"}],"../node_modules/socket.io-parser/node_modules/ms/index.js":[function(require,module,exports) {
-/**
- * Helpers.
- */
-
-var s = 1000;
-var m = s * 60;
-var h = m * 60;
-var d = h * 24;
-var w = d * 7;
-var y = d * 365.25;
-
-/**
- * Parse or format the given `val`.
- *
- * Options:
- *
- *  - `long` verbose formatting [false]
- *
- * @param {String|Number} val
- * @param {Object} [options]
- * @throws {Error} throw an error if val is not a non-empty string or a number
- * @return {String|Number}
- * @api public
- */
-
-module.exports = function (val, options) {
-  options = options || {};
-  var type = typeof val;
-  if (type === 'string' && val.length > 0) {
-    return parse(val);
-  } else if (type === 'number' && isFinite(val)) {
-    return options.long ? fmtLong(val) : fmtShort(val);
-  }
-  throw new Error(
-    'val is not a non-empty string or a valid number. val=' +
-      JSON.stringify(val)
-  );
-};
-
-/**
- * Parse the given `str` and return milliseconds.
- *
- * @param {String} str
- * @return {Number}
- * @api private
- */
-
-function parse(str) {
-  str = String(str);
-  if (str.length > 100) {
-    return;
-  }
-  var match = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
-    str
-  );
-  if (!match) {
-    return;
-  }
-  var n = parseFloat(match[1]);
-  var type = (match[2] || 'ms').toLowerCase();
-  switch (type) {
-    case 'years':
-    case 'year':
-    case 'yrs':
-    case 'yr':
-    case 'y':
-      return n * y;
-    case 'weeks':
-    case 'week':
-    case 'w':
-      return n * w;
-    case 'days':
-    case 'day':
-    case 'd':
-      return n * d;
-    case 'hours':
-    case 'hour':
-    case 'hrs':
-    case 'hr':
-    case 'h':
-      return n * h;
-    case 'minutes':
-    case 'minute':
-    case 'mins':
-    case 'min':
-    case 'm':
-      return n * m;
-    case 'seconds':
-    case 'second':
-    case 'secs':
-    case 'sec':
-    case 's':
-      return n * s;
-    case 'milliseconds':
-    case 'millisecond':
-    case 'msecs':
-    case 'msec':
-    case 'ms':
-      return n;
-    default:
-      return undefined;
-  }
-}
-
-/**
- * Short format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function fmtShort(ms) {
-  var msAbs = Math.abs(ms);
-  if (msAbs >= d) {
-    return Math.round(ms / d) + 'd';
-  }
-  if (msAbs >= h) {
-    return Math.round(ms / h) + 'h';
-  }
-  if (msAbs >= m) {
-    return Math.round(ms / m) + 'm';
-  }
-  if (msAbs >= s) {
-    return Math.round(ms / s) + 's';
-  }
-  return ms + 'ms';
-}
-
-/**
- * Long format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function fmtLong(ms) {
-  var msAbs = Math.abs(ms);
-  if (msAbs >= d) {
-    return plural(ms, msAbs, d, 'day');
-  }
-  if (msAbs >= h) {
-    return plural(ms, msAbs, h, 'hour');
-  }
-  if (msAbs >= m) {
-    return plural(ms, msAbs, m, 'minute');
-  }
-  if (msAbs >= s) {
-    return plural(ms, msAbs, s, 'second');
-  }
-  return ms + ' ms';
-}
-
-/**
- * Pluralization helper.
- */
-
-function plural(ms, msAbs, n, name) {
-  var isPlural = msAbs >= n * 1.5;
-  return Math.round(ms / n) + ' ' + name + (isPlural ? 's' : '');
-}
-
-},{}],"../node_modules/socket.io-parser/node_modules/debug/src/common.js":[function(require,module,exports) {
-
-/**
- * This is the common logic for both the Node.js and web browser
- * implementations of `debug()`.
- */
-
-function setup(env) {
-	createDebug.debug = createDebug;
-	createDebug.default = createDebug;
-	createDebug.coerce = coerce;
-	createDebug.disable = disable;
-	createDebug.enable = enable;
-	createDebug.enabled = enabled;
-	createDebug.humanize = require('ms');
-
-	Object.keys(env).forEach(key => {
-		createDebug[key] = env[key];
-	});
-
-	/**
-	* Active `debug` instances.
-	*/
-	createDebug.instances = [];
-
-	/**
-	* The currently active debug mode names, and names to skip.
-	*/
-
-	createDebug.names = [];
-	createDebug.skips = [];
-
-	/**
-	* Map of special "%n" handling functions, for the debug "format" argument.
-	*
-	* Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
-	*/
-	createDebug.formatters = {};
-
-	/**
-	* Selects a color for a debug namespace
-	* @param {String} namespace The namespace string for the for the debug instance to be colored
-	* @return {Number|String} An ANSI color code for the given namespace
-	* @api private
-	*/
-	function selectColor(namespace) {
-		let hash = 0;
-
-		for (let i = 0; i < namespace.length; i++) {
-			hash = ((hash << 5) - hash) + namespace.charCodeAt(i);
-			hash |= 0; // Convert to 32bit integer
-		}
-
-		return createDebug.colors[Math.abs(hash) % createDebug.colors.length];
-	}
-	createDebug.selectColor = selectColor;
-
-	/**
-	* Create a debugger with the given `namespace`.
-	*
-	* @param {String} namespace
-	* @return {Function}
-	* @api public
-	*/
-	function createDebug(namespace) {
-		let prevTime;
-
-		function debug(...args) {
-			// Disabled?
-			if (!debug.enabled) {
-				return;
-			}
-
-			const self = debug;
-
-			// Set `diff` timestamp
-			const curr = Number(new Date());
-			const ms = curr - (prevTime || curr);
-			self.diff = ms;
-			self.prev = prevTime;
-			self.curr = curr;
-			prevTime = curr;
-
-			args[0] = createDebug.coerce(args[0]);
-
-			if (typeof args[0] !== 'string') {
-				// Anything else let's inspect with %O
-				args.unshift('%O');
-			}
-
-			// Apply any `formatters` transformations
-			let index = 0;
-			args[0] = args[0].replace(/%([a-zA-Z%])/g, (match, format) => {
-				// If we encounter an escaped % then don't increase the array index
-				if (match === '%%') {
-					return match;
-				}
-				index++;
-				const formatter = createDebug.formatters[format];
-				if (typeof formatter === 'function') {
-					const val = args[index];
-					match = formatter.call(self, val);
-
-					// Now we need to remove `args[index]` since it's inlined in the `format`
-					args.splice(index, 1);
-					index--;
-				}
-				return match;
-			});
-
-			// Apply env-specific formatting (colors, etc.)
-			createDebug.formatArgs.call(self, args);
-
-			const logFn = self.log || createDebug.log;
-			logFn.apply(self, args);
-		}
-
-		debug.namespace = namespace;
-		debug.enabled = createDebug.enabled(namespace);
-		debug.useColors = createDebug.useColors();
-		debug.color = selectColor(namespace);
-		debug.destroy = destroy;
-		debug.extend = extend;
-		// Debug.formatArgs = formatArgs;
-		// debug.rawLog = rawLog;
-
-		// env-specific initialization logic for debug instances
-		if (typeof createDebug.init === 'function') {
-			createDebug.init(debug);
-		}
-
-		createDebug.instances.push(debug);
-
-		return debug;
-	}
-
-	function destroy() {
-		const index = createDebug.instances.indexOf(this);
-		if (index !== -1) {
-			createDebug.instances.splice(index, 1);
-			return true;
-		}
-		return false;
-	}
-
-	function extend(namespace, delimiter) {
-		const newDebug = createDebug(this.namespace + (typeof delimiter === 'undefined' ? ':' : delimiter) + namespace);
-		newDebug.log = this.log;
-		return newDebug;
-	}
-
-	/**
-	* Enables a debug mode by namespaces. This can include modes
-	* separated by a colon and wildcards.
-	*
-	* @param {String} namespaces
-	* @api public
-	*/
-	function enable(namespaces) {
-		createDebug.save(namespaces);
-
-		createDebug.names = [];
-		createDebug.skips = [];
-
-		let i;
-		const split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
-		const len = split.length;
-
-		for (i = 0; i < len; i++) {
-			if (!split[i]) {
-				// ignore empty strings
-				continue;
-			}
-
-			namespaces = split[i].replace(/\*/g, '.*?');
-
-			if (namespaces[0] === '-') {
-				createDebug.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
-			} else {
-				createDebug.names.push(new RegExp('^' + namespaces + '$'));
-			}
-		}
-
-		for (i = 0; i < createDebug.instances.length; i++) {
-			const instance = createDebug.instances[i];
-			instance.enabled = createDebug.enabled(instance.namespace);
-		}
-	}
-
-	/**
-	* Disable debug output.
-	*
-	* @return {String} namespaces
-	* @api public
-	*/
-	function disable() {
-		const namespaces = [
-			...createDebug.names.map(toNamespace),
-			...createDebug.skips.map(toNamespace).map(namespace => '-' + namespace)
-		].join(',');
-		createDebug.enable('');
-		return namespaces;
-	}
-
-	/**
-	* Returns true if the given mode name is enabled, false otherwise.
-	*
-	* @param {String} name
-	* @return {Boolean}
-	* @api public
-	*/
-	function enabled(name) {
-		if (name[name.length - 1] === '*') {
-			return true;
-		}
-
-		let i;
-		let len;
-
-		for (i = 0, len = createDebug.skips.length; i < len; i++) {
-			if (createDebug.skips[i].test(name)) {
-				return false;
-			}
-		}
-
-		for (i = 0, len = createDebug.names.length; i < len; i++) {
-			if (createDebug.names[i].test(name)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	* Convert regexp to namespace
-	*
-	* @param {RegExp} regxep
-	* @return {String} namespace
-	* @api private
-	*/
-	function toNamespace(regexp) {
-		return regexp.toString()
-			.substring(2, regexp.toString().length - 2)
-			.replace(/\.\*\?$/, '*');
-	}
-
-	/**
-	* Coerce `val`.
-	*
-	* @param {Mixed} val
-	* @return {Mixed}
-	* @api private
-	*/
-	function coerce(val) {
-		if (val instanceof Error) {
-			return val.stack || val.message;
-		}
-		return val;
-	}
-
-	createDebug.enable(createDebug.load());
-
-	return createDebug;
-}
-
-module.exports = setup;
-
-},{"ms":"../node_modules/socket.io-parser/node_modules/ms/index.js"}],"../node_modules/socket.io-parser/node_modules/debug/src/browser.js":[function(require,module,exports) {
-var process = require("process");
-/* eslint-env browser */
-
-/**
- * This is the web browser implementation of `debug()`.
- */
-exports.log = log;
-exports.formatArgs = formatArgs;
-exports.save = save;
-exports.load = load;
-exports.useColors = useColors;
-exports.storage = localstorage();
-/**
- * Colors.
- */
-
-exports.colors = ['#0000CC', '#0000FF', '#0033CC', '#0033FF', '#0066CC', '#0066FF', '#0099CC', '#0099FF', '#00CC00', '#00CC33', '#00CC66', '#00CC99', '#00CCCC', '#00CCFF', '#3300CC', '#3300FF', '#3333CC', '#3333FF', '#3366CC', '#3366FF', '#3399CC', '#3399FF', '#33CC00', '#33CC33', '#33CC66', '#33CC99', '#33CCCC', '#33CCFF', '#6600CC', '#6600FF', '#6633CC', '#6633FF', '#66CC00', '#66CC33', '#9900CC', '#9900FF', '#9933CC', '#9933FF', '#99CC00', '#99CC33', '#CC0000', '#CC0033', '#CC0066', '#CC0099', '#CC00CC', '#CC00FF', '#CC3300', '#CC3333', '#CC3366', '#CC3399', '#CC33CC', '#CC33FF', '#CC6600', '#CC6633', '#CC9900', '#CC9933', '#CCCC00', '#CCCC33', '#FF0000', '#FF0033', '#FF0066', '#FF0099', '#FF00CC', '#FF00FF', '#FF3300', '#FF3333', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#FF6600', '#FF6633', '#FF9900', '#FF9933', '#FFCC00', '#FFCC33'];
-/**
- * Currently only WebKit-based Web Inspectors, Firefox >= v31,
- * and the Firebug extension (any Firefox version) are known
- * to support "%c" CSS customizations.
- *
- * TODO: add a `localStorage` variable to explicitly enable/disable colors
- */
-// eslint-disable-next-line complexity
-
-function useColors() {
-  // NB: In an Electron preload script, document will be defined but not fully
-  // initialized. Since we know we're in Chrome, we'll just detect this case
-  // explicitly
-  if (typeof window !== 'undefined' && window.process && (window.process.type === 'renderer' || window.process.__nwjs)) {
-    return true;
-  } // Internet Explorer and Edge do not support colors.
-
-
-  if (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) {
-    return false;
-  } // Is webkit? http://stackoverflow.com/a/16459606/376773
-  // document is undefined in react-native: https://github.com/facebook/react-native/pull/1632
-
-
-  return typeof document !== 'undefined' && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance || // Is firebug? http://stackoverflow.com/a/398120/376773
-  typeof window !== 'undefined' && window.console && (window.console.firebug || window.console.exception && window.console.table) || // Is firefox >= v31?
-  // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
-  typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31 || // Double check webkit in userAgent just in case we are in a worker
-  typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/);
-}
-/**
- * Colorize log arguments if enabled.
- *
- * @api public
- */
-
-
-function formatArgs(args) {
-  args[0] = (this.useColors ? '%c' : '') + this.namespace + (this.useColors ? ' %c' : ' ') + args[0] + (this.useColors ? '%c ' : ' ') + '+' + module.exports.humanize(this.diff);
-
-  if (!this.useColors) {
-    return;
-  }
-
-  const c = 'color: ' + this.color;
-  args.splice(1, 0, c, 'color: inherit'); // The final "%c" is somewhat tricky, because there could be other
-  // arguments passed either before or after the %c, so we need to
-  // figure out the correct index to insert the CSS into
-
-  let index = 0;
-  let lastC = 0;
-  args[0].replace(/%[a-zA-Z%]/g, match => {
-    if (match === '%%') {
-      return;
-    }
-
-    index++;
-
-    if (match === '%c') {
-      // We only are interested in the *last* %c
-      // (the user may have provided their own)
-      lastC = index;
-    }
-  });
-  args.splice(lastC, 0, c);
-}
-/**
- * Invokes `console.log()` when available.
- * No-op when `console.log` is not a "function".
- *
- * @api public
- */
-
-
-function log(...args) {
-  // This hackery is required for IE8/9, where
-  // the `console.log` function doesn't have 'apply'
-  return typeof console === 'object' && console.log && console.log(...args);
-}
-/**
- * Save `namespaces`.
- *
- * @param {String} namespaces
- * @api private
- */
-
-
-function save(namespaces) {
-  try {
-    if (namespaces) {
-      exports.storage.setItem('debug', namespaces);
-    } else {
-      exports.storage.removeItem('debug');
-    }
-  } catch (error) {// Swallow
-    // XXX (@Qix-) should we be logging these?
-  }
-}
-/**
- * Load `namespaces`.
- *
- * @return {String} returns the previously persisted debug modes
- * @api private
- */
-
-
-function load() {
-  let r;
-
-  try {
-    r = exports.storage.getItem('debug');
-  } catch (error) {} // Swallow
-  // XXX (@Qix-) should we be logging these?
-  // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
-
-
-  if (!r && typeof process !== 'undefined' && 'env' in process) {
-    r = undefined;
-  }
-
-  return r;
-}
-/**
- * Localstorage attempts to return the localstorage.
- *
- * This is necessary because safari throws
- * when a user disables cookies/localstorage
- * and you attempt to access it.
- *
- * @return {LocalStorage}
- * @api private
- */
-
-
-function localstorage() {
-  try {
-    // TVMLKit (Apple TV JS Runtime) does not have a window object, just localStorage in the global context
-    // The Browser also has localStorage in the global context.
-    return localStorage;
-  } catch (error) {// Swallow
-    // XXX (@Qix-) should we be logging these?
-  }
-}
-
-module.exports = require('./common')(exports);
-const {
-  formatters
-} = module.exports;
-/**
- * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
- */
-
-formatters.j = function (v) {
-  try {
-    return JSON.stringify(v);
-  } catch (error) {
-    return '[UnexpectedJSONParseError]: ' + error.message;
-  }
-};
-},{"./common":"../node_modules/socket.io-parser/node_modules/debug/src/common.js","process":"../node_modules/process/browser.js"}],"../node_modules/socket.io-parser/dist/index.js":[function(require,module,exports) {
+},{"./is-binary":"../node_modules/socket.io-parser/dist/is-binary.js"}],"../node_modules/socket.io-parser/dist/index.js":[function(require,module,exports) {
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -9924,9 +8733,7 @@ var PacketType;
  */
 
 
-var Encoder =
-/*#__PURE__*/
-function () {
+var Encoder = /*#__PURE__*/function () {
   function Encoder() {
     _classCallCheck(this, Encoder);
   }
@@ -10013,9 +8820,7 @@ exports.Encoder = Encoder;
  * @return {Object} decoder
  */
 
-var Decoder =
-/*#__PURE__*/
-function (_Emitter) {
+var Decoder = /*#__PURE__*/function (_Emitter) {
   _inherits(Decoder, _Emitter);
 
   var _super = _createSuper(Decoder);
@@ -10179,7 +8984,7 @@ function (_Emitter) {
 
         case PacketType.EVENT:
         case PacketType.BINARY_EVENT:
-          return Array.isArray(payload) && typeof payload[0] === "string";
+          return Array.isArray(payload) && payload.length > 0;
 
         case PacketType.ACK:
         case PacketType.BINARY_ACK:
@@ -10210,9 +9015,7 @@ function tryParse(str) {
  */
 
 
-var BinaryReconstructor =
-/*#__PURE__*/
-function () {
+var BinaryReconstructor = /*#__PURE__*/function () {
   function BinaryReconstructor(packet) {
     _classCallCheck(this, BinaryReconstructor);
 
@@ -10258,7 +9061,7 @@ function () {
 
   return BinaryReconstructor;
 }();
-},{"component-emitter":"../node_modules/component-emitter/index.js","./binary":"../node_modules/socket.io-parser/dist/binary.js","./is-binary":"../node_modules/socket.io-parser/dist/is-binary.js","debug":"../node_modules/socket.io-parser/node_modules/debug/src/browser.js"}],"../node_modules/socket.io-client/build/on.js":[function(require,module,exports) {
+},{"component-emitter":"../node_modules/component-emitter/index.js","./binary":"../node_modules/socket.io-parser/dist/binary.js","./is-binary":"../node_modules/socket.io-parser/dist/is-binary.js","debug":"../node_modules/debug/src/browser.js"}],"../node_modules/socket.io-client/build/on.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -10268,39 +9071,12 @@ exports.on = void 0;
 
 function on(obj, ev, fn) {
   obj.on(ev, fn);
-  return {
-    destroy: function destroy() {
-      obj.off(ev, fn);
-    }
+  return function subDestroy() {
+    obj.off(ev, fn);
   };
 }
 
 exports.on = on;
-},{}],"../node_modules/component-bind/index.js":[function(require,module,exports) {
-/**
- * Slice reference.
- */
-
-var slice = [].slice;
-
-/**
- * Bind `obj` to `fn`.
- *
- * @param {Object} obj
- * @param {Function|String} fn or string
- * @return {Function}
- * @api public
- */
-
-module.exports = function(obj, fn){
-  if ('string' == typeof fn) fn = obj[fn];
-  if ('function' != typeof fn) throw new Error('bind() requires a function');
-  var args = slice.call(arguments, 2);
-  return function(){
-    return fn.apply(obj, args.concat(slice.call(arguments)));
-  }
-};
-
 },{}],"../node_modules/socket.io-client/build/socket.js":[function(require,module,exports) {
 "use strict";
 
@@ -10347,8 +9123,6 @@ var Emitter = require("component-emitter");
 
 var on_1 = require("./on");
 
-var bind = require("component-bind");
-
 var debug = require("debug")("socket.io-client:socket");
 /**
  * Internal events.
@@ -10366,9 +9140,7 @@ var RESERVED_EVENTS = Object.freeze({
   removeListener: 1
 });
 
-var Socket =
-/*#__PURE__*/
-function (_Emitter) {
+var Socket = /*#__PURE__*/function (_Emitter) {
   _inherits(Socket, _Emitter);
 
   var _super = _createSuper(Socket);
@@ -10384,10 +9156,10 @@ function (_Emitter) {
     _classCallCheck(this, Socket);
 
     _this = _super.call(this);
-    _this.ids = 0;
-    _this.acks = {};
     _this.receiveBuffer = [];
     _this.sendBuffer = [];
+    _this.ids = 0;
+    _this.acks = {};
     _this.flags = {};
     _this.io = io;
     _this.nsp = nsp;
@@ -10418,7 +9190,7 @@ function (_Emitter) {
     value: function subEvents() {
       if (this.subs) return;
       var io = this.io;
-      this.subs = [on_1.on(io, "open", bind(this, "onopen")), on_1.on(io, "packet", bind(this, "onpacket")), on_1.on(io, "close", bind(this, "onclose"))];
+      this.subs = [on_1.on(io, "open", this.onopen.bind(this)), on_1.on(io, "packet", this.onpacket.bind(this)), on_1.on(io, "error", this.onerror.bind(this)), on_1.on(io, "close", this.onclose.bind(this))];
     }
     /**
      * Whether the Socket will try to reconnect when its Manager connects or reconnects
@@ -10559,6 +9331,20 @@ function (_Emitter) {
           type: socket_io_parser_1.PacketType.CONNECT,
           data: this.auth
         });
+      }
+    }
+    /**
+     * Called upon engine or manager `error`.
+     *
+     * @param err
+     * @private
+     */
+
+  }, {
+    key: "onerror",
+    value: function onerror(err) {
+      if (!this.connected) {
+        _get(_getPrototypeOf(Socket.prototype), "emit", this).call(this, "connect_error", err);
       }
     }
     /**
@@ -10791,11 +9577,10 @@ function (_Emitter) {
     value: function destroy() {
       if (this.subs) {
         // clean subscriptions to avoid reconnections
-        for (var i = 0; i < this.subs.length; i++) {
-          this.subs[i].destroy();
-        }
-
-        this.subs = null;
+        this.subs.forEach(function (subDestroy) {
+          return subDestroy();
+        });
+        this.subs = undefined;
       }
 
       this.io["_destroy"](this);
@@ -10948,7 +9733,7 @@ function (_Emitter) {
 }(Emitter);
 
 exports.Socket = Socket;
-},{"socket.io-parser":"../node_modules/socket.io-parser/dist/index.js","component-emitter":"../node_modules/component-emitter/index.js","./on":"../node_modules/socket.io-client/build/on.js","component-bind":"../node_modules/component-bind/index.js","debug":"../node_modules/socket.io-client/node_modules/debug/src/browser.js"}],"../node_modules/backo2/index.js":[function(require,module,exports) {
+},{"socket.io-parser":"../node_modules/socket.io-parser/dist/index.js","component-emitter":"../node_modules/component-emitter/index.js","./on":"../node_modules/socket.io-client/build/on.js","debug":"../node_modules/debug/src/browser.js"}],"../node_modules/backo2/index.js":[function(require,module,exports) {
 
 /**
  * Expose `Backoff`.
@@ -11079,15 +9864,11 @@ var parser = require("socket.io-parser");
 
 var on_1 = require("./on");
 
-var bind = require("component-bind");
-
 var Backoff = require("backo2");
 
 var debug = require("debug")("socket.io-client:manager");
 
-var Manager =
-/*#__PURE__*/
-function (_Emitter) {
+var Manager = /*#__PURE__*/function (_Emitter) {
   _inherits(Manager, _Emitter);
 
   var _super = _createSuper(Manager);
@@ -11229,7 +10010,7 @@ function (_Emitter) {
       this._readyState = "opening";
       this.skipReconnect = false; // emit `open`
 
-      var openSub = on_1.on(socket, "open", function () {
+      var openSubDestroy = on_1.on(socket, "open", function () {
         self.onopen();
         fn && fn();
       }); // emit `error`
@@ -11254,31 +10035,29 @@ function (_Emitter) {
         debug("connect attempt will timeout after %d", timeout);
 
         if (timeout === 0) {
-          openSub.destroy(); // prevents a race condition with the 'open' event
+          openSubDestroy(); // prevents a race condition with the 'open' event
         } // set timer
 
 
         var timer = setTimeout(function () {
           debug("connect attempt timed out after %d", timeout);
-          openSub.destroy();
+          openSubDestroy();
           socket.close();
           socket.emit("error", new Error("timeout"));
         }, timeout);
-        this.subs.push({
-          destroy: function destroy() {
-            clearTimeout(timer);
-          }
+        this.subs.push(function subDestroy() {
+          clearTimeout(timer);
         });
       }
 
-      this.subs.push(openSub);
+      this.subs.push(openSubDestroy);
       this.subs.push(errorSub);
       return this;
     }
     /**
      * Alias for open()
      *
-     * @return {Manager} self
+     * @return self
      * @public
      */
 
@@ -11306,7 +10085,7 @@ function (_Emitter) {
 
 
       var socket = this.engine;
-      this.subs.push(on_1.on(socket, "data", bind(this, "ondata")), on_1.on(socket, "ping", bind(this, "onping")), on_1.on(socket, "error", bind(this, "onerror")), on_1.on(socket, "close", bind(this, "onclose")), on_1.on(this.decoder, "decoded", bind(this, "ondecoded")));
+      this.subs.push(on_1.on(socket, "ping", this.onping.bind(this)), on_1.on(socket, "data", this.ondata.bind(this)), on_1.on(socket, "error", this.onerror.bind(this)), on_1.on(socket, "close", this.onclose.bind(this)), on_1.on(this.decoder, "decoded", this.ondecoded.bind(this)));
     }
     /**
      * Called upon a ping.
@@ -11408,7 +10187,6 @@ function (_Emitter) {
     key: "_packet",
     value: function _packet(packet) {
       debug("writing packet %j", packet);
-      if (packet.query && packet.type === 0) packet.nsp += "?" + packet.query;
       var encodedPackets = this.encoder.encode(packet);
 
       for (var i = 0; i < encodedPackets.length; i++) {
@@ -11425,13 +10203,10 @@ function (_Emitter) {
     key: "cleanup",
     value: function cleanup() {
       debug("cleanup");
-      var subsLength = this.subs.length;
-
-      for (var i = 0; i < subsLength; i++) {
-        var sub = this.subs.shift();
-        sub.destroy();
-      }
-
+      this.subs.forEach(function (subDestroy) {
+        return subDestroy();
+      });
+      this.subs.length = 0;
       this.decoder.destroy();
     }
     /**
@@ -11534,10 +10309,8 @@ function (_Emitter) {
             }
           });
         }, delay);
-        this.subs.push({
-          destroy: function destroy() {
-            clearTimeout(timer);
-          }
+        this.subs.push(function subDestroy() {
+          clearTimeout(timer);
         });
       }
     }
@@ -11562,7 +10335,7 @@ function (_Emitter) {
 }(Emitter);
 
 exports.Manager = Manager;
-},{"engine.io-client":"../node_modules/engine.io-client/lib/index.js","./socket":"../node_modules/socket.io-client/build/socket.js","component-emitter":"../node_modules/component-emitter/index.js","socket.io-parser":"../node_modules/socket.io-parser/dist/index.js","./on":"../node_modules/socket.io-client/build/on.js","component-bind":"../node_modules/component-bind/index.js","backo2":"../node_modules/backo2/index.js","debug":"../node_modules/socket.io-client/node_modules/debug/src/browser.js"}],"../node_modules/socket.io-client/build/index.js":[function(require,module,exports) {
+},{"engine.io-client":"../node_modules/engine.io-client/lib/index.js","./socket":"../node_modules/socket.io-client/build/socket.js","component-emitter":"../node_modules/component-emitter/index.js","socket.io-parser":"../node_modules/socket.io-parser/dist/index.js","./on":"../node_modules/socket.io-client/build/on.js","backo2":"../node_modules/backo2/index.js","debug":"../node_modules/debug/src/browser.js"}],"../node_modules/socket.io-client/build/index.js":[function(require,module,exports) {
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -11605,7 +10378,7 @@ function lookup(uri, opts) {
   }
 
   opts = opts || {};
-  var parsed = url_1.url(uri);
+  var parsed = url_1.url(uri, opts.path);
   var source = parsed.source;
   var id = parsed.id;
   var path = parsed.path;
@@ -11626,7 +10399,7 @@ function lookup(uri, opts) {
   }
 
   if (parsed.query && !opts.query) {
-    opts.query = parsed.query;
+    opts.query = parsed.queryKey;
   }
 
   return io.socket(parsed.path, opts);
@@ -11669,7 +10442,7 @@ Object.defineProperty(exports, "Manager", {
     return manager_2.Manager;
   }
 });
-},{"./url":"../node_modules/socket.io-client/build/url.js","./manager":"../node_modules/socket.io-client/build/manager.js","./socket":"../node_modules/socket.io-client/build/socket.js","debug":"../node_modules/socket.io-client/node_modules/debug/src/browser.js","socket.io-parser":"../node_modules/socket.io-parser/dist/index.js"}],"../node_modules/construct-ui/lib/esm/_shared/align.js":[function(require,module,exports) {
+},{"./url":"../node_modules/socket.io-client/build/url.js","./manager":"../node_modules/socket.io-client/build/manager.js","./socket":"../node_modules/socket.io-client/build/socket.js","debug":"../node_modules/debug/src/browser.js","socket.io-parser":"../node_modules/socket.io-parser/dist/index.js"}],"../node_modules/construct-ui/lib/esm/_shared/align.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -12327,6 +11100,7 @@ exports.__values = __values;
 exports.__read = __read;
 exports.__spread = __spread;
 exports.__spreadArrays = __spreadArrays;
+exports.__spreadArray = __spreadArray;
 exports.__await = __await;
 exports.__asyncGenerator = __asyncGenerator;
 exports.__asyncDelegator = __asyncDelegator;
@@ -12367,6 +11141,7 @@ var extendStatics = function (d, b) {
 };
 
 function __extends(d, b) {
+  if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
   extendStatics(d, b);
 
   function __() {
@@ -12622,12 +11397,16 @@ function __read(o, n) {
 
   return ar;
 }
+/** @deprecated */
+
 
 function __spread() {
   for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
 
   return ar;
 }
+/** @deprecated */
+
 
 function __spreadArrays() {
   for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
@@ -12637,7 +11416,11 @@ function __spreadArrays() {
   return r;
 }
 
-;
+function __spreadArray(to, from) {
+  for (var i = 0, il = from.length, j = to.length; i < il; i++, j++) to[j] = from[i];
+
+  return to;
+}
 
 function __await(v) {
   return this instanceof __await ? (this.v = v, this) : new __await(v);
@@ -12768,26 +11551,22 @@ function __importDefault(mod) {
   };
 }
 
-function __classPrivateFieldGet(receiver, privateMap) {
-  if (!privateMap.has(receiver)) {
-    throw new TypeError("attempted to get private field on non-instance");
-  }
-
-  return privateMap.get(receiver);
+function __classPrivateFieldGet(receiver, state, kind, f) {
+  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+  return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 }
 
-function __classPrivateFieldSet(receiver, privateMap, value) {
-  if (!privateMap.has(receiver)) {
-    throw new TypeError("attempted to set private field on non-instance");
-  }
-
-  privateMap.set(receiver, value);
-  return value;
+function __classPrivateFieldSet(receiver, state, value, kind, f) {
+  if (kind === "m") throw new TypeError("Private method is not writable");
+  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+  return kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value), value;
 }
 },{}],"../node_modules/classnames/index.js":[function(require,module,exports) {
 var define;
 /*!
-  Copyright (c) 2017 Jed Watson.
+  Copyright (c) 2018 Jed Watson.
   Licensed under the MIT License (MIT), see
   http://jedwatson.github.io/classnames
 */
@@ -12798,7 +11577,7 @@ var define;
 
 	var hasOwn = {}.hasOwnProperty;
 
-	function classNames () {
+	function classNames() {
 		var classes = [];
 
 		for (var i = 0; i < arguments.length; i++) {
@@ -12809,16 +11588,22 @@ var define;
 
 			if (argType === 'string' || argType === 'number') {
 				classes.push(arg);
-			} else if (Array.isArray(arg) && arg.length) {
-				var inner = classNames.apply(null, arg);
-				if (inner) {
-					classes.push(inner);
+			} else if (Array.isArray(arg)) {
+				if (arg.length) {
+					var inner = classNames.apply(null, arg);
+					if (inner) {
+						classes.push(inner);
+					}
 				}
 			} else if (argType === 'object') {
-				for (var key in arg) {
-					if (hasOwn.call(arg, key) && arg[key]) {
-						classes.push(key);
+				if (arg.toString === Object.prototype.toString) {
+					for (var key in arg) {
+						if (hasOwn.call(arg, key) && arg[key]) {
+							classes.push(key);
+						}
 					}
+				} else {
+					classes.push(arg.toString());
 				}
 			}
 		}
@@ -18826,14 +17611,14 @@ function () {
 }();
 
 exports.List = List;
-},{"tslib":"../node_modules/tslib/tslib.es6.js","mithril":"../node_modules/mithril/index.js","classnames":"../node_modules/classnames/index.js","../../_shared":"../node_modules/construct-ui/lib/esm/_shared/index.js"}],"../node_modules/util/support/isBufferBrowser.js":[function(require,module,exports) {
+},{"tslib":"../node_modules/tslib/tslib.es6.js","mithril":"../node_modules/mithril/index.js","classnames":"../node_modules/classnames/index.js","../../_shared":"../node_modules/construct-ui/lib/esm/_shared/index.js"}],"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/util/support/isBufferBrowser.js":[function(require,module,exports) {
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],"../node_modules/util/node_modules/inherits/inherits_browser.js":[function(require,module,exports) {
+},{}],"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/util/node_modules/inherits/inherits_browser.js":[function(require,module,exports) {
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -18858,7 +17643,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],"../node_modules/util/util.js":[function(require,module,exports) {
+},{}],"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/util/util.js":[function(require,module,exports) {
 var process = require("process");
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -19579,7 +18364,7 @@ function callbackify(original) {
 }
 
 exports.callbackify = callbackify;
-},{"./support/isBuffer":"../node_modules/util/support/isBufferBrowser.js","inherits":"../node_modules/util/node_modules/inherits/inherits_browser.js","process":"../node_modules/process/browser.js"}],"../node_modules/construct-ui/lib/esm/components/list/ListItem.js":[function(require,module,exports) {
+},{"./support/isBuffer":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/util/support/isBufferBrowser.js","inherits":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/util/node_modules/inherits/inherits_browser.js","process":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../node_modules/construct-ui/lib/esm/components/list/ListItem.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19644,7 +18429,7 @@ function () {
 }();
 
 exports.ListItem = ListItem;
-},{"tslib":"../node_modules/tslib/tslib.es6.js","mithril":"../node_modules/mithril/index.js","classnames":"../node_modules/classnames/index.js","../../_shared":"../node_modules/construct-ui/lib/esm/_shared/index.js","util":"../node_modules/util/util.js"}],"../node_modules/construct-ui/lib/esm/components/list/index.js":[function(require,module,exports) {
+},{"tslib":"../node_modules/tslib/tslib.es6.js","mithril":"../node_modules/mithril/index.js","classnames":"../node_modules/classnames/index.js","../../_shared":"../node_modules/construct-ui/lib/esm/_shared/index.js","util":"../../../../../../usr/lib/node_modules/parcel-bundler/node_modules/util/util.js"}],"../node_modules/construct-ui/lib/esm/components/list/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -20415,7 +19200,8 @@ function (_super) {
         className = _a.class,
         name = _a.name,
         triggerAttrs = _a.triggerAttrs,
-        size = _a.size;
+        size = _a.size,
+        htmlAttrs = (0, _tslib.__rest)(_a, ["options", "class", "name", "triggerAttrs", "size"]);
     var classes = (0, _classnames.default)(_shared.Classes.CUSTOM_SELECT, className);
     var hiddenContainer = (0, _mithril.default)("." + _shared.Classes.CUSTOM_SELECT_HIDDEN, [(0, _mithril.default)('input', {
       class: _shared.Classes.CUSTOM_SELECT_INPUT,
@@ -20455,9 +19241,9 @@ function (_super) {
       onSelect: this.handleSelect,
       trigger: trigger
     });
-    return (0, _mithril.default)('', {
+    return (0, _mithril.default)('', (0, _tslib.__assign)({
       class: classes
-    }, selectList);
+    }, htmlAttrs), selectList);
   };
 
   Object.defineProperty(CustomSelect.prototype, "selectedValue", {
@@ -22011,8 +20797,9 @@ function () {
     var label = typeof option === 'object' ? option.label : option;
     var value = typeof option === 'object' ? option.value : option;
     var attrs = typeof option === 'object' ? option : {};
+    var selected = defaultValue === value ? true : undefined;
     return (0, _mithril.default)('option', (0, _tslib.__assign)((0, _tslib.__assign)({}, attrs), {
-      selected: defaultValue != null && value === defaultValue,
+      selected: selected,
       value: value
     }), label);
   };
@@ -23460,7 +22247,7 @@ Object.keys(_utils).forEach(function (key) {
     }
   });
 });
-},{"./_shared":"../node_modules/construct-ui/lib/esm/_shared/index.js","./components":"../node_modules/construct-ui/lib/esm/components/index.js","./utils":"../node_modules/construct-ui/lib/esm/utils/index.js"}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+},{"./_shared":"../node_modules/construct-ui/lib/esm/_shared/index.js","./components":"../node_modules/construct-ui/lib/esm/components/index.js","./utils":"../node_modules/construct-ui/lib/esm/utils/index.js"}],"../../../../../../usr/lib/node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
 var bundleURL = null;
 
 function getBundleURLCached() {
@@ -23487,12 +22274,12 @@ function getBundleURL() {
 }
 
 function getBaseURL(url) {
-  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)\/[^/]+$/, '$1') + '/';
+  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)?\/[^/]+(?:\?.*)?$/, '$1') + '/';
 }
 
 exports.getBundleURL = getBundleURLCached;
 exports.getBaseURL = getBaseURL;
-},{}],"../node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
+},{}],"../../../../../../usr/lib/node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
 var bundle = require('./bundle-url');
 
 function updateLink(link) {
@@ -23527,12 +22314,12 @@ function reloadCSS() {
 }
 
 module.exports = reloadCSS;
-},{"./bundle-url":"../node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"../node_modules/construct-ui/lib/index.css":[function(require,module,exports) {
+},{"./bundle-url":"../../../../../../usr/lib/node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"../node_modules/construct-ui/lib/index.css":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
 
 module.hot.dispose(reloadCSS);
 module.hot.accept(reloadCSS);
-},{"_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"logo.svg":[function(require,module,exports) {
+},{"_css_loader":"../../../../../../usr/lib/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"logo.svg":[function(require,module,exports) {
 module.exports = "/logo.86ce68ea.svg";
 },{}],"components/Nav.js":[function(require,module,exports) {
 "use strict";
@@ -23745,10 +22532,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //check if session exists
 var session = null;
 var login = {
-  check: function () {
-    var _check = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee() {
+  check: function check() {
+    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -23767,18 +22552,10 @@ var login = {
           }
         }
       }, _callee);
-    }));
-
-    function check() {
-      return _check.apply(this, arguments);
-    }
-
-    return check;
-  }(),
-  setDev: function () {
-    var _setDev = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee2() {
+    }))();
+  },
+  setDev: function setDev() {
+    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
       return regeneratorRuntime.wrap(function _callee2$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
@@ -23815,18 +22592,10 @@ var login = {
           }
         }
       }, _callee2);
-    }));
-
-    function setDev() {
-      return _setDev.apply(this, arguments);
-    }
-
-    return setDev;
-  }(),
-  authenticate: function () {
-    var _authenticate = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee3(remember, user, pwd) {
+    }))();
+  },
+  authenticate: function authenticate(remember, user, pwd) {
+    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
       return regeneratorRuntime.wrap(function _callee3$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
@@ -23856,14 +22625,8 @@ var login = {
           }
         }
       }, _callee3);
-    }));
-
-    function authenticate(_x, _x2, _x3) {
-      return _authenticate.apply(this, arguments);
-    }
-
-    return authenticate;
-  }()
+    }))();
+  }
 };
 exports.login = login;
 },{"mithril":"../node_modules/mithril/index.js","./Nav":"components/Nav.js"}],"components/Searches.js":[function(require,module,exports) {
@@ -23884,9 +22647,7 @@ var Searches = {
   unassignedSearches: [],
   assignedSearches: {},
   loadSearches: function () {
-    var _loadSearches = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee() {
+    var _loadSearches = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -24443,9 +23204,7 @@ var ordersSection = {
       style: 'float: right;',
       // loading: vnode.tag.loading,
       onclick: function () {
-        var _onclick = _asyncToGenerator(
-        /*#__PURE__*/
-        regeneratorRuntime.mark(function _callee() {
+        var _onclick = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
           return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
@@ -24531,9 +23290,7 @@ var clientsSection = {
       style: 'float: right;',
       loading: vnode.state.loading,
       onclick: function () {
-        var _onclick2 = _asyncToGenerator(
-        /*#__PURE__*/
-        regeneratorRuntime.mark(function _callee2() {
+        var _onclick2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
           return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
               switch (_context2.prev = _context2.next) {
@@ -24602,9 +23359,7 @@ var clientsSection = {
       label: "Add Client",
       // CREATE NEW CLIENT
       onclick: function () {
-        var _onclick3 = _asyncToGenerator(
-        /*#__PURE__*/
-        regeneratorRuntime.mark(function _callee3() {
+        var _onclick3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
           var name, surname, mail, phone;
           return regeneratorRuntime.wrap(function _callee3$(_context3) {
             while (1) {
@@ -24670,9 +23425,7 @@ var historySection = {
       style: 'float: right;',
       // loading: vnode.tag.loading,
       onclick: function () {
-        var _onclick4 = _asyncToGenerator(
-        /*#__PURE__*/
-        regeneratorRuntime.mark(function _callee4() {
+        var _onclick4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
           return regeneratorRuntime.wrap(function _callee4$(_context4) {
             while (1) {
               switch (_context4.prev = _context4.next) {
@@ -24833,10 +23586,8 @@ var EditClient = {
       return vnode.state.client = res[0];
     });
   },
-  oninit: function () {
-    var _oninit = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee(vnode) {
+  oninit: function oninit(vnode) {
+    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
       var client;
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
@@ -24868,14 +23619,8 @@ var EditClient = {
           }
         }
       }, _callee);
-    }));
-
-    function oninit(_x) {
-      return _oninit.apply(this, arguments);
-    }
-
-    return oninit;
-  }(),
+    }))();
+  },
   view: function view(vnode) {
     if (vnode.state.client) {
       return [(0, _mithril.default)(_Nav.Nav), (0, _mithril.default)('.client-edit-wrapper', (0, _mithril.default)(_constructUi.Card, {
@@ -25348,10 +24093,8 @@ var Richieste = {
   requests: [],
   updated: false,
   filteredRequests: [],
-  getRequests: function () {
-    var _getRequests = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee() {
+  getRequests: function getRequests() {
+    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -25375,14 +24118,8 @@ var Richieste = {
           }
         }
       }, _callee);
-    }));
-
-    function getRequests() {
-      return _getRequests.apply(this, arguments);
-    }
-
-    return getRequests;
-  }(),
+    }))();
+  },
   getDate: function getDate() {
     var d = new Date();
     var day = d.getDate();
@@ -25433,10 +24170,8 @@ var Richieste = {
     });
     return res;
   },
-  oninit: function () {
-    var _oninit = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee2(vnode) {
+  oninit: function oninit(vnode) {
+    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
       return regeneratorRuntime.wrap(function _callee2$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
@@ -25456,14 +24191,8 @@ var Richieste = {
           }
         }
       }, _callee2);
-    }));
-
-    function oninit(_x) {
-      return _oninit.apply(this, arguments);
-    }
-
-    return oninit;
-  }(),
+    }))();
+  },
   view: function view(vnode) {
     console.log('drawing requests');
     vnode.state.filteredRequests = vnode.state.filterRequests(requests, vnode.state.filter); // console.log(vnode.state.filter, vnode.state.filteredRequests);
@@ -25676,9 +24405,7 @@ var EditOrder = {
     });
   },
   oninit: function () {
-    var _oninit = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee(vnode) {
+    var _oninit = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(vnode) {
       var order;
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
@@ -25721,28 +24448,38 @@ var EditOrder = {
   }(),
   view: function view(vnode) {
     var order = vnode.state.order;
+    vnode.state.confirmed = false;
+    vnode.state.confirmText = 'You sure?';
+    vnode.state.confirmOutline = true;
     return [(0, _mithril.default)(_Nav.Nav), (0, _mithril.default)('.edit-order-wrapper.container', [(0, _mithril.default)('.title#client-name', (0, _mithril.default)('h2', "".concat(vnode.state.order.clientName, "'s Order")), (0, _mithril.default)('.flex.space-b.labels', [(0, _mithril.default)(_constructUi.Tag, {
       label: vnode.state.order._id,
       size: 'xs'
     }), (0, _mithril.default)(_constructUi.Button, {
       iconLeft: _constructUi.Icons.TRASH,
-      label: 'Clear Items',
+      label: vnode.state.confirmed ? vnode.state.confirmText : 'Clear Items',
       compact: true,
       // basic: true,
-      outlined: true,
+      outlined: vnode.state.confirmOutline,
       intent: 'negative',
-      onclick: function onclick() {
-        _mithril.default.request({
-          method: 'DELETE',
-          url: '/api/deleteAssignedSearches/',
-          headers: {
-            order: vnode.state.order._id
-          }
-        }).then(function (res) {
-          (0, _Nav.showToast)("Deleted ".concat(res, " items!"), 'none');
+      onclick: function onclick(e) {
+        console.log(vnode);
+        vnode.state.confirmed = true;
 
-          _Searches.Searches.loadSearches();
-        });
+        var del = function del() {
+          _mithril.default.request({
+            method: 'DELETE',
+            url: '/api/deleteAssignedSearches/',
+            headers: {
+              order: vnode.state.order._id
+            }
+          }).then(function (res) {
+            (0, _Nav.showToast)("Deleted ".concat(res, " items!"), 'none');
+
+            _Searches.Searches.loadSearches();
+          });
+        };
+
+        _mithril.default.redraw();
       }
     })])), (0, _mithril.default)('.searches.grid', [(0, _mithril.default)('.assigned-searches', (0, _mithril.default)('h3', 'Assigned Searches'), (0, _mithril.default)(_constructUi.List, {
       size: 'xs',
@@ -25752,7 +24489,6 @@ var EditOrder = {
       if (vnode.state.pieces < vnode.state.assignedSearches.length) {
         vnode.state.pieces += 1;
         vnode.state.total += parseInt(search.price);
-        console.log(vnode.state);
       }
 
       return (0, _mithril.default)(AssignedSearch, {
@@ -25938,9 +24674,7 @@ var Login = {
       type: 'submit',
       intent: 'primary',
       onclick: function () {
-        var _onclick = _asyncToGenerator(
-        /*#__PURE__*/
-        regeneratorRuntime.mark(function _callee(e) {
+        var _onclick = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(e) {
           return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
@@ -25990,32 +24724,26 @@ var Home = {
 var SearchForm = {
   loading: false,
   search: function () {
-    var _search = _asyncToGenerator(
-    /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee3(model, color) {
+    var _search = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(model, color, vnode) {
       return regeneratorRuntime.wrap(function _callee3$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
             case 0:
-              _context3.next = 2;
+              vnode.state.loading = true;
+              _context3.next = 3;
               return _mithril.default.request({
                 method: "GET",
                 url: "/api/avb/".concat(model, "/").concat(color),
                 headers: {
                   smurf: localStorage.smurf
                 }
-              }).then(
-              /*#__PURE__*/
-              function () {
-                var _ref = _asyncToGenerator(
-                /*#__PURE__*/
-                regeneratorRuntime.mark(function _callee2(res) {
-                  var result;
+              }).then( /*#__PURE__*/function () {
+                var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(res) {
                   return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                       switch (_context2.prev = _context2.next) {
                         case 0:
-                          console.log(res);
+                          vnode.state.loading = false;
 
                           if (!(res === 404)) {
                             _context2.next = 5;
@@ -26023,12 +24751,12 @@ var SearchForm = {
                           }
 
                           (0, _Nav.showToast)("Cant connect to websmart! try <a href=\"websmart.brunellocucinelli.it\">", 'negative');
-                          _context2.next = 16;
+                          _context2.next = 14;
                           break;
 
                         case 5:
                           if (!(res === 401)) {
-                            _context2.next = 14;
+                            _context2.next = 12;
                             break;
                           }
 
@@ -26037,20 +24765,18 @@ var SearchForm = {
                           return _login.login.authenticate(true, localStorage.user, localStorage.pwd);
 
                         case 9:
-                          result = _context2.sent;
-                          console.log(result);
-                          SearchForm.search(model, color);
-                          _context2.next = 16;
+                          SearchForm.search(model, color, vnode);
+                          _context2.next = 14;
                           break;
 
-                        case 14:
+                        case 12:
                           Home.results = Object.values(res);
 
                           if (Home.results.length === 0) {
                             (0, _Nav.showToast)('No results found!', 'negative');
                           }
 
-                        case 16:
+                        case 14:
                         case "end":
                           return _context2.stop();
                       }
@@ -26058,12 +24784,12 @@ var SearchForm = {
                   }, _callee2);
                 }));
 
-                return function (_x4) {
+                return function (_x5) {
                   return _ref.apply(this, arguments);
                 };
               }());
 
-            case 2:
+            case 3:
             case "end":
               return _context3.stop();
           }
@@ -26071,7 +24797,7 @@ var SearchForm = {
       }, _callee3);
     }));
 
-    function search(_x2, _x3) {
+    function search(_x2, _x3, _x4) {
       return _search.apply(this, arguments);
     }
 
@@ -26107,9 +24833,7 @@ var SearchForm = {
       type: 'submit',
       loading: vnode.state.loading,
       onclick: function () {
-        var _onclick2 = _asyncToGenerator(
-        /*#__PURE__*/
-        regeneratorRuntime.mark(function _callee4(e) {
+        var _onclick2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(e) {
           var model, color;
           return regeneratorRuntime.wrap(function _callee4$(_context4) {
             while (1) {
@@ -26117,16 +24841,12 @@ var SearchForm = {
                 case 0:
                   e.preventDefault();
                   SearchForm.clearResults();
-                  vnode.state.loading = !vnode.state.loading;
                   model = document.querySelector('.model-input > input').value === '' ? 'm' : document.querySelector('.model-input > input').value;
                   color = document.querySelector('.color-input > input').value === '' ? 'c' : document.querySelector('.color-input > input').value;
-                  _context4.next = 7;
-                  return vnode.state.search(model, color);
+                  _context4.next = 6;
+                  return vnode.state.search(model, color, vnode);
 
-                case 7:
-                  vnode.state.loading = !vnode.state.loading;
-
-                case 8:
+                case 6:
                 case "end":
                   return _context4.stop();
               }
@@ -26134,7 +24854,7 @@ var SearchForm = {
           }, _callee4);
         }));
 
-        function onclick(_x5) {
+        function onclick(_x6) {
           return _onclick2.apply(this, arguments);
         }
 
@@ -26153,28 +24873,45 @@ function Sku() {
       vnode.state.imgFetched = false;
       vnode.state.discountedPrice = ''; // vnode.state.sku = vnode.attrs.sku
 
-      vnode.state.getPrice = function (vnode) {
-        if (!vnode.state.price && !localStorage["".concat(vnode.attrs.sku.year).concat(vnode.attrs.sku.season).concat(vnode.attrs.sku.model)]) {
-          _mithril.default.request({
-            method: "GET",
-            url: "/api/price/".concat(vnode.attrs.sku.year, "/").concat(vnode.attrs.sku.season, "/").concat(vnode.attrs.sku.model),
-            headers: {
-              smurf: localStorage.smurf
-            }
-          }).then(function (res) {
-            if (_noSaleAI.NOSALE.filter(function (e) {
-              return e == vnode.attrs.sku.model + vnode.attrs.sku.color;
-            }).length > 0 && vnode.attrs.sku.year + vnode.attrs.sku.season === '202') {
-              vnode.dom.querySelector('.basic').textContent = 'BASICO';
-            } else if (vnode.attrs.sku.year + vnode.attrs.sku.season === '202') {
-              vnode.state.salable = true;
-            }
+      vnode.state.getPrice = /*#__PURE__*/function () {
+        var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(vnode) {
+          var localPrice;
+          return regeneratorRuntime.wrap(function _callee5$(_context5) {
+            while (1) {
+              switch (_context5.prev = _context5.next) {
+                case 0:
+                  localPrice = localStorage["".concat(vnode.attrs.sku.year).concat(vnode.attrs.sku.season).concat(vnode.attrs.sku.model)];
+                  console.log(localPrice);
+                  localPrice ? vnode.state.price = localPrice : undefined;
 
-            vnode.state.price = res;
-            localStorage["".concat(vnode.attrs.sku.year).concat(vnode.attrs.sku.season).concat(vnode.attrs.sku.model)] = res;
-          });
-        }
-      };
+                  if (!vnode.state.price) {
+                    _mithril.default.request({
+                      method: "GET",
+                      url: "/api/price/".concat(vnode.attrs.sku.year, "/").concat(vnode.attrs.sku.season, "/").concat(vnode.attrs.sku.model),
+                      headers: {
+                        smurf: localStorage.smurf
+                      }
+                    }).then(function (res) {
+                      vnode.state.price = res;
+                      localStorage["".concat(vnode.attrs.sku.year).concat(vnode.attrs.sku.season).concat(vnode.attrs.sku.model)] = res;
+                    });
+                  }
+
+                  _noSaleAI.NOSALE.includes("".concat(vnode.attrs.sku.model).concat(vnode.attrs.sku.color)) ? vnode.state.salable = true : vnode.state.salable = false;
+                  return _context5.abrupt("return", vnode.state.price);
+
+                case 6:
+                case "end":
+                  return _context5.stop();
+              }
+            }
+          }, _callee5);
+        }));
+
+        return function (_x7) {
+          return _ref2.apply(this, arguments);
+        };
+      }();
     },
     oncreate: function oncreate() {// vnode.state.imgSrc = ''
     },
@@ -26235,11 +24972,31 @@ function Sku() {
         size: 'xs',
         intent: vnode.state.salable ? 'negative' : 'warning',
         oncreate: function oncreate() {
-          vnode.state.getPrice(vnode); // console.log(e);
+          return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6() {
+            return regeneratorRuntime.wrap(function _callee6$(_context6) {
+              while (1) {
+                switch (_context6.prev = _context6.next) {
+                  case 0:
+                    _context6.next = 2;
+                    return vnode.state.getPrice(vnode);
+
+                  case 2:
+                    console.log(vnode.state.price);
+
+                    _mithril.default.redraw(); // console.log(e);
+
+
+                  case 4:
+                  case "end":
+                    return _context6.stop();
+                }
+              }
+            }, _callee6);
+          }))();
         },
-        sublabel: "\u20AC".concat(vnode.state.price || localStorage["".concat(sku.year).concat(sku.season).concat(sku.model)], " "),
+        sublabel: "\u20AC".concat(vnode.state.price, " "),
         label: vnode.state.discountedPrice,
-        loading: vnode.state.price || localStorage["".concat(sku.year).concat(sku.season).concat(sku.model)] ? false : true,
+        loading: vnode.state.price ? false : true,
         onclick: function onclick() {
           if (vnode.state.salable) {
             vnode.state.discountedPrice = parseInt(parseInt(vnode.state.price) * 0.7);
@@ -26298,16 +25055,14 @@ function SizeButton() {
         size: 'xs',
         requestSize: sizeForReq,
         onclick: function () {
-          var _onclick3 = _asyncToGenerator(
-          /*#__PURE__*/
-          regeneratorRuntime.mark(function _callee5() {
+          var _onclick3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7() {
             var string;
-            return regeneratorRuntime.wrap(function _callee5$(_context5) {
+            return regeneratorRuntime.wrap(function _callee7$(_context7) {
               while (1) {
-                switch (_context5.prev = _context5.next) {
+                switch (_context7.prev = _context7.next) {
                   case 0:
                     isLoading = !isLoading;
-                    _context5.next = 3;
+                    _context7.next = 3;
                     return getShops(sku, i);
 
                   case 3:
@@ -26371,10 +25126,10 @@ function SizeButton() {
 
                   case 5:
                   case "end":
-                    return _context5.stop();
+                    return _context7.stop();
                 }
               }
-            }, _callee5);
+            }, _callee7);
           }));
 
           function onclick() {
@@ -26432,7 +25187,7 @@ _mithril.default.route(document.body, '/main', {
   '/clients/edit/:id': _EditClient.default,
   '/richieste': _Richieste.Richieste
 });
-},{"regenerator-runtime/runtime":"../node_modules/regenerator-runtime/runtime.js","mithril":"../node_modules/mithril/index.js","socket.io-client":"../node_modules/socket.io-client/build/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../node_modules/construct-ui/lib/index.css":"../node_modules/construct-ui/lib/index.css","./logo.svg":"logo.svg","/components/login":"components/login.js","/components/Tabs":"components/Tabs.js","/components/Nav":"components/Nav.js","/components/EditClient":"components/EditClient.js","/components/Searches":"components/Searches.js","/components/Richieste":"components/Richieste.js","/components/EditOrder":"components/EditOrder.js","./noSaleAI20":"noSaleAI20.js","/components/Basici":"components/Basici.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"regenerator-runtime/runtime":"../node_modules/regenerator-runtime/runtime.js","mithril":"../node_modules/mithril/index.js","socket.io-client":"../node_modules/socket.io-client/build/index.js","construct-ui":"../node_modules/construct-ui/lib/esm/index.js","../node_modules/construct-ui/lib/index.css":"../node_modules/construct-ui/lib/index.css","./logo.svg":"logo.svg","/components/login":"components/login.js","/components/Tabs":"components/Tabs.js","/components/Nav":"components/Nav.js","/components/EditClient":"components/EditClient.js","/components/Searches":"components/Searches.js","/components/Richieste":"components/Richieste.js","/components/EditOrder":"components/EditOrder.js","./noSaleAI20":"noSaleAI20.js","/components/Basici":"components/Basici.js"}],"../../../../../../usr/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -26460,7 +25215,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "39101" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "38013" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -26491,8 +25246,9 @@ if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
         assetsToAccept.forEach(function (v) {
           hmrAcceptRun(v[0], v[1]);
         });
-      } else {
-        window.location.reload();
+      } else if (location.reload) {
+        // `location` global exists in a web worker context but lacks `.reload()` function.
+        location.reload();
       }
     }
 
@@ -26635,5 +25391,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","app.js"], null)
+},{}]},{},["../../../../../../usr/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","app.js"], null)
 //# sourceMappingURL=/app.c328ef1a.js.map

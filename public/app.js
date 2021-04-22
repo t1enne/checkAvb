@@ -151,7 +151,8 @@ let Home = {
 
 let SearchForm = {
     loading: false,
-    search: async (model, color) => {
+    search: async (model, color, vnode) => {
+        vnode.state.loading = true
         await m.request({
             method: "GET",
             url: `/api/avb/${model}/${color}`,
@@ -159,14 +160,14 @@ let SearchForm = {
                 smurf: localStorage.smurf
             }
         }).then(async res => {
-            console.log(res);
+            vnode.state.loading = false
+
             if (res === 404) {
                 showToast(`Cant connect to websmart! try <a href="websmart.brunellocucinelli.it">`, 'negative')
             } else if (res === 401) {
                 showToast('Search Again!')
-                let result = await login.authenticate(true, localStorage.user, localStorage.pwd)
-                console.log(result)
-                SearchForm.search(model, color)
+                await login.authenticate(true, localStorage.user, localStorage.pwd)
+                SearchForm.search(model, color, vnode)
 
             } else {
                 Home.results = Object.values(res)
@@ -214,7 +215,6 @@ let SearchForm = {
                     onclick: async (e) => {
                         e.preventDefault()
                         SearchForm.clearResults()
-                        vnode.state.loading = !vnode.state.loading
 
                         let model = document.querySelector('.model-input > input').value === '' ?
                             'm' :
@@ -223,11 +223,8 @@ let SearchForm = {
                             'c' :
                             document.querySelector('.color-input > input').value
 
-                        await vnode.state.search(model, color)
+                        await vnode.state.search(model, color, vnode)
 
-
-
-                        vnode.state.loading = !vnode.state.loading;
                     }
                 })
             ])
@@ -244,9 +241,12 @@ function Sku() {
             vnode.state.imgFetched = false
             vnode.state.discountedPrice = ''
             // vnode.state.sku = vnode.attrs.sku
-            vnode.state.getPrice = (vnode) => {
+            vnode.state.getPrice = async (vnode) => {
+                let localPrice = localStorage[`${vnode.attrs.sku.year}${vnode.attrs.sku.season}${vnode.attrs.sku.model}`]
+                console.log(localPrice)
+                localPrice ? vnode.state.price = localPrice : undefined
 
-                if (!vnode.state.price && !localStorage[`${vnode.attrs.sku.year}${vnode.attrs.sku.season}${vnode.attrs.sku.model}`]) {
+                if (!vnode.state.price) {
                     m.request({
                         method: "GET",
                         url: `/api/price/${vnode.attrs.sku.year}/${vnode.attrs.sku.season}/${vnode.attrs.sku.model}`,
@@ -254,15 +254,16 @@ function Sku() {
                             smurf: localStorage.smurf
                         }
                     }).then(res => {
-                        if (NOSALE.filter(e => e == vnode.attrs.sku.model + vnode.attrs.sku.color).length > 0 && vnode.attrs.sku.year + vnode.attrs.sku.season === '202') {
-                            vnode.dom.querySelector('.basic').textContent = 'BASICO'
-                        } else if (vnode.attrs.sku.year + vnode.attrs.sku.season === '202') {
-                            vnode.state.salable = true
-                        }
                         vnode.state.price = res
                         localStorage[`${vnode.attrs.sku.year}${vnode.attrs.sku.season}${vnode.attrs.sku.model}`] = res
                     })
                 }
+
+                NOSALE.includes(`${vnode.attrs.sku.model}${vnode.attrs.sku.color}`) ?
+                    vnode.state.salable = true :
+                    vnode.state.salable = false
+
+                return vnode.state.price
             }
         },
         oncreate: () => {
@@ -328,13 +329,15 @@ function Sku() {
                         size: 'xs',
                         intent: vnode.state.salable ?
                             'negative' : 'warning',
-                        oncreate() {
-                            vnode.state.getPrice(vnode)
+                        async oncreate() {
+                            await vnode.state.getPrice(vnode)
+                            console.log(vnode.state.price)
+                            m.redraw()
                             // console.log(e);
                         },
-                        sublabel: `€${vnode.state.price || localStorage[`${sku.year}${sku.season}${sku.model}`]} `,
+                        sublabel: `€${vnode.state.price} `,
                         label: vnode.state.discountedPrice,
-                        loading: vnode.state.price || localStorage[`${sku.year}${sku.season}${sku.model}`] ? false : true,
+                        loading: vnode.state.price ? false : true,
                         onclick() {
                             if (vnode.state.salable) {
                                 vnode.state.discountedPrice = parseInt(parseInt(vnode.state.price) * 0.7)

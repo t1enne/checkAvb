@@ -2,3 +2,5 @@
 .env
 **/node_modules
 *.swp
+.cache/*
+.parcel-cache/*
