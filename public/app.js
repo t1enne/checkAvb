@@ -165,10 +165,10 @@ let SearchForm = {
             if (res === 404) {
                 showToast(`Cant connect to websmart! try <a href="websmart.brunellocucinelli.it">`, 'negative')
             } else if (res === 401) {
-                showToast('Search Again!')
-                await login.authenticate(true, localStorage.user, localStorage.pwd)
-                SearchForm.search(model, color, vnode)
+                // showToast('Search Again!')
+                let logged = await login.authenticate(true, localStorage.user, localStorage.pwd)
 
+                // the search will be started in login.authenticate
             } else {
                 Home.results = Object.values(res)
                 if (Home.results.length === 0) {
@@ -213,17 +213,21 @@ let SearchForm = {
                     type: 'submit',
                     loading: vnode.state.loading,
                     onclick: async (e) => {
+                        console.log(e)
                         e.preventDefault()
-                        SearchForm.clearResults()
 
-                        let model = document.querySelector('.model-input > input').value === '' ?
-                            'm' :
-                            document.querySelector('.model-input > input').value
-                        let color = document.querySelector('.color-input > input').value === '' ?
-                            'c' :
-                            document.querySelector('.color-input > input').value
+                        if (!vnode.state.loading) {
+                            SearchForm.clearResults()
 
-                        await vnode.state.search(model, color, vnode)
+                            let model = document.querySelector('.model-input > input').value === '' ?
+                                'm' :
+                                document.querySelector('.model-input > input').value
+                            let color = document.querySelector('.color-input > input').value === '' ?
+                                'c' :
+                                document.querySelector('.color-input > input').value
+
+                            await vnode.state.search(model, color, vnode)
+                        }
 
                     }
                 })
@@ -259,9 +263,12 @@ function Sku() {
                     })
                 }
 
-                NOSALE.includes(`${vnode.attrs.sku.model}${vnode.attrs.sku.color}`) ?
-                    vnode.state.salable = true :
-                    vnode.state.salable = false
+                if (NOSALE.includes(`${vnode.attrs.sku.model}${vnode.attrs.sku.color}`) && vnode.attrs.sku.year + vnode.attrs.sku.season === '202') {
+                    // basico
+                    vnode.dom.querySelector('.basic').textContent = 'BASICO'
+                } else if (vnode.attrs.sku.year + vnode.attrs.sku.season <= 202) {
+                    vnode.state.salable = true
+                }
 
                 return vnode.state.price
             }

@@ -22595,10 +22595,10 @@ var login = {
     }))();
   },
   authenticate: function authenticate(remember, user, pwd) {
-    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
-      return regeneratorRuntime.wrap(function _callee3$(_context3) {
+    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
+      return regeneratorRuntime.wrap(function _callee4$(_context4) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context4.prev = _context4.next) {
             case 0:
               _mithril.default.request({
                 url: "/api/login",
@@ -22606,25 +22606,52 @@ var login = {
                   'user': user.toLowerCase(),
                   'pwd': pwd.toLowerCase()
                 }
-              }).then(function (res) {
-                if (res.user) {
-                  session = res;
-                  localStorage.smurf = session.smurf;
-                  localStorage.user = session.user;
-                  if (remember) localStorage.pwd = pwd;
-                  (0, _Nav.showToast)("Welcome back ".concat(localStorage.user, " !"), 'primary');
-                }
+              }).then( /*#__PURE__*/function () {
+                var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(res) {
+                  return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                      switch (_context3.prev = _context3.next) {
+                        case 0:
+                          if (res.user) {
+                            session = res;
+                            localStorage.smurf = session.smurf;
+                            localStorage.user = session.user;
+                            if (remember) localStorage.pwd = pwd;
+                            (0, _Nav.showToast)("Welcome back ".concat(localStorage.user, " !"), 'primary');
+                          }
 
-                login.check();
-                return res.user ? true : false;
-              });
+                          _context3.next = 3;
+                          return login.check();
+
+                        case 3:
+                          // FORCING SEARCH SINCE AWAIT DOESNT SEEM TO WORK PROPERLY in app.js
+                          if (document.querySelector('.model input').value != '' && res.user) {
+                            document.querySelector('.buttons-group button:nth-child(2)').click();
+                          } else {
+                            (0, _Nav.showToast)('Somethings is wrong, please try logging in on websmart.brunellocucinelli.it', 'negative');
+                          }
+
+                          return _context3.abrupt("return", res.user ? true : false);
+
+                        case 5:
+                        case "end":
+                          return _context3.stop();
+                      }
+                    }
+                  }, _callee3);
+                }));
+
+                return function (_x) {
+                  return _ref.apply(this, arguments);
+                };
+              }());
 
             case 1:
             case "end":
-              return _context3.stop();
+              return _context4.stop();
           }
         }
-      }, _callee3);
+      }, _callee4);
     }))();
   }
 };
@@ -24739,6 +24766,7 @@ var SearchForm = {
                 }
               }).then( /*#__PURE__*/function () {
                 var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(res) {
+                  var logged;
                   return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                       switch (_context2.prev = _context2.next) {
@@ -24751,32 +24779,31 @@ var SearchForm = {
                           }
 
                           (0, _Nav.showToast)("Cant connect to websmart! try <a href=\"websmart.brunellocucinelli.it\">", 'negative');
-                          _context2.next = 14;
+                          _context2.next = 13;
                           break;
 
                         case 5:
                           if (!(res === 401)) {
-                            _context2.next = 12;
+                            _context2.next = 11;
                             break;
                           }
 
-                          (0, _Nav.showToast)('Search Again!');
-                          _context2.next = 9;
+                          _context2.next = 8;
                           return _login.login.authenticate(true, localStorage.user, localStorage.pwd);
 
-                        case 9:
-                          SearchForm.search(model, color, vnode);
-                          _context2.next = 14;
+                        case 8:
+                          logged = _context2.sent;
+                          _context2.next = 13;
                           break;
 
-                        case 12:
+                        case 11:
                           Home.results = Object.values(res);
 
                           if (Home.results.length === 0) {
                             (0, _Nav.showToast)('No results found!', 'negative');
                           }
 
-                        case 14:
+                        case 13:
                         case "end":
                           return _context2.stop();
                       }
@@ -24839,14 +24866,21 @@ var SearchForm = {
             while (1) {
               switch (_context4.prev = _context4.next) {
                 case 0:
+                  console.log(e);
                   e.preventDefault();
+
+                  if (vnode.state.loading) {
+                    _context4.next = 8;
+                    break;
+                  }
+
                   SearchForm.clearResults();
                   model = document.querySelector('.model-input > input').value === '' ? 'm' : document.querySelector('.model-input > input').value;
                   color = document.querySelector('.color-input > input').value === '' ? 'c' : document.querySelector('.color-input > input').value;
-                  _context4.next = 6;
+                  _context4.next = 8;
                   return vnode.state.search(model, color, vnode);
 
-                case 6:
+                case 8:
                 case "end":
                   return _context4.stop();
               }
@@ -24897,7 +24931,13 @@ function Sku() {
                     });
                   }
 
-                  _noSaleAI.NOSALE.includes("".concat(vnode.attrs.sku.model).concat(vnode.attrs.sku.color)) ? vnode.state.salable = true : vnode.state.salable = false;
+                  if (_noSaleAI.NOSALE.includes("".concat(vnode.attrs.sku.model).concat(vnode.attrs.sku.color)) && vnode.attrs.sku.year + vnode.attrs.sku.season === '202') {
+                    // basico
+                    vnode.dom.querySelector('.basic').textContent = 'BASICO';
+                  } else if (vnode.attrs.sku.year + vnode.attrs.sku.season <= 202) {
+                    vnode.state.salable = true;
+                  }
+
                   return _context5.abrupt("return", vnode.state.price);
 
                 case 6:
@@ -25215,7 +25255,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "38013" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "41329" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
