@@ -106,9 +106,6 @@ let DrawerContent = {
                     label: 'History',
                     size: vnode.state.size
                 })),
-                // m(m.route.Link, {
-                //   href: '/richieste'
-                // },
                 // m(Button, {
                 //   iconLeft: Icons.TRUCK,
                 //   fluid: true,

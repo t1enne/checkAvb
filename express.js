@@ -8,7 +8,6 @@ const Client = require("./public/models/client");
 const SearchInstance = require("./public/models/search");
 const OrderInstance = require("./public/models/order");
 const Request = require("./public/models/request")
-const socketInit = require('./sockets.js')
 
 const app = express();
 
@@ -31,8 +30,6 @@ db.once('open', () => {
 // SOCKET.IO
 
 const server = require('http').createServer(app);
-
-socketInit(server)
 
 const port = process.env.PORT || 3000;
 

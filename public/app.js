@@ -1,15 +1,5 @@
 import 'regenerator-runtime/runtime';
 import m from 'mithril';
-import io from 'socket.io-client'
-
-const socket = io('http://localhost:3000')
-
-
-socket.on('connect', () => {})
-
-socket.on('message-client-connected', (msg) => {
-    console.log(msg);
-})
 
 import {
     Button,
@@ -58,10 +48,6 @@ import EditClient from '/components/EditClient'
 import {
     Searches
 } from '/components/Searches'
-
-import {
-    Richieste
-} from '/components/Richieste'
 
 import EditOrder from '/components/EditOrder';
 
@@ -530,5 +516,4 @@ m.route(document.body, '/main', {
     '/basici': Basici,
     '/orders/edit/:id': EditOrder,
     '/clients/edit/:id': EditClient,
-    '/richieste': Richieste,
 })
