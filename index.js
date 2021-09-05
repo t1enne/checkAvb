@@ -243,9 +243,9 @@ async function getShops(cookie, year, season, model, color, size) {
   return sizes;
 }
 
-async function availabilityRequest(cookie, model, color) {
+async function availabilityRequest(cookie, model, color, ubicaz) {
   data.results = {};
-
+  console.log(ubicaz)
   const headers = {
     'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0',
     Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -259,7 +259,7 @@ async function availabilityRequest(cookie, model, color) {
       credentials: 'include',
       headers,
       referrer: 'https://websmart.brunellocucinelli.it/bcweb/wrticmo10r.pgm',
-      body: `task=filter&ww_fseriale=&ww_fdataMatrix=&br_barcode=&ww_fLAK=&ww_fBCRMODELL=${model}&ww_fBCRCOLORE=${color}&ww_flinea=`,
+      body: `task=filter${ubicaz}&ww_fseriale=&ww_fdataMatrix=&br_barcode=&ww_fLAK=&ww_fBCRMODELL=${model}&ww_fBCRCOLORE=${color}&ww_flinea=`,
       method: 'POST',
       mode: 'cors',
     }).then((res) => res.text());
@@ -370,9 +370,9 @@ async function getDhl(tracking) {
   return awb;
 }
 
-async function getAvb(cookie, model, color) {
+async function getAvb(cookie, model, color, ubicaz = '') {
   try {
-    const results = await availabilityRequest(cookie, model, color);
+    const results = await availabilityRequest(cookie, model, color, ubicaz);
     return results;
   } catch (e) {
     console.log(e.message);

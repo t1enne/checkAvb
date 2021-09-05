@@ -108,7 +108,8 @@ app.get(`/api/image/:year/:season/:model/`, async (req, res) => {
 <===========>
 */
 app.get('/api/avb/:model/:color/', async (req, res) => {
-  const avb = await getter.getAvb(req.headers.smurf, req.params.model, req.params.color);
+  let ubicaz = req.headers.ubicaz ? req.headers.ubicaz : ''
+  const avb = await getter.getAvb(req.headers.smurf, req.params.model, req.params.color, ubicaz);
   res.json(avb)
 });
 
